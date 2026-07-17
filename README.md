@@ -1,45 +1,61 @@
 # mycellium studio
 
-mycellium studio turns an early software brief into a grounded, reviewable execution plan. Phase 1 establishes the full-stack application foundation and a deterministic local planning domain without connecting external services.
+mycellium studio turns an early software brief into a grounded, reviewable execution plan. Phase 2 adds the secure personal-user foundation: cookie-based authentication, private database-backed projects, and discovery persistence.
 
-## Phase 1 status
+## Phase 2 status
 
 Included:
 
-- Next.js App Router and React
-- Strict TypeScript
-- Tailwind CSS
-- ESLint flat configuration
-- Vitest and coverage tooling
-- Canonical Zod input and output schemas
-- Deterministic typed planner
-- Typed Markdown, JSON, and CSV export utilities
-- Initial server-rendered landing page
+- Next.js 16 App Router, strict TypeScript, Tailwind CSS, ESLint, and Vitest
+- Supabase SSR browser/server clients and cookie session refresh through Next.js Proxy
+- Email/password signup, confirmation, login, logout, and protected routes
+- Profiles, projects, and discovery-message tables with constraints, indexes, triggers, and RLS
+- Personal dashboard and project create/read/update/rename/duplicate/delete workflows
+- Canonical Zod validation at environment, form, and database boundaries
+- Deterministic Phase 1 planner and typed export utilities
 - Preserved static prototype in [`legacy-static/`](./legacy-static/)
 
-Not included:
+Intentionally deferred:
 
-- Supabase or database persistence
-- Authentication or authorization
-- AI or LLM API calls
-- A complete project workspace
-- Billing, teams, or external integrations
+- Conversational discovery and OpenAI calls
+- Complete project editor and generated-plan workspace
+- Billing, teams, collaboration, and external integrations
 
 ## Requirements
 
-- Node.js 20.9 or newer
-- npm (the repository records npm 11.6.1 in `packageManager`)
+- Node.js 22 or newer
+- npm 11.6.1 (recorded in `packageManager`)
+- A Supabase project for authentication and persistence
 
 ## Local development
 
-```bash
-npm install
-npm run dev
-```
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy `.env.example` to `.env.local` and fill in the public project values. Never commit `.env.local`.
+
+   ```dotenv
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   OPENAI_API_KEY=
+   OPENAI_MODEL=
+   ```
+
+   The OpenAI fields stay blank in Phase 2.
+
+3. Apply the checked-in Supabase migration and configure Auth by following [Supabase setup](./docs/supabase-setup.md).
+
+4. Start the app:
+
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000).
-
-Phase 1 does not require environment variables or secrets. `.env.example` is intentionally a placeholder for documented future configuration.
 
 ## Quality commands
 
@@ -50,41 +66,28 @@ npx tsc --noEmit
 npm run build
 ```
 
-Generate a coverage report with `npm run test:coverage`.
+Inspect dependency advisories with `npm audit`; do not apply forced major upgrades without review.
 
 ## Project structure
 
 ```text
-app/                         Next.js routes, layout, and global styles
-components/marketing/        Landing-page components
-lib/domain/plan/             Canonical schemas, inferred types, selectors
-lib/planner/                 Pure deterministic planning engine
-lib/exports/                 Typed Markdown, JSON, and CSV transforms
-tests/                       Vitest unit tests
-docs/                        Scope, contracts, and architecture decisions
+app/                         Public, auth, and protected App Router routes
+components/                  Marketing, authentication, and project UI
+lib/auth/                    Verified user resolution and auth schemas
+lib/domain/                  Canonical Zod contracts and pure business logic
+lib/projects/                Auth-scoped project persistence operations
+lib/discovery/               Auth-scoped discovery persistence operations
+lib/supabase/                Typed browser, server, and Proxy clients
+supabase/migrations/         Versioned schema, trigger, and RLS SQL
+tests/                       Pure unit and contract tests
+docs/                        Architecture, setup, scope, and delivery boundaries
 legacy-static/               Verbatim pre-Next.js prototype snapshot
-```
-
-## Domain contract
-
-`PlanningInputSchema` validates every planner request and applies explicit defaults. `generatePlan` returns data validated by `PlanOutputSchema`; all public types are inferred from those schemas. The planner uses no randomness, timestamps, network access, browser state, or persistence, so identical input produces identical output.
-
-```ts
-import { generatePlan } from "@/lib/planner/generate-plan";
-
-const plan = generatePlan({
-  brief: "Build a planning tool for small teams with sprint-ready exports.",
-  projectName: "Example Project",
-});
 ```
 
 ## Documentation
 
+- [Supabase and authentication setup](./docs/supabase-setup.md)
 - [MVP architecture](./docs/mvp-architecture.md)
 - [Canonical output contract](./docs/output-schema.md)
 - [Build phases and boundaries](./docs/build-plan.md)
 - [Product charter](./docs/project-charter.md)
-
-## Legacy prototype
-
-The complete prototype that preceded the Next.js bootstrap is retained under `legacy-static/`, including its original README, server, HTML, CSS, JavaScript, Vercel configuration, and documentation. It is reference material and is excluded from the current lint and TypeScript scopes.

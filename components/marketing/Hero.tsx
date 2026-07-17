@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Hero() {
   return (
     <section id="top" className="mx-auto grid w-full max-w-7xl gap-14 px-6 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:px-10 lg:pb-28 lg:pt-24">
@@ -10,9 +12,9 @@ export function Hero() {
           mycellium studio shapes early software thinking into clear scope, connected work, and a plan people can review before they build.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
-          <a className="rounded-full bg-ocean px-6 py-3 text-sm font-bold text-white shadow-lg shadow-ocean/15 transition hover:-translate-y-0.5" href="#foundation">
-            Explore the foundation
-          </a>
+          <Link className="rounded-full bg-ocean px-6 py-3 text-sm font-bold text-white shadow-lg shadow-ocean/15 transition hover:-translate-y-0.5" href="/signup">
+            Create your workspace
+          </Link>
           <a className="rounded-full border border-forest/20 bg-paper/70 px-6 py-3 text-sm font-bold text-forest transition hover:border-forest/40" href="#phase-one">
             See the Phase 1 boundary
           </a>

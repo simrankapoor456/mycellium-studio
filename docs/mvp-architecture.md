@@ -1,88 +1,84 @@
 # mycellium studio MVP architecture
 
-## Phase 1 objective
+## Phase 2 objective
 
-Phase 1 creates a reliable application and domain foundation. It proves that a project brief can be validated, transformed deterministically into a typed execution plan, and serialized into portable formats before any persistence, AI, account, or integration layer is introduced.
+Phase 2 adds a secure personal-user application layer around the Phase 1 planning domain. Authenticated users can manage private project metadata and persist future discovery inputs. No AI provider, billing system, team model, or integration client is present.
 
-## System boundary
+## Request and trust boundary
 
 ```text
-Validated planner input
-        |
-        v
-Deterministic planning domain
-        |
-        v
-Canonical PlanOutput
-        |
-        +--> Markdown
-        +--> JSON
-        +--> CSV
+Browser
+  |
+  | cookie-based Supabase session
+  v
+Next.js Proxy ---- refreshes/propagates auth cookies
+  |
+  v
+Protected Server Components / Server Actions
+  |        | validate writes with Zod
+  |        | resolve identity from verified claims
+  v
+Auth-scoped persistence operations
+  |        | always filter by authenticated user_id
+  v
+Supabase Postgres
+           | RLS is authoritative
+           | constraints/triggers preserve invariants
 ```
 
-Every box in this flow runs locally and synchronously. Phase 1 does not send data over the network or retain it between requests.
+Route protection improves navigation and prevents accidental access, but it is not the data-security boundary. RLS independently enforces personal ownership for profiles, projects, and discovery messages.
 
 ## Layers
 
-### Presentation
+### Presentation and routing
 
-`app/` and `components/marketing/` contain the Next.js App Router shell. The landing page is a Server Component tree and renders a deterministic sample plan to demonstrate that the presentation layer can consume the canonical domain output.
+`app/` contains public landing, authentication, confirmation, and protected workspace routes. The `(protected)` layout verifies the current user on the server. Next.js `proxy.ts` refreshes Supabase sessions using the supported Next.js 16 Proxy convention.
 
-The landing page is intentionally not a project workspace. Interactive intake, plan editing, account state, and saved projects are outside Phase 1.
+Client Components are limited to interactive forms and feedback. Data loading remains in Server Components. No authentication token is copied into local storage or application state.
+
+### Authentication
+
+`lib/supabase/` provides typed browser, server, and Proxy clients. Server identity comes from `auth.getClaims()`, not an unverified local cookie value. Signup metadata creates a profile through a database trigger. User-facing auth errors pass through a safe allowlist mapper.
 
 ### Domain contracts
 
-`lib/domain/plan/schemas.ts` is the canonical runtime contract. Zod schemas own validation and defaults; TypeScript types are inferred from them. Snake-case fields in `PlanOutput` keep JSON exports stable and compatible with the vocabulary established by the prototype.
+`lib/domain/project/` owns project input/output schemas, ownership assertions, and duplication mapping. `lib/domain/discovery/` owns the persisted message input contract. All form writes are parsed on the server; database rows are parsed before presentation.
 
-The output contract carries `schema_version: "1.0"`. Future breaking changes must introduce a new version and a deliberate migration path.
+The Phase 1 `PlanOutputSchema` remains the canonical plan contract. Persisted `plan`, `discovery_context`, and `readiness_state` columns accept JSON objects, but Phase 2 does not fabricate or generate their contents.
 
-### Planning engine
+### Persistence
 
-`lib/planner/` contains pure functions and immutable catalogs. `generatePlan`:
+`lib/projects/operations.ts` implements reusable create, read, metadata update, rename, duplicate, and delete operations. Every query includes the authenticated user's ID, even though RLS also applies. `lib/discovery/operations.ts` establishes ordered message persistence for later discovery work.
 
-1. validates and normalizes input;
-2. selects relevant feature definitions;
-3. creates epics, stories, tasks, and acceptance criteria;
-4. allocates stories into capacity-aware sprints;
-5. computes risks and review questions;
-6. validates the final object against `PlanOutputSchema`.
+The migration under `supabase/migrations/` defines tables, checks, indexes, timestamp triggers, profile provisioning, grants, and explicit RLS policies. No service-role key is needed by the application.
 
-The engine uses no timestamps, random identifiers, environment variables, network calls, or mutable shared state. Equal input therefore produces structurally equal output.
+### Phase 1 planning and exports
 
-### Export adapters
-
-`lib/exports/` contains pure transforms from `PlanOutput` into Markdown, JSON, and CSV. These are downloads and data representations, not external publishing integrations. No Jira, Trello, Notion, Slack, or similar client is present.
-
-### Verification
-
-Vitest covers schema defaults, deterministic output, sprint allocation, and export behavior. ESLint, strict TypeScript, and the Next.js production build form the required static and compilation gates.
+`lib/planner/` and `lib/exports/` remain pure and deterministic. They do not import authentication, Supabase, or UI code. Phase 2 does not connect the deterministic demonstration planner to persisted projects.
 
 ## Dependency direction
 
 ```text
-app/components --> planner --> domain schemas
-app/components -------------> domain schemas
-exports --------------------> domain schemas/selectors
-planner --------------------> domain schemas/selectors
+app/components --> auth + project operations --> Supabase clients
+app/components --> domain schemas
+project operations --> project domain + Supabase clients
+discovery operations --> discovery domain + Supabase clients
+planner/exports --> plan domain schemas
+domain schemas -X-> framework or database clients
 ```
 
-The domain layer does not import framework code. Export utilities do not import UI code. This allows later interfaces to reuse the same contracts without coupling the planner to Next.js.
+## Security decisions
 
-## Foundational folders
-
-```text
-app/                    Route-level presentation
-components/             Reusable presentation components
-lib/domain/             Runtime contracts and inferred types
-lib/planner/            Deterministic domain behavior
-lib/exports/            Portable serialization
-tests/                  Automated verification
-docs/                   Architecture and delivery boundaries
-legacy-static/          Preserved prototype
-```
-
-New folders for database clients, authentication, AI providers, billing, teams, or integrations should not be added until a later phase explicitly authorizes them.
+- Only the Supabase URL and publishable key are used; no secret or service-role credential exists in code.
+- Sessions use HttpOnly-compatible SSR cookies managed by Supabase helpers.
+- Protected layouts verify claims server-side; all write actions re-check authentication.
+- Repository operations add ownership filters and PostgreSQL RLS remains authoritative.
+- Inserts cannot choose another user's owner ID; the server supplies it from verified identity.
+- Inputs are trimmed, bounded, and validated; output rows are schema-parsed.
+- Unknown auth/database errors are replaced with generic messages.
+- Persisted content is rendered as text, never untrusted HTML.
+- Project deletion cascades only to that project's discovery messages.
 
 ## Deployment posture
 
-The application is a standard Next.js project and can be built with `npm run build`. No provider-specific configuration is required in Phase 1. Runtime secrets are neither used nor expected.
+The app requires three public environment variables documented in `.env.example`. Deployment also requires applying the migration and configuring Supabase Auth URLs. OpenAI variables remain blank and unused. See [`docs/supabase-setup.md`](./supabase-setup.md).

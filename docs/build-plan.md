@@ -4,18 +4,23 @@
 
 Status: implemented on `feat/fullstack-mvp`.
 
-Deliverables:
+- Preserved the static prototype under `legacy-static/`.
+- Added Next.js App Router, TypeScript, Tailwind CSS, ESLint, and Vitest.
+- Added canonical Zod plan schemas, a deterministic planner, and typed exports.
+- Added the initial server-rendered landing page and architecture documentation.
 
-- Preserve the complete static prototype under `legacy-static/`.
-- Bootstrap Next.js App Router with TypeScript and Tailwind CSS.
-- Configure ESLint, Vitest, coverage, and production build scripts.
-- Add `.gitignore` and a secret-free `.env.example`.
-- Establish presentation, domain, planner, export, test, and documentation folders.
-- Define canonical Zod input and output schemas.
-- Implement a typed deterministic planner.
-- Implement typed Markdown, JSON, and CSV export utilities.
-- Ship an initial server-rendered landing-page shell.
-- Document architecture, contracts, scope, and local setup.
+## Phase 2 — secure personal-user foundation
+
+Status: implemented on `feat/fullstack-mvp`.
+
+- Added typed Supabase SSR clients and Next.js Proxy session refresh.
+- Added email/password signup, confirmation, login, logout, and protected routes.
+- Added profiles, projects, and discovery messages with constraints and triggers.
+- Enabled RLS with explicit personal-ownership policies.
+- Added dashboard and project create, read, metadata update, rename, duplicate, and delete flows.
+- Added loading, error, and empty states.
+- Added focused tests for environment, project, ownership, duplication, schemas, and safe errors.
+- Documented database, Auth, redirect, deployment, and two-user RLS setup.
 
 Acceptance gates:
 
@@ -25,22 +30,19 @@ npm test
 npm run lint
 npx tsc --noEmit
 npm run build
+npm audit
 ```
 
-## Deferred beyond Phase 1
+## Deferred beyond Phase 2
 
-The following capabilities are intentionally not designed or implemented in this phase:
-
-- Supabase or any database
-- Authentication and authorization
-- Persisted projects or a complete project workspace
-- AI or LLM API calls
+- Conversational discovery and OpenAI/LLM calls
+- Complete plan editor and workspace
 - Billing and subscriptions
-- Teams or collaboration
+- Teams and collaboration
 - Direct external integrations
 
-Later phases should begin with a separate scope decision, architecture review, and acceptance criteria. Phase 1 does not preselect vendors or create placeholder clients for these capabilities.
+These are not stubbed with fake output or privileged credentials. A later phase must define its own scope and security review before implementation.
 
 ## Preservation policy
 
-`legacy-static/` is the immutable reference snapshot for the pre-Next.js prototype. Changes to the modern application must not silently rewrite that snapshot. If a future preservation correction is necessary, it should be isolated and explained in its own commit.
+`legacy-static/` is the immutable reference snapshot for the pre-Next.js prototype. Modern application work must not silently rewrite that snapshot.
