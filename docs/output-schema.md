@@ -1,6 +1,6 @@
-# mycellium Output Schema
+# mycellium studio Output Schema
 
-This schema is the target shape for mycellium MVP output. It should be generated as JSON first, then transformed into Markdown or tool-specific payloads.
+This schema is the target shape for mycellium studio MVP output. It should be generated as JSON first, then transformed into Markdown or tool-specific payloads.
 
 ```json
 {

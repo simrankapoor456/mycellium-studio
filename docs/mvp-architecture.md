@@ -1,8 +1,8 @@
-# mycellium MVP Architecture
+# mycellium studio MVP Architecture
 
 ## Architecture Overview
 
-mycellium is a structured workflow pipeline. Each stage transforms project information into a more executable planning artifact.
+mycellium studio is a structured workflow pipeline. Each stage transforms project information into a more executable planning artifact.
 
 Core flow:
 

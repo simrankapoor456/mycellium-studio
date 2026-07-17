@@ -32,5 +32,5 @@ createServer(async (request, response) => {
     response.end("Not found");
   }
 }).listen(port, host, () => {
-  console.log(`mycellium is running at http://${host}:${port}`);
+  console.log(`mycellium studio is running at http://${host}:${port}`);
 });

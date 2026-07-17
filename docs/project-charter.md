@@ -1,14 +1,14 @@
-# mycellium Project Charter
+# mycellium studio Project Charter
 
 ## Product Statement
 
-mycellium is an AI-powered SDLC planning orchestrator that transforms raw software ideas, feature requests, meeting notes, or product briefs into structured sprint-ready execution plans.
+mycellium studio is an AI-powered SDLC planning orchestrator that transforms raw software ideas, feature requests, meeting notes, or product briefs into structured sprint-ready execution plans.
 
 ## Problem
 
 Early project planning is often messy. Ideas arrive as loose notes, stakeholder requests, or vague product descriptions. Turning those inputs into epics, stories, tasks, estimates, dependencies, and sprint plans takes time and usually requires repeated manual cleanup.
 
-mycellium reduces that planning overhead by using an automated workflow with AI-assisted decomposition, validation, and export-ready formatting.
+mycellium studio reduces that planning overhead by using an automated workflow with AI-assisted decomposition, validation, and export-ready formatting.
 
 ## Target Users
 
@@ -20,7 +20,7 @@ mycellium reduces that planning overhead by using an automated workflow with AI-
 
 ## MVP Goal
 
-Prove that mycellium can reliably turn a rough project description into useful planning artifacts that need only light editing before use.
+Prove that mycellium studio can reliably turn a rough project description into useful planning artifacts that need only light editing before use.
 
 The MVP does not need to automate the entire SDLC. It only needs to prove that the core planning workflow is valuable.
 

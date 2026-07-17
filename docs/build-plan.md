@@ -1,4 +1,4 @@
-# mycellium Build Plan
+# mycellium studio Build Plan
 
 ## Phase 0: Definition
 
@@ -37,7 +37,7 @@ Tasks:
 Acceptance criteria:
 
 - A user can submit a project brief.
-- mycellium returns a project summary, epics, and user stories.
+- mycellium studio returns a project summary, epics, and user stories.
 - The workflow can be run repeatedly with different inputs.
 
 ## Phase 2: Structured Outputs
@@ -103,7 +103,7 @@ Acceptance criteria:
 
 ## Phase 5: Tool Integrations
 
-Goal: make mycellium usable with real planning tools.
+Goal: make mycellium studio usable with real planning tools.
 
 Tasks:
 

@@ -103,12 +103,12 @@ dom.copyMarkdown.addEventListener("click", async () => {
 
 dom.downloadMarkdown.addEventListener("click", () => {
   if (!state.plan) return showToast("Generate a plan first.");
-  downloadFile(`${slugify(state.plan.project_name)}-mycellium.md`, toMarkdown(state.plan), "text/markdown");
+  downloadFile(`${slugify(state.plan.project_name)}-mycellium-studio.md`, toMarkdown(state.plan), "text/markdown");
 });
 
 dom.downloadJson.addEventListener("click", () => {
   if (!state.plan) return showToast("Generate a plan first.");
-  downloadFile(`${slugify(state.plan.project_name)}-mycellium.json`, JSON.stringify(state.plan, null, 2), "application/json");
+  downloadFile(`${slugify(state.plan.project_name)}-mycellium-studio.json`, JSON.stringify(state.plan, null, 2), "application/json");
 });
 
 dom.downloadCsv.addEventListener("click", () => {
@@ -713,7 +713,7 @@ function titleCase(value) {
 }
 
 function slugify(value) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "mycellium";
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "mycellium-studio";
 }
 
 function csvCell(value) {
