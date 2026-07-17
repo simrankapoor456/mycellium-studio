@@ -1,57 +1,90 @@
 # mycellium studio
 
-mycellium studio is a grounded, women-led project planning tool that turns rough software ideas into organized scope, tasks, sprint plans, and review-ready exports.
+mycellium studio turns an early software brief into a grounded, reviewable execution plan. Phase 1 establishes the full-stack application foundation and a deterministic local planning domain without connecting external services.
 
-The first version focuses on one clear promise:
+## Phase 1 status
 
-> Ideas connect, branch, and grow into organized work.
+Included:
 
-## About
+- Next.js App Router and React
+- Strict TypeScript
+- Tailwind CSS
+- ESLint flat configuration
+- Vitest and coverage tooling
+- Canonical Zod input and output schemas
+- Deterministic typed planner
+- Typed Markdown, JSON, and CSV export utilities
+- Initial server-rendered landing page
+- Preserved static prototype in [`legacy-static/`](./legacy-static/)
 
-mycellium studio helps teams turn messy early ideas into grounded project structure. The current MVP focuses on planning clarity: scope, epics, stories, tasks, sprint allocation, review signals, and export-ready outputs in one calm workspace.
+Not included:
 
-The product direction is nature-inspired, organized, and quietly powerful. It is meant to feel warm and usable without sliding into generic corporate tooling.
+- Supabase or database persistence
+- Authentication or authorization
+- AI or LLM API calls
+- A complete project workspace
+- Billing, teams, or external integrations
 
-The MVP accepts a project description, analyzes the requirements, generates epics, user stories, technical tasks, and sprint allocations, then returns both a readable planning summary and structured output that can later feed tools like Jira, Trello, Notion, Confluence, or Slack.
+## Requirements
 
-## MVP Deliverables
+- Node.js 20.9 or newer
+- npm (the repository records npm 11.6.1 in `packageManager`)
 
-- Project overview
-- Clarified goals, assumptions, constraints, and missing details
-- Epics
-- User stories with acceptance criteria
-- Technical tasks and subtasks
-- Priority and effort estimates
-- Sprint allocation
-- Markdown summary
-- JSON output
-- Human review gate before publishing to external tools
+## Local development
 
-## Current MVP
+```bash
+npm install
+npm run dev
+```
 
-mycellium studio now has a free, deployable static prototype in this folder.
+Open [http://localhost:3000](http://localhost:3000).
 
-- Open `index.html` locally to try it.
-- Or run `node server.mjs` from this folder and open `http://127.0.0.1:4173`.
-- Paste a project idea or load the sample.
-- Shape a structured plan with grounded scope, epics, stories, tasks, sprint allocation, and review questions.
-- Filter by search, priority, owner, and review status.
-- Edit generated text directly on the page.
-- Export Markdown, JSON, or CSV.
+Phase 1 does not require environment variables or secrets. `.env.example` is intentionally a placeholder for documented future configuration.
 
-This version avoids paid n8n subscriptions and does not require a backend. It is ready for simple hosting on GitHub Pages, Netlify, Vercel static hosting, or any basic web server.
+## Quality commands
 
-## Recommended Next Stack
+```bash
+npm test
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-- Static frontend for the first demo
-- Optional AI API later for stronger generation quality
-- Structured JSON schema as the internal output format
-- Markdown/JSON/CSV as the first export formats
-- SQLite, Supabase, or Firebase only after saved projects become necessary
+Generate a coverage report with `npm run test:coverage`.
 
-## Project Docs
+## Project structure
 
-- [Project Charter](docs/project-charter.md)
-- [MVP Architecture](docs/mvp-architecture.md)
-- [Build Plan](docs/build-plan.md)
-- [Output Schema](docs/output-schema.md)
+```text
+app/                         Next.js routes, layout, and global styles
+components/marketing/        Landing-page components
+lib/domain/plan/             Canonical schemas, inferred types, selectors
+lib/planner/                 Pure deterministic planning engine
+lib/exports/                 Typed Markdown, JSON, and CSV transforms
+tests/                       Vitest unit tests
+docs/                        Scope, contracts, and architecture decisions
+legacy-static/               Verbatim pre-Next.js prototype snapshot
+```
+
+## Domain contract
+
+`PlanningInputSchema` validates every planner request and applies explicit defaults. `generatePlan` returns data validated by `PlanOutputSchema`; all public types are inferred from those schemas. The planner uses no randomness, timestamps, network access, browser state, or persistence, so identical input produces identical output.
+
+```ts
+import { generatePlan } from "@/lib/planner/generate-plan";
+
+const plan = generatePlan({
+  brief: "Build a planning tool for small teams with sprint-ready exports.",
+  projectName: "Example Project",
+});
+```
+
+## Documentation
+
+- [MVP architecture](./docs/mvp-architecture.md)
+- [Canonical output contract](./docs/output-schema.md)
+- [Build phases and boundaries](./docs/build-plan.md)
+- [Product charter](./docs/project-charter.md)
+
+## Legacy prototype
+
+The complete prototype that preceded the Next.js bootstrap is retained under `legacy-static/`, including its original README, server, HTML, CSS, JavaScript, Vercel configuration, and documentation. It is reference material and is excluded from the current lint and TypeScript scopes.

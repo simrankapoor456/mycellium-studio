@@ -1,221 +1,88 @@
-# mycellium studio MVP Architecture
+# mycellium studio MVP architecture
 
-## Architecture Overview
+## Phase 1 objective
 
-mycellium studio is a structured workflow pipeline. Each stage transforms project information into a more executable planning artifact.
+Phase 1 creates a reliable application and domain foundation. It proves that a project brief can be validated, transformed deterministically into a typed execution plan, and serialized into portable formats before any persistence, AI, account, or integration layer is introduced.
 
-Core flow:
+## System boundary
 
 ```text
-Input -> Cleanup -> Analysis -> Epics -> Stories -> Tasks -> Estimates -> Sprint Plan -> Review -> Output
+Validated planner input
+        |
+        v
+Deterministic planning domain
+        |
+        v
+Canonical PlanOutput
+        |
+        +--> Markdown
+        +--> JSON
+        +--> CSV
 ```
+
+Every box in this flow runs locally and synchronously. Phase 1 does not send data over the network or retain it between requests.
 
 ## Layers
 
-### 1. Input Layer
+### Presentation
 
-Receives the project idea.
+`app/` and `components/marketing/` contain the Next.js App Router shell. The landing page is a Server Component tree and renders a deterministic sample plan to demonstrate that the presentation layer can consume the canonical domain output.
 
-MVP input options:
+The landing page is intentionally not a project workspace. Interactive intake, plan editing, account state, and saved projects are outside Phase 1.
 
-- n8n webhook
-- n8n form
-- Simple frontend form
+### Domain contracts
 
-Required field:
+`lib/domain/plan/schemas.ts` is the canonical runtime contract. Zod schemas own validation and defaults; TypeScript types are inferred from them. Snake-case fields in `PlanOutput` keep JSON exports stable and compatible with the vocabulary established by the prototype.
 
-- Project description
+The output contract carries `schema_version: "1.0"`. Future breaking changes must introduce a new version and a deliberate migration path.
 
-Optional metadata:
+### Planning engine
 
-- Project name
-- Team size
-- Sprint duration
-- Sprint count
-- Deadline
-- Tech stack
-- Priority
-- Target users
+`lib/planner/` contains pure functions and immutable catalogs. `generatePlan`:
 
-### 2. Understanding Layer
+1. validates and normalizes input;
+2. selects relevant feature definitions;
+3. creates epics, stories, tasks, and acceptance criteria;
+4. allocates stories into capacity-aware sprints;
+5. computes risks and review questions;
+6. validates the final object against `PlanOutputSchema`.
 
-Uses an LLM to interpret the input.
+The engine uses no timestamps, random identifiers, environment variables, network calls, or mutable shared state. Equal input therefore produces structurally equal output.
 
-Outputs:
+### Export adapters
 
-- Project summary
-- Business objective
-- Main users or actors
-- Key features
-- Assumptions
-- Constraints
-- Missing requirements
-- Project type
-- Complexity signal
+`lib/exports/` contains pure transforms from `PlanOutput` into Markdown, JSON, and CSV. These are downloads and data representations, not external publishing integrations. No Jira, Trello, Notion, Slack, or similar client is present.
 
-### 3. Planning Layer
+### Verification
 
-Breaks the project into execution units.
+Vitest covers schema defaults, deterministic output, sprint allocation, and export behavior. ESLint, strict TypeScript, and the Next.js production build form the required static and compilation gates.
 
-Outputs:
-
-- Epics
-- User stories
-- Acceptance criteria
-- Tasks
-- Subtasks
-- Dependencies
-- Priority
-- Effort estimates
-
-### 4. Sprint Planning Layer
-
-Groups work into sprints based on:
-
-- Priority
-- Dependencies
-- Foundational work
-- Team size
-- Sprint duration
-- Estimated effort
-
-MVP estimation can use Fibonacci story points: `1`, `2`, `3`, `5`, `8`.
-
-### 5. Review Layer
-
-Checks quality before publication.
-
-Review checks:
-
-- Missing acceptance criteria
-- Duplicate stories
-- Unrealistic sprint loading
-- Unclear dependencies
-- Stories that are too large
-- Features that appear invented rather than inferred
-
-### 6. Delivery Layer
-
-Formats output for humans and systems.
-
-MVP outputs:
-
-- Markdown report
-- Structured JSON
-- Jira-ready payload preview
-- Trello-ready card preview
-
-Later outputs:
-
-- Jira issue creation
-- Trello card creation
-- Notion page creation
-- Confluence page creation
-- Slack summary
-
-## n8n Workflow Nodes
-
-### Node 1: Trigger
-
-Use a webhook or form submission.
-
-### Node 2: Input Cleanup
-
-Normalize input and validate required fields.
-
-Defaults:
-
-- Team size: 2
-- Sprint duration: 2 weeks
-- Sprint count: 3
-- Estimate scale: Fibonacci story points
-
-### Node 3: Project Classification
-
-Classify the project type, such as:
-
-- Web app
-- Mobile app
-- Internal tool
-- AI product
-- Data pipeline
-- Dashboard
-- E-commerce
-- LMS
-
-### Node 4: Requirement Analyzer
-
-Generate structured requirements analysis.
-
-### Node 5: Epic Generator
-
-Generate 4 to 8 distinct epics.
-
-### Node 6: Story Generator
-
-Loop through each epic and generate user stories with acceptance criteria.
-
-### Node 7: Task Generator
-
-Loop through each story and generate implementation tasks.
-
-### Node 8: Estimation Node
-
-Assign priority, complexity, and effort.
-
-### Node 9: Sprint Planner
-
-Group stories into sprints.
-
-### Node 10: Critic Node
-
-Review the generated plan for quality issues.
-
-### Node 11: Human Review Gate
-
-Send the output for approval before publishing.
-
-### Node 12: Export Node
-
-Export Markdown, JSON, and optional tool-ready payloads.
-
-## Workflow Branches
-
-### Branch A: Simple Plan Generation
+## Dependency direction
 
 ```text
-Input -> Analysis -> Epics -> Stories -> Tasks -> Sprints -> Output
+app/components --> planner --> domain schemas
+app/components -------------> domain schemas
+exports --------------------> domain schemas/selectors
+planner --------------------> domain schemas/selectors
 ```
 
-### Branch B: Clarification Needed
+The domain layer does not import framework code. Export utilities do not import UI code. This allows later interfaces to reuse the same contracts without coupling the planner to Next.js.
+
+## Foundational folders
 
 ```text
-Input -> Analysis -> Missing Info -> Clarifying Questions -> User Response
+app/                    Route-level presentation
+components/             Reusable presentation components
+lib/domain/             Runtime contracts and inferred types
+lib/planner/            Deterministic domain behavior
+lib/exports/            Portable serialization
+tests/                  Automated verification
+docs/                   Architecture and delivery boundaries
+legacy-static/          Preserved prototype
 ```
 
-### Branch C: Publish To Jira Or Trello
+New folders for database clients, authentication, AI providers, billing, teams, or integrations should not be added until a later phase explicitly authorizes them.
 
-```text
-Approved Plan -> Transform Payload -> Create Issues Or Cards
-```
+## Deployment posture
 
-### Branch D: Publish Documentation
-
-```text
-Approved Plan -> Markdown Formatter -> Notion Or Confluence Page
-```
-
-## Prompt Strategy
-
-Use specialized prompts instead of one large prompt.
-
-Recommended prompts:
-
-- Requirement analyzer
-- Epic generator
-- Story generator
-- Task generator
-- Sprint planner
-- Critic reviewer
-
-Each prompt should return valid JSON first. Markdown should be generated from the structured plan after validation.
+The application is a standard Next.js project and can be built with `npm run build`. No provider-specific configuration is required in Phase 1. Runtime secrets are neither used nor expected.

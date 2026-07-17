@@ -1,94 +1,66 @@
-# mycellium studio Output Schema
+# Canonical planning contracts
 
-This schema is the target shape for mycellium studio MVP output. It should be generated as JSON first, then transformed into Markdown or tool-specific payloads.
+The executable source of truth is [`lib/domain/plan/schemas.ts`](../lib/domain/plan/schemas.ts). Documentation summarizes the contract; it does not replace runtime validation.
 
-```json
-{
-  "project_name": "",
-  "project_summary": "",
-  "project_type": "",
-  "business_objective": "",
-  "target_users": [],
-  "goals": [],
-  "assumptions": [],
-  "constraints": [],
-  "missing_requirements": [],
-  "risks": [
-    {
-      "risk": "",
-      "impact": "low | medium | high",
-      "mitigation": ""
-    }
-  ],
-  "epics": [
-    {
-      "epic_id": "EPIC-1",
-      "epic_name": "",
-      "description": "",
-      "priority": "low | medium | high",
-      "stories": [
-        {
-          "story_id": "STORY-1",
-          "story_title": "",
-          "user_story": "",
-          "acceptance_criteria": [],
-          "priority": "low | medium | high",
-          "estimate_points": 3,
-          "dependencies": [],
-          "tasks": [
-            {
-              "task_id": "TASK-1",
-              "task_title": "",
-              "description": "",
-              "owner_type": "frontend | backend | fullstack | qa | devops | data | design | product",
-              "subtasks": [],
-              "dependency": ""
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "sprints": [
-    {
-      "sprint_id": "SPRINT-1",
-      "sprint_name": "",
-      "goal": "",
-      "duration": "",
-      "capacity_points": 0,
-      "allocated_points": 0,
-      "stories": [
-        {
-          "story_id": "",
-          "reason": ""
-        }
-      ],
-      "risks": []
-    }
-  ],
-  "review": {
-    "quality_score": 0,
-    "duplicate_story_warnings": [],
-    "missing_acceptance_criteria": [],
-    "oversized_stories": [],
-    "unsupported_assumptions": [],
-    "clarifying_questions": []
-  },
-  "exports": {
-    "markdown_summary": "",
-    "jira_ready": [],
-    "trello_ready": []
-  }
-}
+## Input
+
+`PlanningInputSchema` accepts:
+
+| Field | Rule | Default |
+| --- | --- | --- |
+| `brief` | trimmed string, 20–10,000 characters | required |
+| `projectName` | trimmed string, 1–120 characters | inferred from brief |
+| `projectType` | supported project-type literal | `web-app` |
+| `teamSize` | integer, 1–50 | `3` |
+| `sprintDurationWeeks` | integer, 1–4 | `2` |
+| `sprintCapacityPoints` | integer, 1–200 | `24` |
+| `planningDepth` | `lean`, `balanced`, or `detailed` | `balanced` |
+
+The exported `PlannerInput` type represents pre-parse input, while `NormalizedPlannerInput` represents Zod output after defaults are applied.
+
+## Output
+
+`PlanOutputSchema` validates this hierarchy:
+
+```text
+PlanOutput
+├── schema_version
+├── project identity and summary
+├── target users, goals, assumptions, and constraints
+├── missing requirements and risks
+├── epics[]
+│   └── stories[]
+│       ├── acceptance criteria
+│       ├── dependencies and estimate
+│       └── tasks[]
+├── sprints[]
+│   └── allocated story references
+└── review
+    ├── quality score
+    ├── warnings
+    └── clarifying questions
 ```
 
-## Field Rules
+## Invariants
 
-- `assumptions` must be clearly separated from known input facts.
-- `missing_requirements` should be empty only when the input is sufficiently clear.
-- Every epic must contain at least one story.
-- Every story must contain acceptance criteria.
-- Every story should have priority and estimate points.
-- Every task should have an owner type.
-- Sprint allocation should explain why each story belongs in that sprint.
-- External tool payloads should not be published until human approval is received.
+- `schema_version` is currently `1.0`.
+- Every plan contains at least one epic and one sprint.
+- Every epic contains at least one story.
+- Every story contains acceptance criteria and at least one task.
+- Priorities and impacts are limited to `low`, `medium`, or `high`.
+- Estimates use Fibonacci values `1`, `2`, `3`, `5`, or `8`.
+- Task owners use the documented owner-type literal set.
+- Sprint allocations reference canonical story identifiers.
+- External data must be parsed with the Zod schema rather than asserted as a TypeScript type.
+
+## Naming
+
+Input fields use camel case because they are called directly from TypeScript application code. Canonical output fields use snake case because the output is an export boundary and retains the original prototype vocabulary.
+
+## Export behavior
+
+Markdown and CSV are derived views. JSON is a formatted serialization of a fresh `PlanOutputSchema.parse` result. Export adapters never add application state or publish to another service.
+
+## Versioning
+
+Additive optional fields may remain within schema version `1.x` when defaults preserve existing consumers. Removing or renaming fields, changing identifier semantics, or altering required nesting requires a new major schema version and explicit migration documentation.
