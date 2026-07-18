@@ -31,6 +31,21 @@ type ProjectRow = {
   plan: Json | null;
   plan_schema_version: string | null;
   generation_source: string | null;
+  approved_discovery_context: Json | null;
+  discovery_approved_at: string | null;
+  context_version: number;
+  blueprint_version: number;
+  created_at: string;
+  updated_at: string;
+};
+
+type DiscoveryRequestRow = {
+  id: string;
+  request_id: string;
+  project_id: string;
+  user_id: string;
+  status: string;
+  response_payload: Json | null;
   created_at: string;
   updated_at: string;
 };
@@ -83,6 +98,10 @@ export type Database = {
           plan?: Json | null;
           plan_schema_version?: string | null;
           generation_source?: string | null;
+          approved_discovery_context?: Json | null;
+          discovery_approved_at?: string | null;
+          context_version?: number;
+          blueprint_version?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -104,6 +123,21 @@ export type Database = {
         Update: Partial<
           Pick<DiscoveryMessageRow, "role" | "content" | "structured_facts" | "sequence_number">
         >;
+        Relationships: [];
+      };
+      discovery_requests: {
+        Row: DiscoveryRequestRow;
+        Insert: {
+          id?: string;
+          request_id: string;
+          project_id: string;
+          user_id: string;
+          status?: string;
+          response_payload?: Json | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Pick<DiscoveryRequestRow, "status" | "response_payload" | "updated_at">>;
         Relationships: [];
       };
     };

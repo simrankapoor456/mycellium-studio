@@ -22,11 +22,13 @@ export async function listDiscoveryMessages(projectId: string, userId: string) {
 export async function createDiscoveryMessage(
   input: DiscoveryMessageCreateInput,
   userId: string,
+  messageId?: string,
 ) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("discovery_messages")
     .insert({
+      ...(messageId ? { id: messageId } : {}),
       project_id: input.projectId,
       user_id: userId,
       role: input.role,
