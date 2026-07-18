@@ -5,11 +5,27 @@ import { FormEvent, useState } from "react";
 
 import { LivingProductGraph } from "@/components/discovery/LivingProductGraph";
 import { ReadinessRoots } from "@/components/discovery/ReadinessRoots";
-import type { DiscoveryContext, DiscoveryTurnResponse, ReadinessAssessment } from "@/lib/domain/discovery/schemas";
+import { ProjectWorkspaceNav } from "@/components/projects/ProjectWorkspaceNav";
+import {
+  DiscoveryTurnResponseSchema,
+  type DiscoveryContext,
+  type DiscoveryTurnResponse,
+  type ReadinessAssessment,
+} from "@/lib/domain/discovery/schemas";
+import { MYCELLIUM_COPY } from "@/lib/voice/mycellium";
 
-type Message = { id: string; role: string; content: string };
+type Message = Readonly<{ id: string; role: string; content: string }>;
 
-export function DiscoveryWorkspace({ projectId, projectName, initialMessages, initialContext, initialReadiness }: { projectId: string; projectName: string; initialMessages: Message[]; initialContext: DiscoveryContext; initialReadiness: ReadinessAssessment }) {
+type DiscoveryWorkspaceProps = Readonly<{
+  blueprintAvailable: boolean;
+  initialContext: DiscoveryContext;
+  initialMessages: Message[];
+  initialReadiness: ReadinessAssessment;
+  projectId: string;
+  projectName: string;
+}>;
+
+export function DiscoveryWorkspace({ blueprintAvailable, initialContext, initialMessages, initialReadiness, projectId, projectName }: DiscoveryWorkspaceProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [context, setContext] = useState(initialContext);
   const [readiness, setReadiness] = useState(initialReadiness);
@@ -18,37 +34,80 @@ export function DiscoveryWorkspace({ projectId, projectName, initialMessages, in
   const [error, setError] = useState("");
   const [lastChange, setLastChange] = useState<DiscoveryTurnResponse | null>(null);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const formData = new FormData(form);
-    const message = String(formData.get("message") ?? "").trim();
-    if (!message || pending) return;
-    setPending(true); setError("");
+    const message = String(new FormData(form).get("message") ?? "").trim();
+
+    if (!message || pending) {
+      return;
+    }
+
+    setPending(true);
+    setError("");
+
     try {
-      const response = await fetch(`/api/projects/${projectId}/discovery`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId: crypto.randomUUID(), message }) });
-      const payload = await response.json() as DiscoveryTurnResponse & { error?: string };
-      if (!response.ok) throw new Error(payload.error || "Discovery could not continue.");
-      setMessages((current) => [...current, { id: crypto.randomUUID(), role: "user", content: message }, { id: crypto.randomUUID(), role: "assistant", content: `${payload.assistantMessage}\n\n${payload.assistantQuestion}` }]);
-      setContext(payload.context); setReadiness(payload.readinessAssessment); setLastChange(payload); form.reset();
-    } catch (caught) { setError(caught instanceof Error ? caught.message : "Discovery could not continue."); }
-    finally { setPending(false); }
+      const response = await fetch(`/api/projects/${projectId}/discovery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: crypto.randomUUID(), message }),
+      });
+      const responseBody: unknown = await response.json();
+
+      if (!response.ok) {
+        throw new Error(readErrorMessage(responseBody, "Discovery could not continue."));
+      }
+
+      const payload = DiscoveryTurnResponseSchema.parse(responseBody);
+      setMessages((current) => [
+        ...current,
+        { id: crypto.randomUUID(), role: "user", content: message },
+        { id: crypto.randomUUID(), role: "assistant", content: `${payload.assistantMessage}\n\n${payload.assistantQuestion}` },
+      ]);
+      setContext(payload.context);
+      setReadiness(payload.readinessAssessment);
+      setLastChange(payload);
+      form.reset();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Discovery could not continue.");
+    } finally {
+      setPending(false);
+    }
   }
+
+  const mode = lastChange?.discoveryMode ?? "fallback";
 
   return (
     <main className="discovery-shell">
-      <header className="discovery-shell__header"><div><Link href={`/projects/${projectId}`}>← {projectName}</Link><h1>Discovery workspace</h1></div><div className="discovery-shell__mode"><span>Mode</span><strong>{lastChange?.discoveryMode ?? "fallback ready"}</strong></div></header>
-      <div className="discovery-mobile-tabs" role="tablist" aria-label="Discovery workspace panels"><button aria-selected={mobilePanel === "conversation"} onClick={() => setMobilePanel("conversation")} role="tab">Conversation</button><button aria-selected={mobilePanel === "graph"} onClick={() => setMobilePanel("graph")} role="tab">Product graph</button></div>
+      <header className="discovery-shell__header">
+        <div><Link href={`/projects/${projectId}`}>← {projectName}</Link><span className="eyebrow">Product discovery</span><h1>Let’s find the product worth building.</h1></div>
+        <div className="discovery-shell__mode"><span>{MYCELLIUM_COPY.mode[mode]}</span><strong>{mode === "ai" ? "Mycellium Product Architect" : MYCELLIUM_COPY.mode.fallbackDetail}</strong></div>
+      </header>
+      <ProjectWorkspaceNav active="discovery" blueprintAvailable={blueprintAvailable} projectId={projectId} />
+      <div aria-label="Discovery workspace panels" className="discovery-mobile-tabs" role="tablist">
+        <button aria-selected={mobilePanel === "conversation"} onClick={() => setMobilePanel("conversation")} role="tab">Conversation</button>
+        <button aria-selected={mobilePanel === "graph"} onClick={() => setMobilePanel("graph")} role="tab">Product graph</button>
+      </div>
       <div className="discovery-layout">
-        <section className="discovery-conversation" data-mobile-active={mobilePanel === "conversation"} aria-label="Discovery conversation">
+        <section aria-label="Discovery conversation" className="discovery-conversation" data-mobile-active={mobilePanel === "conversation"}>
           <ReadinessRoots readiness={readiness} />
-          <div className="discovery-messages" aria-live="polite">{messages.length === 0 ? <article data-role="assistant"><span>Mycellium</span><p>{readiness.recommendedNextQuestion}</p></article> : messages.map((message) => <article data-role={message.role} key={message.id}><span>{message.role === "user" ? "You" : "Mycellium"}</span>{message.content.split("\n").filter(Boolean).map((line, index) => <p key={`${message.id}-${index}`}>{line}</p>)}</article>)}</div>
-          {lastChange ? <section className="discovery-change-summary" aria-label="Latest understanding changes"><div><strong>Added</strong>{lastChange.extractedFacts.length ? lastChange.extractedFacts.map((fact) => <span key={fact.id}>{fact.label}: {fact.value}</span>) : <span>No new fact yet</span>}</div><div><strong>Still unclear</strong>{lastChange.unresolvedItems.slice(0, 3).map((item) => <span key={item}>{item}</span>)}</div></section> : null}
-          <form className="discovery-composer" onSubmit={submit}><label htmlFor="discovery-message">Your answer</label><textarea disabled={pending} id="discovery-message" maxLength={4000} name="message" placeholder="Share what you know, or say unknown, undecided, or not applicable." required rows={4} /><div><span>{error ? <span role="alert">{error}</span> : "One high-value question at a time."}</span><button disabled={pending} type="submit">{pending ? "Growing understanding" : "Send answer"}</button></div></form>
-          {readiness.status !== "discovering" ? <Link className="discovery-review-link" href={`/projects/${projectId}/review`}>Review structured understanding →</Link> : null}
+          <div aria-live="polite" className="discovery-messages">
+            {messages.length === 0 ? <article data-role="assistant"><span>Mycellium</span><p>{MYCELLIUM_COPY.emptyStates.discovery}</p><p>{readiness.recommendedNextQuestion}</p></article> : messages.map((message) => <article data-role={message.role} key={message.id}><span>{message.role === "user" ? "You" : "Mycellium"}</span>{message.content.split("\n").filter(Boolean).map((line, index) => <p key={`${message.id}-${index}`}>{line}</p>)}</article>)}
+          </div>
+          {lastChange ? <section aria-label="Latest understanding changes" className="discovery-change-summary"><div><strong>What became clearer</strong>{lastChange.extractedFacts.length ? lastChange.extractedFacts.map((fact) => <span key={fact.id}>{fact.label}: {fact.value}</span>) : <span>No new product decision yet</span>}</div><div><strong>Still needs clarity</strong>{lastChange.unresolvedItems.slice(0, 3).map((item) => <span key={item}>{item}</span>)}</div></section> : null}
+          <form className="discovery-composer" onSubmit={handleSubmit}><label htmlFor="discovery-message">Your answer</label><textarea disabled={pending} id="discovery-message" maxLength={4000} name="message" placeholder="Say what you know. ‘Undecided’ is a useful answer too." required rows={4} /><div><span>{error ? <span role="alert">{error}</span> : "One question, chosen for what matters next."}</span><button disabled={pending} type="submit">{pending ? "Thinking it through" : "Share answer"}</button></div></form>
+          {readiness.status !== "discovering" ? <Link className="discovery-review-link" href={`/projects/${projectId}/review`}>I think I understand it — review the foundation →</Link> : null}
         </section>
         <div className="discovery-graph-panel" data-mobile-active={mobilePanel === "graph"}><LivingProductGraph graph={context.graph} /></div>
       </div>
     </main>
   );
+}
+
+function readErrorMessage(input: unknown, fallback: string): string {
+  if (typeof input === "object" && input !== null && "error" in input && typeof input.error === "string") {
+    return input.error;
+  }
+
+  return fallback;
 }

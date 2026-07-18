@@ -4,10 +4,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 const questions = [
   ["What is Mycellium Studio?", "Mycellium Studio is an AI Product Architect in development. It is designed to help teams move from a rough idea through discovery, product architecture, requirements, and execution planning while keeping human review explicit."],
   ["How is this different from Jira or Linear?", "Jira and Linear manage understood work exceptionally well. Mycellium focuses on the earlier reasoning that establishes product context, scope, architecture, risks, and reviewable requirements before tickets become the center of gravity."],
-  ["Is AI required?", "No. The foundation includes a deterministic local planner that can produce schema-valid output without an AI provider. Adaptive conversational discovery is planned for Phase 3B."],
-  ["What does deterministic fallback mean?", "The same validated input produces the same structured planning result without randomness or a network request. It offers a predictable path when provider access is unavailable or not desired."],
+  ["Is AI required?", "No. Mycellium's reliable built-in planning engine supports the complete discovery and blueprint path without an AI provider. When AI is configured, it adds another guided interpretation layer behind the same validated contracts."],
+  ["What is Reliable mode?", "Reliable mode is Mycellium's deterministic planning engine. The same validated input produces the same structured result without randomness or an external model request."],
   ["How is project data handled?", "Personal projects use cookie-based authentication, server-side identity verification, ownership-scoped queries, and PostgreSQL row-level security. Provider API keys are not exposed to the browser."],
-  ["Can I edit the output?", "Human approval is a product principle. Editable plan output is part of the product direction, but the complete editor belongs to a later phase and is not represented as available today."],
+  ["Can I edit and export the output?", "Yes. The Product Blueprint is editable, every change is saved with lineage, and the current saved version can be downloaded as Markdown, JSON, or CSV."],
 ] as const;
 
 export function FaqSection() {

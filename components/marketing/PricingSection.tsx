@@ -17,11 +17,11 @@ export function PricingSection() {
               <h3 className="display-type text-3xl text-forest">Personal</h3>
               <Badge tone="success">Available now</Badge>
             </div>
-            <p className="mt-5 max-w-lg leading-7 text-ink/65">A private workspace for project foundations, metadata, ownership, and the upcoming guided discovery flow.</p>
+            <p className="mt-5 max-w-lg leading-7 text-ink/65">A private AI Product Architect for discovery, review, editable blueprints, and portable exports.</p>
             <ul className="mt-7 space-y-3 text-sm text-ink/75">
               <li>Secure email and password account</li>
-              <li>User-owned projects and discovery persistence</li>
-              <li>Deterministic planning and export foundation</li>
+              <li>Adaptive discovery with visible product foundations</li>
+              <li>Editable Product Blueprints with Markdown, JSON, and CSV exports</li>
             </ul>
             <ButtonLink className="mt-8" href="/signup">Start free</ButtonLink>
           </article>

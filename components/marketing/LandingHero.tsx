@@ -18,7 +18,7 @@ export function LandingHero() {
             <ButtonLink href="/signup">Start your project</ButtonLink>
             <ButtonLink href="#how-it-works" variant="secondary">See how it works</ButtonLink>
           </div>
-          <p className="mt-5 text-sm text-ink/70">Secure personal workspace available now. AI-guided discovery arrives in Phase 3B.</p>
+          <p className="mt-5 text-sm text-ink/70">Start privately. Use AI-guided discovery or Mycellium’s reliable built-in planning engine.</p>
         </div>
         <ProductGraphHero />
       </Container>

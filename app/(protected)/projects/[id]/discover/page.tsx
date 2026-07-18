@@ -16,5 +16,5 @@ export default async function DiscoverPage({ params }: { params: Promise<{ id: s
   const context = project.discovery_context ? DiscoveryContextSchema.parse(project.discovery_context) : createInitialDiscoveryContext({ id: project.id, description: project.description, targetUsers: project.target_users, constraints: project.constraints }, now);
   const readiness = project.readiness_state ? ReadinessAssessmentSchema.parse(project.readiness_state) : calculateReadiness(context);
   const messages = await listDiscoveryMessages(project.id, user.id);
-  return <DiscoveryWorkspace initialContext={context} initialMessages={messages.map((message) => ({ id: message.id, role: message.role, content: message.content }))} initialReadiness={readiness} projectId={project.id} projectName={project.name} />;
+  return <DiscoveryWorkspace blueprintAvailable={project.plan_schema_version === "2.0" && Boolean(project.plan)} initialContext={context} initialMessages={messages.map((message) => ({ id: message.id, role: message.role, content: message.content }))} initialReadiness={readiness} projectId={project.id} projectName={project.name} />;
 }

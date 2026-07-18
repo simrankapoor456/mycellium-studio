@@ -12,9 +12,9 @@ import type { Project } from "@/lib/domain/project/schemas";
 
 function ProjectSubmitButton({ editing }: { editing: boolean }) {
   const { pending } = useFormStatus();
-  const label = editing ? "Save project" : "Create project";
+  const label = editing ? "Save starting context" : "Start this project";
 
-  return <Button disabled={pending} type="submit">{pending ? "Saving project" : label}</Button>;
+  return <Button disabled={pending} type="submit">{pending ? "Saving the foundation" : label}</Button>;
 }
 
 export function ProjectForm({ project }: { project?: Project }) {

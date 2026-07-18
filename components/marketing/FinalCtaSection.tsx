@@ -9,7 +9,7 @@ export function FinalCtaSection() {
       <Container className="grid items-center gap-10 sm:grid-cols-[1fr_auto]">
         <div>
           <h2 className="display-type balanced-text max-w-4xl text-4xl leading-[1.05] sm:text-6xl">Give the next product decision a stronger foundation.</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-paper/70">Create a private project workspace now, then continue into guided discovery when Phase 3B arrives.</p>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-paper/70">Bring the rough idea. Mycellium will help uncover the product, make the architecture traceable, and turn it into work you can carry forward.</p>
           <ButtonLink className="mt-8 bg-paper text-forest hover:bg-sage" href="/signup">Start your project</ButtonLink>
         </div>
         <Image alt="" height={128} src="/brand/mycellium-mark-light.svg" width={128} />

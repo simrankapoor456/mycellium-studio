@@ -34,7 +34,7 @@ export function LivingProductGraph({ graph }: { graph: ProductGraph }) {
         })}
       </svg>
       <div className="living-graph__list" role="list" aria-label="Structured product understanding">{nodes.map((node) => <div key={node.id} role="listitem"><button aria-pressed={selected?.id === node.id} data-state={node.state} onClick={() => selectNode(node.id)}><span>{node.label}</span><strong>{node.value}</strong><small>{node.state}</small></button></div>)}</div>
-      {selected ? <aside aria-live="polite" className="living-graph__detail"><span>{selected.category.replaceAll("_", " ")}</span><h3>{selected.label}</h3><p>{selected.value}</p><small>{selected.state === "inferred" ? "Inferred assumption — review before approval" : selected.state === "unknown" ? "Explicitly unresolved" : selected.state === "contradicted" ? "Competing answer requires resolution" : "Supported by discovery"}</small></aside> : null}
+      {selected ? <aside aria-live="polite" className="living-graph__detail"><span>{selected.category.replaceAll("_", " ")}</span><h3>{selected.label}</h3><p>{selected.value}</p><small>{selected.state === "inferred" ? "Working assumption — check this before approval" : selected.state === "unknown" ? "Intentionally left open" : selected.state === "contradicted" ? "Two answers are competing here" : "Rooted in discovery"}</small></aside> : null}
     </section>
   );
 }

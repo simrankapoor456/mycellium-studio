@@ -14,6 +14,13 @@ import {
   type ProductGraph,
   type ReadinessAssessment,
 } from "@/lib/domain/discovery/schemas";
+import {
+  buildContradictionDescription,
+  buildDiscoveryAcknowledgement,
+  buildDiscoveryInsight,
+  DISCOVERY_CATEGORY_COPY,
+  getReadinessPresentation,
+} from "@/lib/voice/mycellium";
 
 const CATEGORY_ORDER = [
   "business_objective",
@@ -30,18 +37,18 @@ const CATEGORY_ORDER = [
 ] as const satisfies readonly FactCategory[];
 
 const CATEGORY_CONFIG: Record<FactCategory, { label: string; question: string; weight: number; critical: boolean; single: boolean }> = {
-  business_objective: { label: "Business objective", question: "What should this product change for the business or person funding it?", weight: 14, critical: true, single: true },
-  problem: { label: "Problem", question: "What painful situation should the first version solve, in the user's own workflow?", weight: 14, critical: true, single: true },
-  target_users: { label: "Target users", question: "Who is the first version specifically for?", weight: 14, critical: true, single: false },
-  use_cases: { label: "Primary use case", question: "What is the one outcome that user must complete in the first release?", weight: 14, critical: true, single: false },
-  success_metrics: { label: "Success metric", question: "What observable result would tell you the first release is working?", weight: 10, critical: true, single: false },
-  functional_requirements: { label: "Functional requirement", question: "Which capability is essential for that first successful outcome?", weight: 10, critical: false, single: false },
-  non_functional_requirements: { label: "Quality requirement", question: "Are there security, accessibility, reliability, or performance expectations we must treat as requirements?", weight: 5, critical: false, single: false },
-  constraints: { label: "Constraint", question: "Which deadline, budget, platform, or policy constraint most affects the design?", weight: 10, critical: false, single: false },
-  assumptions: { label: "Assumption", question: "Which important belief are you relying on but have not validated yet?", weight: 4, critical: false, single: false },
-  risks: { label: "Risk", question: "What could make this product unsafe, unusable, or not worth shipping?", weight: 6, critical: false, single: false },
-  architecture_decisions: { label: "Architecture decision", question: "Is there a technical boundary already decided, or should architecture remain open?", weight: 3, critical: false, single: false },
-  unknowns: { label: "Unknown", question: "Which unresolved choice would be most useful to clarify next?", weight: 0, critical: false, single: false },
+  business_objective: { ...DISCOVERY_CATEGORY_COPY.business_objective, weight: 14, critical: true, single: true },
+  problem: { ...DISCOVERY_CATEGORY_COPY.problem, weight: 14, critical: true, single: true },
+  target_users: { ...DISCOVERY_CATEGORY_COPY.target_users, weight: 14, critical: true, single: false },
+  use_cases: { ...DISCOVERY_CATEGORY_COPY.use_cases, weight: 14, critical: true, single: false },
+  success_metrics: { ...DISCOVERY_CATEGORY_COPY.success_metrics, weight: 10, critical: true, single: false },
+  functional_requirements: { ...DISCOVERY_CATEGORY_COPY.functional_requirements, weight: 10, critical: false, single: false },
+  non_functional_requirements: { ...DISCOVERY_CATEGORY_COPY.non_functional_requirements, weight: 5, critical: false, single: false },
+  constraints: { ...DISCOVERY_CATEGORY_COPY.constraints, weight: 10, critical: false, single: false },
+  assumptions: { ...DISCOVERY_CATEGORY_COPY.assumptions, weight: 4, critical: false, single: false },
+  risks: { ...DISCOVERY_CATEGORY_COPY.risks, weight: 6, critical: false, single: false },
+  architecture_decisions: { ...DISCOVERY_CATEGORY_COPY.architecture_decisions, weight: 3, critical: false, single: false },
+  unknowns: { ...DISCOVERY_CATEGORY_COPY.unknowns, weight: 0, critical: false, single: false },
 };
 
 type ProjectSeed = Readonly<{
@@ -108,10 +115,11 @@ export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnRes
   });
   const readinessAssessment = calculateReadiness(context);
   const nextQuestion = input.aiResponse?.nextQuestion || readinessAssessment.recommendedNextQuestion;
-  const acknowledgement = input.aiResponse?.acknowledgement || buildAcknowledgement(extractedFacts);
+  const acknowledgement = buildDiscoveryAcknowledgement(extractedFacts, input.messageId);
+  const insight = buildDiscoveryInsight(readinessAssessment);
 
   return DiscoveryTurnResponseSchema.parse({
-    assistantMessage: acknowledgement,
+    assistantMessage: `${acknowledgement}\n\n${insight}`,
     assistantQuestion: nextQuestion,
     extractedFacts,
     updatedFacts,
@@ -149,7 +157,7 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
       : "discovering";
   const nextCategory = chooseNextCategory(context);
 
-  return ReadinessAssessmentSchema.parse({
+  const readiness = ReadinessAssessmentSchema.parse({
     score: Math.max(0, score - openContradictions.length * 10),
     status,
     confirmedFields,
@@ -157,10 +165,11 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
     criticalGaps,
     contradictions: openContradictions.map((item) => item.description),
     recommendedNextQuestion: status === "ready" ? "Review the structured understanding, then approve it when it reflects your intent." : CATEGORY_CONFIG[nextCategory].question,
-    explanation: status === "ready" ? "The critical product areas are rooted and no unresolved contradiction blocks architecture." : `${rooted.size} product areas are rooted; ${criticalGaps.length} critical gap${criticalGaps.length === 1 ? "" : "s"} and ${openContradictions.length} contradiction${openContradictions.length === 1 ? "" : "s"} still need attention.`,
+    explanation: "Foundation progress calculated.",
     rootedAreas: CATEGORY_ORDER.filter((category) => rooted.has(category)),
     areasNeedingClarification: CATEGORY_ORDER.filter((category) => !rooted.has(category) && !resolvedByUnknown.has(category)),
   });
+  return ReadinessAssessmentSchema.parse({ ...readiness, explanation: getReadinessPresentation(readiness).summary });
 }
 
 export function canApproveDiscovery(context: DiscoveryContext): boolean {
@@ -285,7 +294,7 @@ function detectContradictions(facts: readonly DiscoveryFact[], previous: Discove
     const pair = [...distinct.values()].slice(-2);
     const pairIds = pair.map((fact) => fact.id).sort();
     const id = stableId("contradiction", pairIds);
-    if (!contradictions.some((item) => item.id === id)) contradictions.push({ id, factIds: pairIds, description: `${CATEGORY_CONFIG[category].label} has two competing answers that need a decision.`, status: "open", resolution: null, sourceMessageIds: [...new Set(pair.flatMap((fact) => fact.sourceMessageIds))] });
+    if (!contradictions.some((item) => item.id === id)) contradictions.push({ id, factIds: pairIds, description: buildContradictionDescription(category), status: "open", resolution: null, sourceMessageIds: [...new Set(pair.flatMap((fact) => fact.sourceMessageIds))] });
   }
   return contradictions;
 }
@@ -309,13 +318,6 @@ function diffGraphs(before: ProductGraph, after: ProductGraph) {
     addedEdges: after.edges.filter((edge) => !beforeEdges.has(edge.id)),
     resolvedEdgeIds: after.edges.filter((edge) => edge.state === "resolved" && beforeEdges.get(edge.id)?.state === "active").map((edge) => edge.id),
   });
-}
-
-function buildAcknowledgement(facts: readonly DiscoveryFact[]): string {
-  if (facts.length === 0) return "I kept your answer, but it does not create a requirement yet.";
-  if (facts.every((fact) => fact.status === "unknown")) return "That is useful uncertainty. I will keep it explicit instead of guessing.";
-  const labels = [...new Set(facts.map((fact) => fact.label.toLowerCase()))];
-  return `That adds ${labels.slice(0, 2).join(" and ")} to the product understanding.`;
 }
 
 function uniqueCategories(facts: readonly DiscoveryFact[]): FactCategory[] {
