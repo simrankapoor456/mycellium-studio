@@ -1,7 +1,7 @@
-export function LoadingState({ cards = 3 }: { cards?: number }) {
+export function LoadingState({ cards = 3, label = "Loading projects" }: { cards?: number; label?: string }) {
   return (
-    <div aria-label="Loading projects" aria-live="polite" className="loading-state animate-pulse">
-      <span className="sr-only">Loading projects</span>
+    <div aria-label={label} aria-live="polite" className="loading-state animate-pulse">
+      <span className="sr-only">{label}</span>
       <div className="h-11 w-52 rounded-lg bg-sage/30" />
       <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: cards }, (_, index) => (
