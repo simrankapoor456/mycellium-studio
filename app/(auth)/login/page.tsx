@@ -1,18 +1,31 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { LoginForm } from "@/components/auth/AuthForms";
+import { LoginForm } from "@/components/auth/LoginForm";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
-export default async function LoginPage() {
+export const metadata: Metadata = {
+  title: "Log in",
+  description: "Return to your private Mycellium Studio project workspace.",
+};
+
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   if (await getCurrentUser()) {
     redirect("/dashboard");
   }
 
+  const { error } = await searchParams;
+
   return (
-    <section className="mt-10 rounded-[2rem] border border-line bg-paper/85 p-7 shadow-xl shadow-forest/5 sm:p-9">
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-clay">Welcome back</p>
-      <h1 className="mt-3 font-serif text-4xl text-forest">Sign in</h1>
-      <p className="mt-3 leading-7 text-forest/70">Return to your private planning workspace.</p>
+    <section aria-labelledby="login-title">
+      <p className="font-mono text-sm font-bold text-moss">Welcome back</p>
+      <h1 className="display-type mt-3 text-4xl text-forest" id="login-title">Log in to your studio</h1>
+      <p className="mt-4 leading-7 text-ink/65">Continue shaping private project context and decisions.</p>
+      {error === "confirmation" ? (
+        <p className="mt-6 border border-clay/35 bg-clay/10 p-4 text-sm leading-6 text-clay" role="alert">
+          The confirmation link is invalid or expired. Request a new confirmation email by signing up again.
+        </p>
+      ) : null}
       <LoginForm />
     </section>
   );

@@ -1,13 +1,11 @@
-import Link from "next/link";
+import { AuthValuePanel } from "@/components/auth/AuthValuePanel";
 
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main className="min-h-screen bg-canvas px-5 py-10 text-ink sm:py-16">
-      <div className="mx-auto w-full max-w-md">
-        <Link className="font-serif text-xl font-semibold text-forest" href="/">
-          mycellium studio
-        </Link>
-        {children}
+    <main className="grid min-h-[100dvh] bg-canvas text-ink lg:grid-cols-[0.9fr_1.1fr]">
+      <AuthValuePanel />
+      <div className="flex items-center justify-center px-5 py-12 sm:px-10 lg:py-16">
+        <div className="w-full max-w-md">{children}</div>
       </div>
     </main>
   );
