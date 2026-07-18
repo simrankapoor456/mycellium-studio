@@ -63,6 +63,10 @@ export const ProjectOutputSchema = z.object({
   plan: JsonObjectSchema.nullable(),
   plan_schema_version: z.string().nullable(),
   generation_source: z.string().nullable(),
+  approved_discovery_context: JsonObjectSchema.nullable().default(null),
+  discovery_approved_at: z.string().datetime({ offset: true }).nullable().default(null),
+  context_version: z.number().int().nonnegative().default(0),
+  blueprint_version: z.number().int().nonnegative().default(0),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });

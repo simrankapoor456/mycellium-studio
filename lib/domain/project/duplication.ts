@@ -34,5 +34,9 @@ export function createProjectDuplicate(
     plan: source.plan,
     plan_schema_version: source.plan_schema_version,
     generation_source: source.generation_source,
+    approved_discovery_context: source.approved_discovery_context,
+    discovery_approved_at: source.discovery_approved_at,
+    context_version: source.context_version,
+    blueprint_version: source.blueprint_version,
   };
 }
