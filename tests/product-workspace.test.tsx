@@ -15,7 +15,7 @@ describe("Phase 3B workspace interactions", () => {
     const svgNode = screen.getByRole("button", { name: /Target users: Independent designers/ });
     fireEvent.keyDown(svgNode, { key: "Enter" });
     expect(screen.getAllByText("Independent designers").length).toBeGreaterThan(0);
-    expect(screen.getByText("Supported by discovery")).toBeInTheDocument();
+    expect(screen.getByText("Rooted in discovery")).toBeInTheDocument();
   });
 
   it("makes the architecture reveal immediate for reduced-motion users", () => {
