@@ -1,8 +1,15 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ButtonLink } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { requireUser } from "@/lib/auth/current-user";
 import { listProjects } from "@/lib/projects/operations";
+
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Manage private Mycellium Studio product projects.",
+};
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -10,29 +17,18 @@ export default async function DashboardPage() {
 
   return (
     <main>
-      <div className="flex flex-wrap items-end justify-between gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-clay">Your workspace</p>
-          <h1 className="mt-2 font-serif text-4xl text-forest sm:text-5xl">Projects</h1>
-          <p className="mt-3 max-w-2xl leading-7 text-forest/70">
-            Shape project context now; discovery and generated planning arrive in later phases.
-          </p>
+          <h1 className="display-type text-4xl text-forest sm:text-5xl">Projects</h1>
+          <p className="mt-3 max-w-2xl leading-7 text-ink/65">Build durable product context now, then continue into guided discovery in Phase 3B.</p>
         </div>
-        <Link className="rounded-full bg-ocean px-5 py-3 text-sm font-bold text-white hover:bg-forest" href="/projects/new">
-          New project
-        </Link>
+        <ButtonLink href="/projects/new">Create project</ButtonLink>
       </div>
 
       {projects.length === 0 ? (
-        <section className="mt-10 rounded-[2rem] border border-dashed border-forest/25 bg-paper/60 px-6 py-16 text-center">
-          <h2 className="font-serif text-3xl text-forest">Plant the first project.</h2>
-          <p className="mx-auto mt-3 max-w-md leading-7 text-forest/65">
-            Capture its shape, users, team capacity, and constraints in a private workspace.
-          </p>
-          <Link className="mt-6 inline-block rounded-full bg-forest px-5 py-3 text-sm font-bold text-white" href="/projects/new">
-            Create a project
-          </Link>
-        </section>
+        <div className="mt-10">
+          <EmptyState actionHref="/projects/new" actionLabel="Create your first project" description="Capture the product idea, users, team shape, capacity, and constraints in one private foundation." title="Start with the product context" />
+        </div>
       ) : (
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => <ProjectCard key={project.id} project={project} />)}

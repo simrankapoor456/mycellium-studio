@@ -1,39 +1,33 @@
-import Link from "next/link";
-
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
 import { logoutAction } from "@/app/(protected)/actions";
 import { requireUser } from "@/lib/auth/current-user";
 
-export default async function ProtectedLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function ProtectedLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = await requireUser();
 
   return (
-    <div className="min-h-screen bg-canvas text-ink">
-      <header className="border-b border-line bg-paper/85 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 lg:px-8">
-          <Link className="font-serif text-xl font-semibold text-forest" href="/dashboard">
-            mycellium studio
-          </Link>
-          <nav className="flex items-center gap-4" aria-label="Workspace navigation">
-            <Link className="text-sm font-bold text-forest/75 hover:text-forest" href="/dashboard">
-              Projects
-            </Link>
+    <div className="min-h-[100dvh] bg-canvas text-ink">
+      <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-surface focus:px-4 focus:py-3" href="#workspace-content">Skip to workspace content</a>
+      <header className="border-b border-line bg-surface">
+        <Container className="flex min-h-20 items-center justify-between gap-4">
+          <BrandLogo href="/dashboard" />
+          <nav className="flex items-center gap-1 sm:gap-3" aria-label="Workspace navigation">
+            <a className="min-h-11 px-3 py-3 text-sm font-bold text-forest" href="/dashboard">Projects</a>
             <form action={logoutAction}>
-              <button
-                className="rounded-full border border-forest/20 px-4 py-2 text-sm font-bold text-forest hover:border-forest/45"
-                type="submit"
-              >
-                Sign out
-              </button>
+              <Button className="px-3 sm:px-5" type="submit" variant="quiet">Sign out</Button>
             </form>
           </nav>
-        </div>
+        </Container>
       </header>
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-12">
-        <p className="mb-6 text-xs text-forest/55">Signed in as {user.email ?? "account owner"}</p>
-        {children}
-      </div>
+      <Container className="py-8 lg:py-12">
+        <div className="mb-7 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4 text-xs text-ink/70">
+          <span>Personal studio</span>
+          <span className="max-w-full truncate">{user.email ?? "Account owner"}</span>
+        </div>
+        <div id="workspace-content">{children}</div>
+      </Container>
     </div>
   );
 }
