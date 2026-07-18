@@ -7,9 +7,9 @@ export function JourneySection() {
     <section className="border-y border-line bg-surface-quiet/55 py-24 sm:py-32" id="product">
       <Container>
         <SectionHeading
-          description="Switch stages to see how one product idea develops without losing its original context. The demonstration is fixed and local; it makes no AI request."
+          description="Move through a realistic fixed-data workflow. Each stage exposes the conversation, decisions, boundaries, dependencies, and delivery structure it creates."
           eyebrow="Discover → Architect → Execute"
-          title="One idea, developed through a connected product journey."
+          title="Work the same idea from first question to sprint allocation."
         />
         <div className="mt-14"><ProductStageExperience /></div>
       </Container>

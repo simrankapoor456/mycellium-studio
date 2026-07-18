@@ -34,16 +34,27 @@ export function FeatureShowcase() {
           description="The foundation is deliberately honest about what works today and what enters the product in the next phase."
           title="A complete product architecture, built in accountable layers."
         />
-        <div className="mt-14 grid border-t border-line lg:grid-cols-2">
-          {capabilities.map(([title, description, status], index) => (
-            <article className={index % 2 === 0 ? "border-b border-line py-6 lg:pr-10" : "border-b border-line py-6 lg:border-l lg:pl-10"} key={title}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-xl font-bold text-forest">{title}</h3>
+        <div className="capability-ledger mt-14">
+          <aside className="capability-ledger__context">
+            <p>The operating rule</p>
+            <strong>Understanding stays connected to every artifact created from it.</strong>
+            <dl>
+              <div><dt>Input</dt><dd>Reviewed product context</dd></div>
+              <div><dt>Boundary</dt><dd>Human approval</dd></div>
+              <div><dt>Output</dt><dd>Portable, validated work</dd></div>
+            </dl>
+          </aside>
+          <ol className="capability-ledger__list">
+            {capabilities.map(([title, description, status]) => (
+              <li key={title}>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </div>
                 <Badge tone={statusTone(status)}>{status}</Badge>
-              </div>
-              <p className="mt-3 max-w-[58ch] leading-7 text-ink/65">{description}</p>
-            </article>
-          ))}
+              </li>
+            ))}
+          </ol>
         </div>
       </Container>
     </section>
