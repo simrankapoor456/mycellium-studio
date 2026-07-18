@@ -1,7 +1,6 @@
 import { FaqSection } from "@/components/marketing/FaqSection";
 import { FeatureShowcase } from "@/components/marketing/FeatureShowcase";
 import { FinalCtaSection } from "@/components/marketing/FinalCtaSection";
-import { HowItWorksSection } from "@/components/marketing/HowItWorksSection";
 import { IdealUsersSection } from "@/components/marketing/IdealUsersSection";
 import { JourneySection } from "@/components/marketing/JourneySection";
 import { LandingHero } from "@/components/marketing/LandingHero";
@@ -10,6 +9,7 @@ import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { PhilosophySection } from "@/components/marketing/PhilosophySection";
 import { PricingSection } from "@/components/marketing/PricingSection";
 import { ProblemSection } from "@/components/marketing/ProblemSection";
+import { ScrollProductNarrative } from "@/components/marketing/ScrollProductNarrative";
 import { TrustSection } from "@/components/marketing/TrustSection";
 
 export default function HomePage() {
@@ -21,9 +21,9 @@ export default function HomePage() {
       <MarketingHeader />
       <main id="main-content">
         <LandingHero />
+        <ScrollProductNarrative />
         <JourneySection />
         <ProblemSection />
-        <HowItWorksSection />
         <PhilosophySection />
         <FeatureShowcase />
         <IdealUsersSection />
