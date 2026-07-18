@@ -93,6 +93,46 @@ Motion confirms state; it does not decorate idle screens.
 
 Only opacity and transform are animated. Root-path drawing runs once when the selected stage changes. Under `prefers-reduced-motion: reduce`, duration tokens become zero, scroll behavior becomes immediate, and root/reveal movement is removed.
 
+### Living Architecture signature system
+
+The signature experience keeps one Product Graph visible from the hero through the scroll story and the Discover, Architect, and Execute demonstration. Its visual grammar is semantic:
+
+- Nodes are named product artifacts, never decorative particles.
+- Edges show a traceable dependency or transformation.
+- Active layers use forest and gold; future layers remain quiet but legible.
+- Seed and sprint nodes bookend the graph so the original intent remains connected to delivery.
+- Diagram labels and detail panels carry meaning independently of motion or color.
+
+The graph enters in four deliberate layers: seed, discovery, architecture, then execution. Pointer movement may offset selected hero layers by a few pixels through compositor transforms. Scroll progression changes a single active layer through `IntersectionObserver`; it does not bind rendering work to the scroll event. On narrow screens, the large SVG becomes a five-step ordered summary. The workflow diagrams remain locally scrollable without creating page-level overflow.
+
+### Elevation and motion tokens
+
+| Tier | Use |
+| --- | --- |
+| `flat` | Content that belongs directly to the page plane |
+| `raised` | Interactive panels, tabs, and selected product surfaces |
+| `floating` | The signature hero graph and exceptional narrative emphasis |
+
+| Motion | Duration | Use |
+| --- | --- | --- |
+| Immediate | 90 ms | Pressed and focus feedback |
+| Fast | 140 ms | Small hover and state changes |
+| Normal | 220 ms | Tabs and surface transitions |
+| Moderate | 360 ms | Diagram relationships |
+| Deliberate | 640 ms | One-time narrative entrance |
+| Extended | 760 ms | Connector drawing |
+
+The spatial curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product application surfaces use only the immediate, fast, and normal tiers. Marketing may use moderate and deliberate motion for explanation. No surface oscillates while idle.
+
+### Performance budgets
+
+- No runtime visualization dependency; diagrams use optimized inline SVG and CSS.
+- No continuous React state updates from pointer or scroll movement.
+- One observer coordinates the scroll story, and one animation frame batches hero pointer transforms.
+- Static content is rendered before enhancement so the story remains complete without JavaScript or motion.
+- Incremental landing-page client JavaScript should remain below 25 KB gzip.
+- Hero and diagram dimensions are stable before animation to avoid layout shift.
+
 ## Accessibility
 
 - Semantic landmarks and headings describe page structure.
@@ -112,6 +152,8 @@ Automated tests cover markup and interaction logic, but they do not certify comp
 ## Responsive behavior
 
 Base styles target narrow screens. Multi-column layouts collapse below 768 pixels, navigation becomes horizontally scrollable rather than removing destinations, and project actions wrap without hiding functionality. Review widths are 375, 768, 1024, and 1440 pixels. Safe viewport height uses `100dvh` for application and authentication shells.
+
+At 375 pixels, the Product Graph uses its ordered text fallback and each detailed workflow diagram scrolls inside its own focused region. At 768 pixels and above, the full graph is restored. The narrative sticky plane is reserved for large viewports; smaller screens receive the same five chapters in normal document flow.
 
 ## Content rules
 

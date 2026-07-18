@@ -58,6 +58,20 @@ Status: implemented on `feat/fullstack-mvp`.
 
 Phase 3A does not add OpenAI calls, adaptive discovery, generated-plan persistence, complete project editing, billing, teams, or integrations.
 
+## Phase 3A.5 - signature experience
+
+Status: implemented on `feat/fullstack-mvp`.
+
+- Introduced the Living Architecture Product Graph as a shared hero, narrative, and workflow language.
+- Added a five-stage scroll story with a sticky desktop visualization and complete mobile/static fallback.
+- Rebuilt the fixed-data Discover, Architect, and Execute demonstration with keyboard-operable tabs.
+- Added readiness, scope, dependency, work-hierarchy, and sprint-allocation diagrams.
+- Defined explicit spatial elevation and motion tiers with reduced-motion behavior.
+- Carried calmer versions of the surface language into authentication, dashboard, project, empty, loading, and error states.
+- Preserved the Phase 3A authentication, Supabase, CRUD, RLS, metadata, and responsive behavior.
+
+Phase 3A.5 remains presentation-only. It makes no external model request and does not add adaptive discovery or new persistence behavior.
+
 ## Phase 3B continuation
 
 Phase 3B begins from the protected project shell and existing discovery-message persistence. It may add adaptive questions, readiness assessment, server-side provider calls, validated structured extraction, and deterministic fallback orchestration after a separate security and product review.
