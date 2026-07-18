@@ -1,17 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #f5f0e6;
-  --color-paper: #fffaf1;
-  --color-ink: #1d3027;
-  --color-forest: #103d2e;
-  --color-moss: #6b7f61;
-  --color-sage: #a9b99d;
-  --color-ocean: #155264;
-  --color-clay: #c77661;
-  --color-line: #d9cfbe;
-  --font-sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
-  --font-serif: Iowan Old Style, Baskerville, "Times New Roman", serif;
+  --color-canvas: oklch(96.5% 0.018 142);
+  --color-paper: oklch(98.6% 0.009 142);
+  --color-surface: oklch(99.2% 0.005 142);
+  --color-surface-quiet: oklch(92.8% 0.027 142);
+  --color-ink: oklch(24% 0.025 150);
+  --color-forest: oklch(31% 0.075 153);
+  --color-forest-strong: oklch(23% 0.065 153);
+  --color-moss: oklch(47% 0.071 145);
+  --color-sage: oklch(78% 0.052 142);
+  --color-gold: oklch(66% 0.083 86);
+  --color-ocean: oklch(38% 0.071 168);
+  --color-clay: oklch(51% 0.14 32);
+  --color-line: oklch(85% 0.025 142);
+  --color-line-strong: oklch(67% 0.04 145);
+  --font-sans: "Aptos", "Avenir Next", "Segoe UI Variable", sans-serif;
+  --font-display: "Aptos Display", "Avenir Next", "Segoe UI Variable Display", sans-serif;
+  --font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+:root {
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-moderate: 320ms;
+  --duration-deliberate: 560ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --focus-ring: oklch(66% 0.083 86);
 }
 
 * {
@@ -24,14 +40,135 @@ html {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 90% 4%, rgb(169 185 157 / 32%), transparent 27rem),
-    radial-gradient(circle at 8% 65%, rgb(199 118 97 / 14%), transparent 25rem),
-    #f5f0e6;
+  min-width: 320px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a,
+button,
+summary,
+input,
+select,
+textarea {
+  outline: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 ::selection {
-  background: #a9b99d;
-  color: #103d2e;
+  background: var(--color-sage);
+  color: var(--color-forest-strong);
+}
+
+.display-type {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+
+.balanced-text {
+  text-wrap: balance;
+}
+
+.form-control {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 10px;
+  background: var(--color-surface);
+  padding: 0.75rem 0.875rem;
+  color: var(--color-ink);
+  transition:
+    border-color var(--duration-normal) var(--ease-standard),
+    box-shadow var(--duration-normal) var(--ease-standard);
+}
+
+.form-control:focus-visible {
+  border-color: var(--color-forest);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-sage) 55%, transparent);
+}
+
+.form-control::placeholder {
+  color: color-mix(in oklch, var(--color-ink) 52%, transparent);
+}
+
+.reveal {
+  animation: reveal-in var(--duration-deliberate) var(--ease-decelerate) both;
+}
+
+.root-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-root 900ms var(--ease-decelerate) forwards;
+}
+
+.dialog-backdrop::backdrop {
+  background: color-mix(in oklch, var(--color-forest-strong) 68%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes draw-root {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive-lift:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-moderate: 0ms;
+    --duration-deliberate: 0ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .reveal,
+  .root-path {
+    animation: none;
+  }
 }

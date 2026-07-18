@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mycellium Studio</title>
+  <rect width="64" height="64" rx="12" fill="#173f31"/>
+  <g fill="none" stroke="#f4f6ef" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 35V13l19 21 19-21v22" stroke-width="5"/>
+    <path d="M13 36c0 7-4 9-8 12m27-13v17m19-16c0 7 4 9 8 12M21 44c3 0 7 2 11 8m11-8c-3 0-7 2-11 8" stroke-width="3"/>
+  </g>
+</svg>

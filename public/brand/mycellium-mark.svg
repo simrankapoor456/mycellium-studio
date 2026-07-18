@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Mycellium Studio rooted M mark</title>
+  <g fill="none" stroke="#173f31" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 38V15l20 22 20-22v23" stroke-width="5"/>
+    <path d="M12 39c0 7-4 10-9 13m29-14v17m20-16c0 7 4 10 9 13M20 47c3-1 7 1 12 8m12-8c-3-1-7 1-12 8" stroke-width="3"/>
+    <path d="M3 52h.1M32 56h.1M61 52h.1M20 47h.1M44 47h.1" stroke-width="5"/>
+  </g>
+</svg>

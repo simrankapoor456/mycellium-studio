@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 64" role="img" aria-labelledby="title">
+  <title id="title">Mycellium Studio</title>
+  <g fill="none" stroke="#173f31" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 38V14l21 23 21-23v24" stroke-width="5"/>
+    <path d="M10 39c0 7-4 10-8 13m29-14v17m21-16c0 7 4 10 8 13M19 47c3-1 7 1 12 8m12-8c-3-1-7 1-12 8" stroke-width="3"/>
+  </g>
+  <g transform="translate(76 11)" fill="none" stroke="#173f31" stroke-width="2.6" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3 33V8l9 13 9-13v25M29 8l8 13 8-13M37 21v12M66 11c-3-3-13-3-13 10s10 13 13 9M91 8H74v25h17M74 20h13M100 8v25h16M125 8v25h16M150 8v25M160 8v18c0 10 17 10 17 0V8M188 33V8l9 13 9-13v25"/>
+    <path d="M235 11c-3-4-16-5-16 3 0 9 17 4 17 13 0 8-14 8-18 3M244 8h20M254 8v25M272 8v18c0 10 17 10 17 0V8M298 8v25h7c12 0 12-25 0-25h-7M321 8v25M331 21c0-18 15-18 15 0s-15 18-15 0"/>
+  </g>
+</svg>
