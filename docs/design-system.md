@@ -157,6 +157,25 @@ At 375 pixels, the Product Graph uses its ordered text fallback and each detaile
 
 ## Content rules
 
+### Product voice
+
+Mycellium speaks like an experienced product strategist: warm, curious, precise, grounded, and concise. It acknowledges what changed, names one useful insight or uncertainty, then asks one material question. It encourages momentum without forced cheerfulness, corporate workflow language, or decorative metaphor.
+
+Reusable product copy lives in `lib/voice/mycellium.ts`. A stable input-derived selector varies deterministic acknowledgements without runtime randomness, so fallback conversations stay natural and testable. The same layer owns readiness, contradiction, fallback disclosure, empty-state, review, generation, transition, and export language.
+
+Primary UI copy describes the user's product progress: “Foundation strength,” “Still needs clarity,” “Reliable mode,” and “Ready to architect.” Raw domain statuses remain available in detail surfaces where precision matters. Seed, root, and growth language is reserved for occasional momentum cues rather than every sentence.
+
+- Keep acknowledgements to one sentence unless the answer is genuinely complex.
+- Explain the change before asking the next question.
+- Name contradictions directly without sounding punitive.
+- State when Reliable mode is active without presenting it as a failure.
+- Explain exactly when locked actions become available.
+- Never use “input received,” “proceed to next step,” “critical gaps remain,” or “readiness assessment updated.”
+
+### Export states
+
+Export remains visible in project navigation at every stage. Before blueprint generation, the destination explains that exports unlock after the first Product Blueprint. After generation, Markdown, JSON, and CSV actions remain directly visible on the export page, blueprint header, blueprint export section, and completion state. Each download confirms success and is generated from the current persisted blueprint, including saved edits.
+
 - State what exists today and label future capability clearly.
 - Use sentence case and direct verbs for actions.
 - Avoid fake customers, testimonials, logos, metrics, certifications, pricing checkout, and integrations.

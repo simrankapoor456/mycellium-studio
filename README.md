@@ -1,6 +1,6 @@
 # Mycellium Studio
 
-Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Phase 3B connects authenticated discovery, a Living Product Graph, human approval, and an editable Product Blueprint to the secure foundation and signature experience.
+Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Its AI Product Architect combines warm, precise discovery with a Living Product Graph, human approval, an editable Product Blueprint, and portable exports.
 
 ## Phase 3B status
 
@@ -22,6 +22,8 @@ Included:
 - Persisted review approval, visible lineage, and an editable Product Blueprint
 - Optional server-only OpenAI Responses API structured output with deterministic fallback
 - Persisted Markdown, JSON, and CSV blueprint exports
+- Always-visible export navigation, locked-state guidance, direct downloads, and download success feedback
+- Centralized deterministic Mycellium voice for discovery, readiness, review, generation, errors, and exports
 - Preserved static prototype in [`legacy-static/`](./legacy-static/)
 
 Intentionally deferred:
@@ -68,12 +70,15 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm test
+npm run test:e2e
 npm run lint
 npx tsc --noEmit
 npm run build
 ```
 
 Inspect dependency advisories with `npm audit`; do not apply forced major upgrades without review.
+
+The Playwright export regression uses dedicated local variables and skips safely when they are absent: `E2E_EMAIL`, `E2E_PASSWORD`, `E2E_PROJECT_ID`, `E2E_EMPTY_PROJECT_ID`, and `E2E_FALLBACK_PROJECT_ID`. Set `E2E_BASE_URL` only when the app is not running at `http://127.0.0.1:3000`. Never commit E2E credentials.
 
 ## Project structure
 
@@ -86,9 +91,11 @@ lib/projects/                Auth-scoped project persistence operations
 lib/discovery/               Auth-scoped discovery persistence operations
 lib/blueprint/               Blueprint generation, editing, persistence, and exports
 lib/ai/                      Server-only optional OpenAI provider boundary
+lib/voice/                   Centralized deterministic product voice and state copy
 lib/supabase/                Typed browser, server, and Proxy clients
 supabase/migrations/         Versioned schema, trigger, and RLS SQL
 tests/                       Pure unit and contract tests
+e2e/                         Authenticated Playwright export regression
 docs/                        Architecture, setup, scope, and delivery boundaries
 legacy-static/               Verbatim pre-Next.js prototype snapshot
 ```
