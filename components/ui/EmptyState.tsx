@@ -14,7 +14,7 @@ export function EmptyState({
   actionLabel: string;
 }>) {
   return (
-    <section className="border border-dashed border-line-strong bg-surface/65 px-6 py-16 text-center">
+    <section className="empty-state border border-dashed border-line-strong bg-surface/65 px-6 py-16 text-center">
       <Image alt="" className="mx-auto" height={64} src="/brand/mycellium-mark.svg" width={64} />
       <h2 className="display-type mt-6 text-3xl text-forest">{title}</h2>
       <p className="mx-auto mt-3 max-w-md leading-7 text-ink/65">{description}</p>

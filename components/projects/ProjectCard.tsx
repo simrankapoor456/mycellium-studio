@@ -9,7 +9,7 @@ export function ProjectCard({ project }: { project: Project }) {
   const updatedAt = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(project.updated_at));
 
   return (
-    <Card className="interactive-lift flex min-h-80 flex-col p-6 transition-transform duration-200">
+    <Card className="project-card interactive-lift flex min-h-80 flex-col p-6 transition-transform duration-200">
       <div className="flex items-start justify-between gap-4">
         <Badge tone={project.status === "ready" ? "success" : "warning"}>{project.status}</Badge>
         <span className="text-xs font-semibold capitalize text-ink/70">{project.project_type?.replaceAll("-", " ") ?? "Type not set"}</span>

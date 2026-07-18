@@ -32,7 +32,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   return (
     <main>
       <Link className="inline-flex min-h-11 items-center font-bold text-forest underline-offset-4 hover:underline" href="/dashboard">← Back to projects</Link>
-      <header className="mt-5 border-b border-line pb-8">
+      <header className="project-identity mt-5 border-b border-line pb-8">
         <div className="flex flex-wrap items-center gap-3">
           <Badge tone={project.status === "ready" ? "success" : "warning"}>{project.status}</Badge>
           <span className="text-sm capitalize text-ink/70">{project.project_type?.replaceAll("-", " ") ?? "Project type not set"}</span>
@@ -41,7 +41,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         <p className="mt-5 max-w-3xl whitespace-pre-wrap text-lg leading-8 text-ink/65">{project.description || "Add a product description to make the project context easier to review."}</p>
       </header>
 
-      <nav className="flex gap-1 overflow-x-auto border-b border-line py-3" aria-label="Project sections">
+      <nav className="project-section-nav flex gap-1 overflow-x-auto border-b border-line py-3" aria-label="Project sections">
         <span aria-current="page" className="min-h-11 whitespace-nowrap border-b-2 border-forest px-4 py-3 text-sm font-bold text-forest">Overview</span>
         <span aria-disabled="true" className="min-h-11 whitespace-nowrap px-4 py-3 text-sm font-bold text-ink/70">Discovery (Phase 3B)</span>
         <span aria-disabled="true" className="min-h-11 whitespace-nowrap px-4 py-3 text-sm font-bold text-ink/70">Architecture (planned)</span>
@@ -85,7 +85,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             <h2 className="display-type text-2xl text-forest">Project actions</h2>
             <ProjectCardActions projectId={project.id} projectName={project.name} />
           </Card>
-          <section className="border border-gold/50 bg-gold/10 p-6">
+          <section className="continuation-surface border border-gold/50 bg-gold/10 p-6">
             <Badge tone="warning">Phase 3B continuation</Badge>
             <h2 className="display-type mt-4 text-2xl text-forest">Guided discovery begins here</h2>
             <p className="mt-3 text-sm leading-6 text-ink/65">The project and message persistence boundaries are ready. Adaptive questions, readiness assessment, and AI provider calls remain intentionally unimplemented.</p>

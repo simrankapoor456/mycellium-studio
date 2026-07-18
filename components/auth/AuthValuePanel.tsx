@@ -1,3 +1,4 @@
+import { AuthArchitectureMotif } from "@/components/auth/AuthArchitectureMotif";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 
 const productPath = [
@@ -8,7 +9,8 @@ const productPath = [
 
 export function AuthValuePanel() {
   return (
-    <aside className="bg-forest px-6 py-6 text-paper sm:px-10 sm:py-8 lg:flex lg:min-h-[100dvh] lg:flex-col lg:justify-between lg:px-14 lg:py-12">
+    <aside className="auth-value-panel bg-forest px-6 py-6 text-paper sm:px-10 sm:py-8 lg:flex lg:min-h-[100dvh] lg:flex-col lg:justify-between lg:px-14 lg:py-12">
+      <AuthArchitectureMotif />
       <BrandLogo light />
       <div className="mt-8 max-w-xl lg:my-20">
         <p className="font-mono text-sm font-bold text-sage">AI Product Architect</p>
