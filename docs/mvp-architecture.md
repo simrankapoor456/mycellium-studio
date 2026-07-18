@@ -1,4 +1,4 @@
-# mycellium studio MVP architecture
+# Mycellium Studio MVP architecture
 
 ## Phase 2 objective
 
@@ -82,3 +82,9 @@ domain schemas -X-> framework or database clients
 ## Deployment posture
 
 The app requires three public environment variables documented in `.env.example`. Deployment also requires applying the migration and configuring Supabase Auth URLs. OpenAI variables remain blank and unused. See [`docs/supabase-setup.md`](./supabase-setup.md).
+
+## Phase 3A presentation system
+
+Phase 3A adds a presentation layer without changing the trust boundary. Marketing content is rendered primarily as Server Components; only the product-stage tabs and form/dialog interactions cross the Client Component boundary. Fixed landing demonstration data lives in `lib/marketing/` and performs no network request.
+
+Semantic tokens in `app/globals.css` feed reusable components under `components/ui/` and `components/brand/`. Authentication and project pages reuse these components while retaining the same Phase 2 actions, validated operations, auth-scoped queries, and RLS policies. See [`docs/design-system.md`](./design-system.md) for the durable visual and interaction contract.

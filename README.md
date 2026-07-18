@@ -1,8 +1,8 @@
-# mycellium studio
+# Mycellium Studio
 
-mycellium studio turns an early software brief into a grounded, reviewable execution plan. Phase 2 adds the secure personal-user foundation: cookie-based authentication, private database-backed projects, and discovery persistence.
+Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Phase 3A adds the original rooted-M identity, complete marketing experience, and a polished authenticated product shell around the secure Phase 2 foundation.
 
-## Phase 2 status
+## Phase 3A status
 
 Included:
 
@@ -11,6 +11,11 @@ Included:
 - Email/password signup, confirmation, login, logout, and protected routes
 - Profiles, projects, and discovery-message tables with constraints, indexes, triggers, and RLS
 - Personal dashboard and project create/read/update/rename/duplicate/delete workflows
+- Hand-authored SVG logo, favicon, wordmark, lockup, touch icon, and social card
+- Responsive landing page with fixed-data Discover, Architect, and Execute interaction
+- Shared brand, layout, button, card, badge, form, loading, empty, tabs, and dialog patterns
+- Polished authentication, dashboard, project forms, and project shell
+- Canonical metadata, Open Graph, Twitter card, focus, motion, and reduced-motion behavior
 - Canonical Zod validation at environment, form, and database boundaries
 - Deterministic Phase 1 planner and typed export utilities
 - Preserved static prototype in [`legacy-static/`](./legacy-static/)
@@ -87,6 +92,7 @@ legacy-static/               Verbatim pre-Next.js prototype snapshot
 ## Documentation
 
 - [Supabase and authentication setup](./docs/supabase-setup.md)
+- [Mycellium design system](./docs/design-system.md)
 - [MVP architecture](./docs/mvp-architecture.md)
 - [Canonical output contract](./docs/output-schema.md)
 - [Build phases and boundaries](./docs/build-plan.md)

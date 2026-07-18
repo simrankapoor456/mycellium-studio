@@ -1,8 +1,8 @@
-# mycellium studio project charter
+# Mycellium Studio project charter
 
 ## Product statement
 
-mycellium studio helps people turn rough software ideas into grounded, reviewable execution plans.
+Mycellium Studio is an AI Product Architect that helps founders and product teams turn rough ideas into grounded product understanding, architecture, scope, requirements, and reviewable execution plans.
 
 ## Problem
 
@@ -16,7 +16,7 @@ mycellium studio creates a structured first pass while keeping facts, assumption
 - Product managers shaping an initial backlog
 - Engineering leads preparing delivery work
 - Agencies translating client briefs into plans
-- Students learning structured software planning
+- Student and capstone teams learning structured software planning
 
 ## Phase 1 goal
 
