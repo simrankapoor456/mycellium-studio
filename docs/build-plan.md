@@ -72,9 +72,20 @@ Status: implemented on `feat/fullstack-mvp`.
 
 Phase 3A.5 remains presentation-only. It makes no external model request and does not add adaptive discovery or new persistence behavior.
 
-## Phase 3B continuation
+## Phase 3B - core product experience
 
-Phase 3B begins from the protected project shell and existing discovery-message persistence. It may add adaptive questions, readiness assessment, server-side provider calls, validated structured extraction, and deterministic fallback orchestration after a separate security and product review.
+Status: implemented on `feat/fullstack-mvp`.
+
+- Added the responsive conversation and Living Product Graph workspace.
+- Added adaptive fact extraction, explicit unknowns, contradiction history, graph changes, and rooted readiness.
+- Added persisted review, assumption decisions, contradiction resolution, acceptable unknowns, and context approval.
+- Added a skippable, reduced-motion-safe architecture reveal.
+- Added a versioned canonical Product Blueprint with visible lineage and controlled editing.
+- Added authenticated discovery, review, blueprint, and persisted export APIs.
+- Added optional server-only OpenAI Responses structured output with bounded retry/timeout and contract-identical deterministic fallback.
+- Added a Phase 3B migration for approval/version metadata and idempotent discovery requests under RLS.
+
+Phase 3B does not add billing, subscriptions, teams, collaboration, or external publishing integrations.
 
 ## Preservation policy
 

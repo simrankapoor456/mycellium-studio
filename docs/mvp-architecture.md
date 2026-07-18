@@ -88,3 +88,27 @@ The app requires three public environment variables documented in `.env.example`
 Phase 3A adds a presentation layer without changing the trust boundary. Marketing content is rendered primarily as Server Components; only the product-stage tabs and form/dialog interactions cross the Client Component boundary. Fixed landing demonstration data lives in `lib/marketing/` and performs no network request.
 
 Semantic tokens in `app/globals.css` feed reusable components under `components/ui/` and `components/brand/`. Authentication and project pages reuse these components while retaining the same Phase 2 actions, validated operations, auth-scoped queries, and RLS policies. See [`docs/design-system.md`](./design-system.md) for the durable visual and interaction contract.
+
+## Phase 3B discovery and blueprint pipeline
+
+```text
+Authenticated browser
+  -> discovery turn with request UUID
+  -> ownership check and idempotency row
+  -> bounded conversation plus validated context
+  -> optional structured AI output OR deterministic extraction
+  -> fact merge, contradictions, readiness, and graph diff
+  -> persisted messages and project context
+  -> human review and approved context snapshot
+  -> optional structured AI blueprint OR deterministic blueprint
+  -> canonical ProductBlueprint 2.0
+  -> controlled edits and persisted exports
+```
+
+Route handlers derive identity from verified Supabase claims, re-read the owned project, validate request bodies, and constrain response shapes. PostgreSQL RLS independently protects projects, discovery messages, and discovery request records.
+
+`discovery_context`, `readiness_state`, and `plan` remain canonical validated JSON documents on the project. Ordered conversation remains relational. The Phase 3B migration adds an approved discovery snapshot, context and blueprint versions, and `discovery_requests` for duplicate-request protection.
+
+Lineage stores only user-visible references: source discovery message IDs, fact IDs, related requirement IDs, generated-from entity IDs, and `ai`, `fallback`, or `manual` source. Hidden model reasoning is neither requested nor persisted.
+
+The official OpenAI SDK exists only below `lib/ai/`. Both provider variables must be present before it runs. Requests use strict Zod-backed Responses API output, `store: false`, a 15-second timeout, and one SDK retry. An unavailable, timed-out, invalid, or lineage-inconsistent provider result falls back to the same canonical contracts.

@@ -1,6 +1,6 @@
-# Supabase setup for Phase 2
+# Supabase setup through Phase 3B
 
-Phase 2 needs a Supabase URL and publishable key only. Do not create, expose, or add a service-role key to this application.
+The application needs a Supabase URL and publishable key only. Do not create, expose, or add a service-role key.
 
 ## 1. Local environment
 
@@ -14,11 +14,13 @@ OPENAI_API_KEY=
 OPENAI_MODEL=
 ```
 
-`.env.local` is ignored by Git. Keep both OpenAI values blank in Phase 2.
+`.env.local` is ignored by Git. Keep both OpenAI values blank for deterministic Phase 3B behavior. Set both only when enabling optional provider generation; the API key remains server-only.
 
 ## 2. Apply the migration
 
 Apply [`supabase/migrations/20260717220000_phase_2_personal_foundation.sql`](../supabase/migrations/20260717220000_phase_2_personal_foundation.sql) to the target Supabase project.
+
+Then apply [`supabase/migrations/20260718000000_phase_3b_core_product.sql`](../supabase/migrations/20260718000000_phase_3b_core_product.sql). Migrations must run in timestamp order. Do not edit the already-applied Phase 2 migration.
 
 With a locally authenticated Supabase CLI, link the intended project and run:
 
@@ -27,7 +29,7 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-Alternatively, open the migration in the Supabase SQL Editor, review the target project, and run it once. The migration creates `profiles`, `projects`, and `discovery_messages`, then explicitly enables RLS and creates the policies described below. Do not run it against an unrelated or production project without the normal review/backup process.
+Alternatively, open each migration in the Supabase SQL Editor, review the target project, and run it once in timestamp order. Together they create `profiles`, `projects`, ordered `discovery_messages`, Phase 3B approval/version fields, and project-scoped `discovery_requests`, with explicit RLS. Do not run them against an unrelated or production project without the normal review/backup process.
 
 ## 3. Configure Auth
 
@@ -58,6 +60,7 @@ The callback verifies the one-time token on the server and then redirects to `/d
 - `profiles`: one row per `auth.users` record; a trigger provisions it at signup.
 - `projects`: personally owned project metadata plus JSON slots for later discovery/readiness/plan data.
 - `discovery_messages`: ordered, role-constrained messages that cascade when their project is deleted.
+- `discovery_requests`: project-scoped request UUIDs and completed response payloads for duplicate-turn protection.
 
 RLS permits an authenticated user to:
 
@@ -116,5 +119,5 @@ Expected results for User B: the select and update return no rows; the insert fa
 - Set `NEXT_PUBLIC_SITE_URL` to the exact deployed HTTPS origin.
 - Add the production confirmation callback to Supabase Auth redirect URLs.
 - Apply the checked-in migration to the deployment project's database.
-- Keep `OPENAI_API_KEY` and `OPENAI_MODEL` blank until an explicitly scoped AI phase.
+- Keep `OPENAI_API_KEY` and `OPENAI_MODEL` blank for deterministic mode, or set both to enable the optional server-only provider.
 - Run signup, confirmation, login, project CRUD, logout, and the two-user isolation test against the deployed environment.

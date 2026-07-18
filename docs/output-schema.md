@@ -64,3 +64,11 @@ Markdown and CSV are derived views. JSON is a formatted serialization of a fresh
 ## Versioning
 
 Additive optional fields may remain within schema version `1.x` when defaults preserve existing consumers. Removing or renaming fields, changing identifier semantics, or altering required nesting requires a new major schema version and explicit migration documentation.
+
+## Product Blueprint 2.0
+
+Phase 3B preserves `PlanOutputSchema` 1.0 for the Phase 1 planner and introduces a separate executable contract at `lib/domain/blueprint/schemas.ts`.
+
+`ProductBlueprintSchema` 2.0 contains overview and understanding references; goals; requirements; architecture decisions; scope; epics; stories; acceptance criteria; tasks; dependencies; sprint assignments; risks; review warnings; status; priority; owner; estimates; and explicit lineage on every editable plan entity.
+
+Blueprint and structured-document views operate on the same parsed object. Controlled edits re-parse the complete document, increment its version, mark the entity manually edited, and change its lineage source to `manual`. Markdown, JSON, and normalized CSV exports parse the persisted 2.0 document immediately before serialization.

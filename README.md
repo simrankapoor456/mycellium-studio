@@ -1,8 +1,8 @@
 # Mycellium Studio
 
-Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Phase 3A adds the original rooted-M identity, complete marketing experience, and a polished authenticated product shell around the secure Phase 2 foundation.
+Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Phase 3B connects authenticated discovery, a Living Product Graph, human approval, and an editable Product Blueprint to the secure foundation and signature experience.
 
-## Phase 3A status
+## Phase 3B status
 
 Included:
 
@@ -18,12 +18,14 @@ Included:
 - Canonical metadata, Open Graph, Twitter card, focus, motion, and reduced-motion behavior
 - Canonical Zod validation at environment, form, and database boundaries
 - Deterministic Phase 1 planner and typed export utilities
+- Adaptive discovery with explicit facts, unknowns, contradictions, readiness, and graph changes
+- Persisted review approval, visible lineage, and an editable Product Blueprint
+- Optional server-only OpenAI Responses API structured output with deterministic fallback
+- Persisted Markdown, JSON, and CSV blueprint exports
 - Preserved static prototype in [`legacy-static/`](./legacy-static/)
 
 Intentionally deferred:
 
-- Conversational discovery and OpenAI calls
-- Complete project editor and generated-plan workspace
 - Billing, teams, collaboration, and external integrations
 
 ## Requirements
@@ -50,7 +52,7 @@ Intentionally deferred:
    OPENAI_MODEL=
    ```
 
-   The OpenAI fields stay blank in Phase 2.
+   Keep both OpenAI fields blank to use the complete deterministic workflow. Set both only when enabling optional provider generation.
 
 3. Apply the checked-in Supabase migration and configure Auth by following [Supabase setup](./docs/supabase-setup.md).
 
@@ -77,11 +79,13 @@ Inspect dependency advisories with `npm audit`; do not apply forced major upgrad
 
 ```text
 app/                         Public, auth, and protected App Router routes
-components/                  Marketing, authentication, and project UI
+components/                  Marketing, discovery, blueprint, authentication, and project UI
 lib/auth/                    Verified user resolution and auth schemas
 lib/domain/                  Canonical Zod contracts and pure business logic
 lib/projects/                Auth-scoped project persistence operations
 lib/discovery/               Auth-scoped discovery persistence operations
+lib/blueprint/               Blueprint generation, editing, persistence, and exports
+lib/ai/                      Server-only optional OpenAI provider boundary
 lib/supabase/                Typed browser, server, and Proxy clients
 supabase/migrations/         Versioned schema, trigger, and RLS SQL
 tests/                       Pure unit and contract tests
