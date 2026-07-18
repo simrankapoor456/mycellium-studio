@@ -24,7 +24,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   try {
     if (parsed.data.action === "approve") {
       const readiness = calculateReadiness(context);
-      if (!canApproveDiscovery(context)) return NextResponse.json({ error: "Resolve critical gaps and contradictions before approval." }, { status: 409 });
+      if (!canApproveDiscovery(context)) return NextResponse.json({ error: "A few foundation decisions still need clarity before approval." }, { status: 409 });
       await approveDiscoveryState(project.id, user.id, context);
       return NextResponse.json({ context, readiness, approved: true });
     }

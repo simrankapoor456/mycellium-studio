@@ -12,5 +12,5 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
   if (!project.discovery_context) redirect(`/projects/${project.id}/discover`);
   const context = DiscoveryContextSchema.parse(project.discovery_context);
   const readiness = project.readiness_state ? ReadinessAssessmentSchema.parse(project.readiness_state) : calculateReadiness(context);
-  return <ReviewWorkspace initialContext={context} initialReadiness={readiness} initiallyApproved={Boolean(project.discovery_approved_at)} projectId={project.id} projectName={project.name} />;
+  return <ReviewWorkspace blueprintAvailable={project.plan_schema_version === "2.0" && Boolean(project.plan)} initialContext={context} initialReadiness={readiness} initiallyApproved={Boolean(project.discovery_approved_at)} projectId={project.id} projectName={project.name} />;
 }

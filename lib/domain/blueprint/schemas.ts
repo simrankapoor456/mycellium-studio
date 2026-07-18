@@ -116,7 +116,13 @@ export const BlueprintEditInputSchema = z.object({
   }).refine((changes) => Object.keys(changes).length > 0, "Provide at least one change."),
 });
 
+export const BlueprintGenerationResponseSchema = z.object({
+  blueprint: ProductBlueprintSchema,
+  generationSource: z.enum(["ai", "fallback"]),
+});
+
 export type Lineage = z.infer<typeof LineageSchema>;
 export type ProductBlueprint = z.infer<typeof ProductBlueprintSchema>;
 export type BlueprintEditInput = z.infer<typeof BlueprintEditInputSchema>;
+export type BlueprintGenerationResponse = z.infer<typeof BlueprintGenerationResponseSchema>;
 export type BlueprintEntityType = BlueprintEditInput["entityType"];

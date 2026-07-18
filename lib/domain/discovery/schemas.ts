@@ -146,6 +146,12 @@ export const DiscoveryReviewInputSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("approve") }),
 ]);
 
+export const DiscoveryReviewResponseSchema = z.object({
+  context: DiscoveryContextSchema,
+  readiness: ReadinessAssessmentSchema,
+  approved: z.boolean(),
+});
+
 export const DiscoveryMessageCreateSchema = z.object({
   projectId: z.string().uuid(),
   role: DiscoveryRoleSchema,
@@ -168,4 +174,5 @@ export type DiscoveryTurnInput = z.infer<typeof DiscoveryTurnInputSchema>;
 export type DiscoveryTurnResponse = z.infer<typeof DiscoveryTurnResponseSchema>;
 export type AiDiscoveryResponse = z.infer<typeof AiDiscoveryResponseSchema>;
 export type DiscoveryReviewInput = z.infer<typeof DiscoveryReviewInputSchema>;
+export type DiscoveryReviewResponse = z.infer<typeof DiscoveryReviewResponseSchema>;
 export type DiscoveryMessageCreateInput = z.infer<typeof DiscoveryMessageCreateSchema>;
