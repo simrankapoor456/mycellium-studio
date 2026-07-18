@@ -1,27 +1,38 @@
-import { FoundationPreview } from "@/components/marketing/FoundationPreview";
-import { Hero } from "@/components/marketing/Hero";
-import { SiteFooter } from "@/components/marketing/SiteFooter";
-import { SiteHeader } from "@/components/marketing/SiteHeader";
-import { generatePlan } from "@/lib/planner/generate-plan";
-
-const samplePlan = generatePlan({
-  brief:
-    "Build a calm planning tool for small product teams that turns a rough software brief into sprint-ready stories, review questions, and downloadable plan files.",
-  projectName: "mycellium studio",
-  projectType: "ai-product",
-  teamSize: 3,
-  sprintDurationWeeks: 2,
-  sprintCapacityPoints: 24,
-  planningDepth: "balanced",
-});
+import { FaqSection } from "@/components/marketing/FaqSection";
+import { FeatureShowcase } from "@/components/marketing/FeatureShowcase";
+import { FinalCtaSection } from "@/components/marketing/FinalCtaSection";
+import { HowItWorksSection } from "@/components/marketing/HowItWorksSection";
+import { IdealUsersSection } from "@/components/marketing/IdealUsersSection";
+import { JourneySection } from "@/components/marketing/JourneySection";
+import { LandingHero } from "@/components/marketing/LandingHero";
+import { MarketingFooter } from "@/components/marketing/MarketingFooter";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { PhilosophySection } from "@/components/marketing/PhilosophySection";
+import { PricingSection } from "@/components/marketing/PricingSection";
+import { ProblemSection } from "@/components/marketing/ProblemSection";
+import { TrustSection } from "@/components/marketing/TrustSection";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-canvas text-ink">
-      <SiteHeader />
-      <Hero />
-      <FoundationPreview plan={samplePlan} />
-      <SiteFooter />
-    </main>
+    <>
+      <a className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-surface focus:px-4 focus:py-3" href="#main-content">
+        Skip to main content
+      </a>
+      <MarketingHeader />
+      <main id="main-content">
+        <LandingHero />
+        <JourneySection />
+        <ProblemSection />
+        <HowItWorksSection />
+        <PhilosophySection />
+        <FeatureShowcase />
+        <IdealUsersSection />
+        <TrustSection />
+        <PricingSection />
+        <FaqSection />
+        <FinalCtaSection />
+      </main>
+      <MarketingFooter />
+    </>
   );
 }
