@@ -50,11 +50,11 @@ describe("interactive product experience", () => {
     expect(discover).toHaveAttribute("aria-selected", "true");
     await user.click(architect);
     expect(architect).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Product architecture")).toBeInTheDocument();
+    expect(screen.getByText("Scope and decision map")).toBeInTheDocument();
 
     fireEvent.keyDown(architect, { key: "ArrowRight" });
     expect(screen.getByRole("tab", { name: /Execute/ })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Execution structure")).toBeInTheDocument();
+    expect(screen.getByText("Epics, stories, tasks, sprints")).toBeInTheDocument();
   });
 
   it("uses native FAQ disclosure behavior", async () => {
@@ -82,6 +82,8 @@ describe("interactive product experience", () => {
     expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
     expect(styles).toContain(".root-path");
     expect(styles).toContain("animation: none");
+    expect(styles).toContain(".signature-hero-graph__light");
+    expect(styles).toContain("transition-duration: 0.01ms");
   });
 });
 
