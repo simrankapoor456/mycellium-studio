@@ -24,6 +24,8 @@ Then apply [`supabase/migrations/20260718000000_phase_3b_core_product.sql`](../s
 
 Finally apply [`supabase/migrations/20260718190000_mycel_core_intelligence.sql`](../supabase/migrations/20260718190000_mycel_core_intelligence.sql). It adds the separate Pressure Test snapshot, its blueprint-version link, and owner-scoped workflow idempotency records. Do not edit either earlier migration.
 
+Then apply [`supabase/migrations/20260719090000_phase_6_core_journey.sql`](../supabase/migrations/20260719090000_phase_6_core_journey.sql). It adds the custom product-type label, generation request lineage, and optional profile avatar, timezone, and location fields. Existing personal-workspace RLS policies remain unchanged.
+
 With a locally authenticated Supabase CLI, link the intended project and run:
 
 ```bash

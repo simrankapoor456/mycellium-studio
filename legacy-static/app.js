@@ -385,7 +385,7 @@ function inferMissingRequirements(brief) {
   if (!lower.includes("export") && !lower.includes("download") && !lower.includes("share")) {
     missing.push("handoff or export format");
   }
-  if (!lower.includes("deadline") && !lower.includes("sprint") && !lower.includes("week")) {
+  if (!lower.includes("target date") && !lower.includes("sprint") && !lower.includes("week")) {
     missing.push("timeline or delivery target");
   }
   if (!lower.includes("success") && !lower.includes("goal") && !lower.includes("useful")) {

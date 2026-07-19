@@ -27,7 +27,7 @@ The MVP does not need to automate the entire SDLC. It only needs to prove that t
 ## In Scope
 
 - Accept a project description
-- Optionally accept team size, sprint duration, sprint count, deadline, priority, and tech stack
+- Optionally accept team size, sprint duration, sprint count, target date, priority, and tech stack
 - Analyze requirements
 - Identify goals, assumptions, risks, constraints, and missing details
 - Generate epics

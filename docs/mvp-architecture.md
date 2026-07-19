@@ -132,3 +132,11 @@ Blueprint generation requires an approved context with no blocking contradiction
 Missing provider configuration and all bounded provider failures activate Reliable mode. Reliable mode uses the same canonical schemas, decisions, persistence paths, and UI workflow as AI-enhanced mode. The UI receives only the engine state and safe explanations, never credentials, raw provider data, or hidden reasoning.
 
 The `workflow_requests` table provides owner-scoped idempotency for blueprint generation and Pressure Test operations. The existing discovery request records continue to prevent duplicate discovery messages. Both tables are protected by RLS and project-ownership policies.
+
+## Phase 6 stabilized journey
+
+Phase 6 preserves the same trust boundary while making workflow state explicit. Foundation approval returns a typed blocker inventory with stable UI targets. Blueprint retries reuse one request UUID, failed or stale workflow records can safely restart, and the project stores the request UUID that produced its latest blueprint. Valid generation responses drive a short data-backed reveal and then open the persisted blueprint.
+
+The project journey derives availability from persisted discovery, approval, and blueprint fields. Export remains reachable before a blueprint so the unavailable state can explain the correct next action. The Foundation Map is a pure projection of canonical facts, gaps, contradictions, and challenges; it creates no parallel readiness state.
+
+Profile settings update the existing owner-protected `profiles` row. Password and email changes use Supabase Auth server flows. Account removal remains guidance because the browser-facing application has no privileged credential. The additive Phase 6 migration extends project types and profile metadata without changing existing RLS policies. Team storage and permissions remain deferred.

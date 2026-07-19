@@ -26,6 +26,10 @@ Included:
 - Persisted product challenges, graph fact controls, and non-mutating Pressure Test findings
 - Persisted Markdown, JSON, and CSV blueprint exports
 - Always-visible export navigation, locked-state guidance, direct downloads, and download success feedback
+- Long-form source-material intake, custom product types, and working-memory-aware discovery questions
+- Typed approval blockers with focused recovery actions and the interactive seven-area Foundation Map
+- Recoverable, idempotent blueprint generation with a data-driven architecture reveal and automatic navigation
+- Persisted six-stage project journey and owner-scoped profile settings
 - Centralized deterministic Mycellium voice for discovery, readiness, review, generation, errors, and exports
 - Preserved static prototype in [`legacy-static/`](./legacy-static/)
 
@@ -87,11 +91,12 @@ The Playwright export regression uses dedicated local variables and skips safely
 
 ```text
 app/                         Public, auth, and protected App Router routes
-components/                  Marketing, discovery, blueprint, authentication, and project UI
+components/                  Marketing, discovery, blueprint, profile, authentication, and project UI
 lib/auth/                    Verified user resolution and auth schemas
 lib/domain/                  Canonical Zod contracts and pure business logic
 lib/projects/                Auth-scoped project persistence operations
 lib/discovery/               Auth-scoped discovery persistence operations
+lib/profile/                 Owner-scoped profile persistence operations
 lib/blueprint/               Blueprint generation, editing, persistence, and exports
 lib/mycel-core/              AI proposals, decision policies, and deterministic orchestration
 lib/ai/                      Compatibility export for the server-only provider boundary

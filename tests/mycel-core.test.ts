@@ -8,6 +8,7 @@ import { AiDiscoveryResponseSchema, type AiDiscoveryResponse } from "@/lib/domai
 import { ProjectOutputSchema } from "@/lib/domain/project/schemas";
 import { authorizeEntityId, authorizeOwnedProject } from "@/lib/mycel-core/decision/authorize";
 import { decideContextApproval } from "@/lib/mycel-core/decision/readiness";
+import { shouldRestartWorkflowRequest } from "@/lib/mycel-core/decision/workflow";
 import { canContinueDiscovery, isWithinRateLimit } from "@/lib/mycel-core/decision/policies";
 import { validateAiDiscoveryProposal, validateProviderProposal } from "@/lib/mycel-core/decision/validate";
 import { generateReliablePressureTest } from "@/lib/mycel-core/execution/blueprint";
@@ -45,6 +46,14 @@ describe("Mycel Core boundaries", () => {
     expect(canContinueDiscovery("ready")).toBe(true);
     expect(isWithinRateLimit(3, 4)).toBe(true);
     expect(isWithinRateLimit(4, 4)).toBe(false);
+  });
+
+  it("restarts failed or stale workflow requests without duplicating active work", () => {
+    const current = new Date("2026-07-19T00:05:00.000Z").valueOf();
+    expect(shouldRestartWorkflowRequest("failed", "2026-07-19T00:04:50.000Z", current)).toBe(true);
+    expect(shouldRestartWorkflowRequest("pending", "2026-07-19T00:02:00.000Z", current)).toBe(true);
+    expect(shouldRestartWorkflowRequest("pending", "2026-07-19T00:04:50.000Z", current)).toBe(false);
+    expect(shouldRestartWorkflowRequest("completed", "2026-07-19T00:00:00.000Z", current)).toBe(false);
   });
 
   it("rejects malformed or untrusted AI proposals before execution", () => {

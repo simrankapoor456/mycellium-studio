@@ -12,7 +12,7 @@ describe("adaptive deterministic discovery", () => {
   it("extracts supported facts and chooses the highest-value missing area", () => {
     const result = advanceDiscovery({ context: emptyContext(), messageId: messageId(1), message: "I want to build an invoicing tool for independent freelance designers.", mode: "fallback", now });
     expect(result.extractedFacts.map((fact) => fact.category)).toEqual(expect.arrayContaining(["business_objective", "target_users", "use_cases"]));
-    expect(result.readinessAssessment.recommendedNextQuestion).toMatch(/painful situation/i);
+    expect(result.readinessAssessment.recommendedNextQuestion).toMatch(/product form|one outcome/i);
     expect(result.discoveryMode).toBe("fallback");
   });
 

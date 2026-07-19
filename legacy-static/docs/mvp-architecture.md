@@ -32,7 +32,7 @@ Optional metadata:
 - Team size
 - Sprint duration
 - Sprint count
-- Deadline
+- Target date
 - Tech stack
 - Priority
 - Target users

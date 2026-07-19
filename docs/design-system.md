@@ -61,7 +61,7 @@ Display type uses a strong roman sans face with tight spacing. Body copy uses a 
 - Marketing structure: borders and whitespace instead of decorative shadows
 - Dialog: native browser top layer with one quiet surface
 
-Nested cards, 24-pixel-plus radii, glass effects, outer glow, and decorative shadows are outside the system.
+Nested cards and decorative shadow stacks are outside the system. Translucency is reserved for navigation, selected intelligence surfaces, and generation state; restrained glow identifies active Mycel Core paths only.
 
 ## Reusable components
 
@@ -104,6 +104,8 @@ The signature experience keeps one Product Graph visible from the hero through t
 - Diagram labels and detail panels carry meaning independently of motion or color.
 
 The graph enters in four deliberate layers: seed, discovery, architecture, then execution. Pointer movement may offset selected hero layers by a few pixels through compositor transforms. Scroll progression changes a single active layer through `IntersectionObserver`; it does not bind rendering work to the scroll event. On narrow screens, the large SVG becomes a five-step ordered summary. The workflow diagrams remain locally scrollable without creating page-level overflow.
+
+Phase 6 extends this grammar into a near-black forest environment, warm cream type, bioluminescent active paths, and antique-gold uncertainty cues. The application stays calmer than marketing. Its journey rail, narrative review, Foundation Map, and generation workspace use persisted product state rather than decorative values. The architecture reveal lasts only long enough to explain the real blueprint structure, supports skip, and becomes immediate under reduced motion.
 
 ### Elevation and motion tokens
 
