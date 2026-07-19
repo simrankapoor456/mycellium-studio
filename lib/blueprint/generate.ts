@@ -8,6 +8,7 @@ import type { Project } from "@/lib/domain/project/schemas";
 
 export function generateDeterministicBlueprint(project: Project, approvedContextInput: DiscoveryContext, now: string): ProductBlueprint {
   const context = DiscoveryContextSchema.parse(approvedContextInput);
+  const nextBlueprintVersion = Math.max(1, project.blueprint_version + 1);
   const usableFacts = context.facts.filter((fact) => fact.deletedAt === null && (fact.status === "confirmed" || fact.status === "inferred"));
   const objectiveFact = firstFact(usableFacts, "business_objective") ?? firstFact(usableFacts, "problem") ?? usableFacts[0];
   const objective = objectiveFact?.value ?? project.description ?? `Create a useful first release of ${project.name}.`;
@@ -63,9 +64,10 @@ export function generateDeterministicBlueprint(project: Project, approvedContext
     projectId: project.id,
     projectName: project.name,
     projectType: project.project_type ?? "web-app",
+    customProjectType: project.custom_project_type,
     summary: `${project.name} turns the approved discovery context into traceable requirements, architecture, scope, and delivery work.`,
     generationSource: "fallback",
-    version: 1,
+    version: nextBlueprintVersion,
     createdAt: now,
     updatedAt: now,
     overview: { businessObjective: objective, targetUsers, successMetrics: metricFacts.map((fact) => fact.value) },
@@ -90,6 +92,7 @@ export function generateDeterministicBlueprint(project: Project, approvedContext
 
 export function normalizeAiBlueprint(candidate: unknown, project: Project, context: DiscoveryContext, now: string): ProductBlueprint {
   const parsed = ProductBlueprintSchema.parse(candidate);
+  const nextBlueprintVersion = Math.max(1, project.blueprint_version + 1);
   const goalIds = normalizedIds(parsed.goals, "GOAL");
   const requirementIds = normalizedIds(parsed.requirements, "REQ");
   const architectureIds = normalizedIds(parsed.architectureDecisions, "ARCH");
@@ -143,8 +146,9 @@ export function normalizeAiBlueprint(candidate: unknown, project: Project, conte
     projectId: project.id,
     projectName: project.name,
     projectType: project.project_type ?? "web-app",
+    customProjectType: project.custom_project_type,
     generationSource: "ai",
-    version: 1,
+    version: nextBlueprintVersion,
     createdAt: now,
     updatedAt: now,
     goals: parsed.goals.map((item) => normalizeBase(item, requiredMappedId(goalIds, item.id))),

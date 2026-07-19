@@ -74,6 +74,7 @@ export async function requestAiBlueprint(
           id: project.id,
           name: project.name,
           projectType: project.project_type,
+          customProjectType: project.custom_project_type,
           capacity: project.capacity,
         },
         approvedContext,

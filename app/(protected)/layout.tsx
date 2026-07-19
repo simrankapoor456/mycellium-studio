@@ -15,6 +15,7 @@ export default async function ProtectedLayout({ children }: Readonly<{ children:
           <BrandLogo href="/dashboard" />
           <nav className="flex items-center gap-1 sm:gap-3" aria-label="Workspace navigation">
             <a className="min-h-11 px-3 py-3 text-sm font-bold text-forest" href="/dashboard">Projects</a>
+            <a className="min-h-11 px-3 py-3 text-sm font-bold text-forest" href="/settings/profile">Profile</a>
             <form action={logoutAction}>
               <Button className="px-3 sm:px-5" type="submit" variant="quiet">Sign out</Button>
             </form>

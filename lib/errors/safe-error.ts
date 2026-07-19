@@ -62,3 +62,7 @@ export function toProjectErrorMessage(error: unknown): string {
 
   return "The project could not be saved. Please try again.";
 }
+
+export function toSafeErrorMessage(_error: unknown, fallback: string): string {
+  return fallback;
+}

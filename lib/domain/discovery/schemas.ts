@@ -7,6 +7,7 @@ export const DiscoveryModeSchema = z.enum(["ai", "fallback"]);
 export const DiscoveryEngineStateSchema = z.enum(["ai_enhanced", "reliable", "ai_unavailable_reliable"]);
 export const FactCategorySchema = z.enum([
   "business_objective",
+  "product_type",
   "problem",
   "target_users",
   "use_cases",
@@ -201,6 +202,33 @@ export const AiDiscoveryResponseSchema = z.object({
   generationMode: DiscoveryModeSchema,
 }).strict();
 
+export const FoundationBlockerKindSchema = z.enum([
+  "missing_foundation",
+  "unknown",
+  "contradiction",
+  "challenge",
+]);
+
+export const FoundationBlockerSchema = z.object({
+  id: z.string().min(1).max(120),
+  kind: FoundationBlockerKindSchema,
+  label: z.string().trim().min(1).max(240),
+  detail: z.string().trim().min(1).max(1_000),
+  targetId: z.string().min(1).max(160),
+});
+
+export const FoundationApprovalDetailsSchema = z.object({
+  total: z.number().int().positive(),
+  summary: z.string().trim().min(1).max(500),
+  counts: z.object({
+    missingFoundation: z.number().int().nonnegative(),
+    unknowns: z.number().int().nonnegative(),
+    contradictions: z.number().int().nonnegative(),
+    challenges: z.number().int().nonnegative(),
+  }),
+  blockers: z.array(FoundationBlockerSchema).min(1).max(100),
+});
+
 export const DiscoveryReviewInputSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("edit_fact"),
@@ -254,6 +282,8 @@ export type DiscoveryContext = z.infer<typeof DiscoveryContextSchema>;
 export type DiscoveryTurnInput = z.infer<typeof DiscoveryTurnInputSchema>;
 export type DiscoveryTurnResponse = z.infer<typeof DiscoveryTurnResponseSchema>;
 export type AiDiscoveryResponse = z.infer<typeof AiDiscoveryResponseSchema>;
+export type FoundationApprovalDetails = z.infer<typeof FoundationApprovalDetailsSchema>;
+export type FoundationBlocker = z.infer<typeof FoundationBlockerSchema>;
 export type DiscoveryReviewInput = z.infer<typeof DiscoveryReviewInputSchema>;
 export type DiscoveryReviewResponse = z.infer<typeof DiscoveryReviewResponseSchema>;
 export type DiscoveryMessageCreateInput = z.infer<typeof DiscoveryMessageCreateSchema>;

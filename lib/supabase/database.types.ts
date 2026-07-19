@@ -9,6 +9,9 @@ export type Json =
 type ProfileRow = {
   id: string;
   display_name: string | null;
+  avatar_url: string | null;
+  timezone: string | null;
+  location: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -19,6 +22,7 @@ type ProjectRow = {
   name: string;
   description: string | null;
   project_type: string | null;
+  custom_project_type: string | null;
   target_users: string | null;
   team_size: number | null;
   sprint_length: string | null;
@@ -38,6 +42,7 @@ type ProjectRow = {
   pressure_test: Json | null;
   pressure_tested_at: string | null;
   pressure_test_blueprint_version: number | null;
+  last_generation_request_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -84,11 +89,17 @@ export type Database = {
         Insert: {
           id: string;
           display_name?: string | null;
+          avatar_url?: string | null;
+          timezone?: string | null;
+          location?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           display_name?: string | null;
+          avatar_url?: string | null;
+          timezone?: string | null;
+          location?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -101,6 +112,7 @@ export type Database = {
           name: string;
           description?: string | null;
           project_type?: string | null;
+          custom_project_type?: string | null;
           target_users?: string | null;
           team_size?: number | null;
           sprint_length?: string | null;
@@ -120,6 +132,7 @@ export type Database = {
           pressure_test?: Json | null;
           pressure_tested_at?: string | null;
           pressure_test_blueprint_version?: number | null;
+          last_generation_request_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

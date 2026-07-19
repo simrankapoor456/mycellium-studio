@@ -5,6 +5,7 @@ import { ProductBlueprintSchema } from "@/lib/domain/blueprint/schemas";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
 import { getProjectById } from "@/lib/projects/operations";
 import { createClient } from "@/lib/supabase/server";
+import { shouldRestartWorkflowRequest } from "@/lib/mycel-core/decision/workflow";
 import { toJson } from "@/lib/discovery/persistence";
 import type { WorkflowOperation } from "@/lib/mycel-core/types";
 
@@ -56,6 +57,22 @@ export async function beginWorkflowRequest(
 
   if (existing.status === "completed" && existing.response_payload) {
     return { kind: "completed" as const, response: existing.response_payload };
+  }
+
+  if (shouldRestartWorkflowRequest(existing.status, existing.updated_at)) {
+    const { data: restarted, error: restartError } = await supabase
+      .from("workflow_requests")
+      .update({ status: "pending", response_payload: null })
+      .eq("id", existing.id)
+      .eq("user_id", userId)
+      .select("*")
+      .single();
+
+    if (restartError) {
+      throw restartError;
+    }
+
+    return { kind: "started" as const, request: restarted };
   }
 
   return { kind: "pending" as const };

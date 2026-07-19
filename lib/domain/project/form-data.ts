@@ -3,6 +3,7 @@ export function projectInputFromFormData(formData: FormData) {
     name: formData.get("name"),
     description: formData.get("description"),
     projectType: formData.get("projectType"),
+    customProjectType: formData.get("customProjectType"),
     targetUsers: formData.get("targetUsers"),
     teamSize: formData.get("teamSize"),
     sprintLength: formData.get("sprintLength"),

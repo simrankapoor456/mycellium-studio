@@ -20,6 +20,7 @@ type Message = Readonly<{ id: string; role: string; content: string }>;
 
 type DiscoveryWorkspaceProps = Readonly<{
   blueprintAvailable: boolean;
+  foundationApproved?: boolean;
   initialContext: DiscoveryContext;
   initialMessages: Message[];
   initialReadiness: ReadinessAssessment;
@@ -29,7 +30,7 @@ type DiscoveryWorkspaceProps = Readonly<{
   projectName: string;
 }>;
 
-export function DiscoveryWorkspace({ blueprintAvailable, initialContext, initialMessages, initialReadiness, initialEngineState = "reliable", downstreamItems = {}, projectId, projectName }: DiscoveryWorkspaceProps) {
+export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = false, initialContext, initialMessages, initialReadiness, initialEngineState = "reliable", downstreamItems = {}, projectId, projectName }: DiscoveryWorkspaceProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [context, setContext] = useState(initialContext);
   const [readiness, setReadiness] = useState(initialReadiness);
@@ -107,7 +108,7 @@ export function DiscoveryWorkspace({ blueprintAvailable, initialContext, initial
         <div><Link href={`/projects/${projectId}`}>← {projectName}</Link><span className="eyebrow">Product discovery</span><h1>Let’s find the product worth building.</h1></div>
         <div className="discovery-shell__mode"><span>Intelligence engine</span><strong>{MYCELLIUM_COPY.engineState[engineState]}</strong></div>
       </header>
-      <ProjectWorkspaceNav active="discovery" blueprintAvailable={blueprintAvailable} projectId={projectId} />
+      <ProjectWorkspaceNav active="discovery" blueprintAvailable={blueprintAvailable} discoveryStarted foundationApproved={foundationApproved} projectId={projectId} />
       <div aria-label="Discovery workspace panels" className="discovery-mobile-tabs" role="tablist">
         <button aria-selected={mobilePanel === "conversation"} onClick={() => setMobilePanel("conversation")} role="tab">Conversation</button>
         <button aria-selected={mobilePanel === "graph"} onClick={() => setMobilePanel("graph")} role="tab">Product graph</button>

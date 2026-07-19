@@ -13,8 +13,10 @@ import {
   DiscoveryReviewResponseSchema,
   DiscoveryTurnInputSchema,
   DiscoveryTurnResponseSchema,
+  type FoundationApprovalDetails,
 } from "@/lib/domain/discovery/schemas";
 import { PressureTestRequestSchema, PressureTestSchema } from "@/lib/domain/pressure-test/schemas";
+import { getProductTypeLabel } from "@/lib/domain/project/labels";
 import { requestAiBlueprint, requestAiDiscovery, requestAiPressureTest } from "@/lib/mycel-core/ai/openai";
 import { isOpenAiConfigured } from "@/lib/mycel-core/ai/provider";
 import { authorizeOwnedProject } from "@/lib/mycel-core/decision/authorize";
@@ -111,6 +113,10 @@ export async function orchestrateDiscoveryTurn(
         description: access.data.project.description,
         targetUsers: access.data.project.target_users,
         constraints: access.data.project.constraints,
+        productTypeLabel: getProductTypeLabel(
+          access.data.project.project_type,
+          access.data.project.custom_project_type,
+        ),
       }, now);
     const messages = await listDiscoveryMessages(access.data.project.id, access.data.userId);
     const sequence = messages.length + 1;
@@ -183,7 +189,7 @@ export async function orchestrateDiscoveryTurn(
 export async function orchestrateReviewChange(
   projectId: string,
   input: unknown,
-): Promise<CoreOutcome<z.output<typeof DiscoveryReviewResponseSchema>>> {
+): Promise<CoreOutcome<z.output<typeof DiscoveryReviewResponseSchema>, FoundationApprovalDetails>> {
   const access = await loadAccess(projectId);
   if (!access.ok) return access;
   if (!access.data.project.discovery_context) {
@@ -199,7 +205,9 @@ export async function orchestrateReviewChange(
     if (requestDecision.value.action === "approve") {
       const readiness = calculateReadiness(context);
       const approvalDecision = decideContextApproval(context, readiness);
-      if (approvalDecision.status !== "allowed") return failure(409, approvalDecision.explanation, approvalDecision.status);
+      if (approvalDecision.status !== "allowed") {
+        return failure(409, approvalDecision.explanation, approvalDecision.status, approvalDecision.details);
+      }
       const approvedContext = DiscoveryContextSchema.parse({ ...context, approvalState: "approved" });
       await approveDiscoveryState(access.data.project.id, access.data.userId, approvedContext);
       return success(DiscoveryReviewResponseSchema.parse({ context: approvedContext, readiness, approved: true }));
@@ -229,13 +237,30 @@ export async function orchestrateBlueprintGeneration(
   const foundationDecision = decideContextApproval(approvedContext, calculateReadiness(approvedContext));
   if (foundationDecision.status !== "allowed") return failure(409, foundationDecision.explanation, foundationDecision.status);
 
-  const rateDecision = await enforceWorkflowRate(access.data.project.id, access.data.userId, "blueprint_generation");
-  if (!rateDecision.ok) return rateDecision;
   const requestState = await beginWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation");
   if (requestState.kind === "completed") return success(BlueprintGenerationResponseSchema.parse(requestState.response));
   if (requestState.kind === "pending") return failure(409, "That architecture request is already being processed.", "denied");
+  const rateDecision = await enforceWorkflowRate(access.data.project.id, access.data.userId, "blueprint_generation");
+  if (!rateDecision.ok) {
+    await failWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation");
+    return rateDecision;
+  }
 
   try {
+    if (
+      access.data.project.last_generation_request_id === requestDecision.value.requestId
+      && access.data.project.plan
+    ) {
+      const persistedBlueprint = ProductBlueprintSchema.parse(access.data.project.plan);
+      const persistedResponse = BlueprintGenerationResponseSchema.parse({
+        blueprint: persistedBlueprint,
+        generationSource: persistedBlueprint.generationSource,
+        engineState: persistedBlueprint.generationSource === "ai" ? "ai_enhanced" : "reliable",
+      });
+      await completeWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation", persistedResponse);
+      return success(persistedResponse);
+    }
+
     const now = new Date().toISOString();
     const providerConfigured = isOpenAiConfigured();
     let blueprint = generateDeterministicBlueprint(access.data.project, approvedContext, now);
@@ -260,7 +285,7 @@ export async function orchestrateBlueprintGeneration(
       generationSource: blueprint.generationSource,
       engineState: resolveEngineState(providerConfigured, useAi),
     });
-    await persistBlueprint(access.data.project.id, access.data.userId, blueprint);
+    await persistBlueprint(access.data.project.id, access.data.userId, blueprint, requestDecision.value.requestId);
     await completeWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation", response);
     return success(response);
   } catch {
@@ -389,10 +414,11 @@ function success<Value>(data: Value): CoreOutcome<Value> {
   return { ok: true, status: 200, data };
 }
 
-function failure(
+function failure<Details = undefined>(
   status: 400 | 401 | 404 | 409 | 429 | 500,
   error: string,
   decision: Exclude<DecisionStatus, "allowed">,
-): CoreOutcome<never> {
-  return { ok: false, status, error, decision };
+  details?: Details,
+): CoreOutcome<never, Details> {
+  return { ok: false, status, error, decision, details };
 }

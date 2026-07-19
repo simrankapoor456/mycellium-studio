@@ -1,5 +1,6 @@
 import { ProductBlueprintSchema, type ProductBlueprint } from "@/lib/domain/blueprint/schemas";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
+import { getProductTypeLabel } from "@/lib/domain/project/labels";
 
 export type BlueprintExportFormat = "markdown" | "json" | "csv";
 
@@ -10,7 +11,7 @@ export function blueprintToJson(input: ProductBlueprint): string {
 export function blueprintToMarkdown(input: ProductBlueprint, pressureTestInput?: PressureTest | null): string {
   const blueprint = ProductBlueprintSchema.parse(input);
   const pressureTest = pressureTestInput ? PressureTestSchema.parse(pressureTestInput) : null;
-  const lines = [`# ${blueprint.projectName}`, "", blueprint.summary, "", "## Understanding", `Business objective: ${blueprint.overview.businessObjective}`, "", "### Target users", ...blueprint.overview.targetUsers.map((item) => `- ${item}`), "", "### Success metrics", ...blueprint.overview.successMetrics.map((item) => `- ${item}`), "", "### Assumptions", ...listOrNone(blueprint.assumptions), "", "### Constraints", ...listOrNone(blueprint.constraints), "", "### Dependencies", ...listOrNone(blueprint.dependencies), "", "### Trade-offs", ...listOrNone(blueprint.tradeOffs), "", "### Ownership suggestions", ...listOrNone(blueprint.ownershipSuggestions), "", "## Goals", ...blueprint.goals.map((item) => `- **${item.title}:** ${item.description}`), "", "## Requirements"];
+  const lines = [`# ${blueprint.projectName}`, "", blueprint.summary, "", `Product type: ${getProductTypeLabel(blueprint.projectType, blueprint.customProjectType)}`, "", "## Understanding", `Business objective: ${blueprint.overview.businessObjective}`, "", "### Target users", ...blueprint.overview.targetUsers.map((item) => `- ${item}`), "", "### Success metrics", ...blueprint.overview.successMetrics.map((item) => `- ${item}`), "", "### Assumptions", ...listOrNone(blueprint.assumptions), "", "### Constraints", ...listOrNone(blueprint.constraints), "", "### Dependencies", ...listOrNone(blueprint.dependencies), "", "### Trade-offs", ...listOrNone(blueprint.tradeOffs), "", "### Ownership suggestions", ...listOrNone(blueprint.ownershipSuggestions), "", "## Goals", ...blueprint.goals.map((item) => `- **${item.title}:** ${item.description}`), "", "## Requirements"];
   for (const item of blueprint.requirements) lines.push(`### ${item.id}: ${item.title}`, item.description, ...item.acceptanceCriteria.map((criterion) => `- ${criterion}`), lineageLine(item), "");
   lines.push("## Architecture");
   for (const item of blueprint.architectureDecisions) lines.push(`### ${item.id}: ${item.title}`, item.description, `Rationale: ${item.rationale}`, lineageLine(item), "");
@@ -31,6 +32,7 @@ export function blueprintToMarkdown(input: ProductBlueprint, pressureTestInput?:
 export function blueprintToCsv(input: ProductBlueprint): string {
   const blueprint = ProductBlueprintSchema.parse(input);
   const rows: Array<Array<string | number>> = [["type", "id", "parent_id", "title", "status", "priority", "owner", "estimate", "description", "fact_ids", "requirement_ids", "generation_source"]];
+  rows.push(["project", blueprint.projectId, "", blueprint.projectName, "", "", "", "", `Product type: ${getProductTypeLabel(blueprint.projectType, blueprint.customProjectType)}`, "", "", blueprint.generationSource]);
   const add = (type: string, item: { id: string; title: string; status: string; priority: string; owner: string | null; estimate: number | null; description: string; lineage: { factIds: string[]; requirementIds: string[]; source: string } }, parent = "") => rows.push([type, item.id, parent, item.title, item.status, item.priority, item.owner ?? "", item.estimate ?? "", item.description, item.lineage.factIds.join("|"), item.lineage.requirementIds.join("|"), item.lineage.source]);
   blueprint.goals.forEach((item) => add("goal", item));
   blueprint.requirements.forEach((item) => add("requirement", item));

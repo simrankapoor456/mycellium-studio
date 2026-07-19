@@ -54,6 +54,7 @@ export async function createProject(
       name: input.name,
       description: input.description,
       project_type: input.projectType,
+      custom_project_type: input.customProjectType,
       target_users: input.targetUsers,
       team_size: input.teamSize,
       sprint_length: input.sprintLength,
@@ -103,6 +104,7 @@ export async function updateProjectMetadata(
     .update({
       description: input.description,
       project_type: input.projectType,
+      custom_project_type: input.customProjectType,
       target_users: input.targetUsers,
       team_size: input.teamSize,
       sprint_length: input.sprintLength,

@@ -10,17 +10,22 @@ export const DecisionStatusSchema = z.enum([
 
 export type DecisionStatus = z.infer<typeof DecisionStatusSchema>;
 
-export type DecisionResult<Value = undefined> =
+export type DecisionResult<Value = undefined, Details = undefined> =
   | Readonly<{ status: "allowed"; explanation: string; value: Value }>
-  | Readonly<{ status: "denied" | "requires_review" | "requires_clarification" | "fallback_required"; explanation: string }>;
+  | Readonly<{
+    status: "denied" | "requires_review" | "requires_clarification" | "fallback_required";
+    explanation: string;
+    details?: Details | undefined;
+  }>;
 
-export type CoreOutcome<Value> =
+export type CoreOutcome<Value, Details = undefined> =
   | Readonly<{ ok: true; status: 200; data: Value }>
   | Readonly<{
     ok: false;
     status: 400 | 401 | 404 | 409 | 429 | 500;
     error: string;
     decision: Exclude<DecisionStatus, "allowed">;
+    details?: Details | undefined;
   }>;
 
 export const EngineStateSchema = z.enum([

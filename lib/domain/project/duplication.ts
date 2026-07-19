@@ -22,6 +22,7 @@ export function createProjectDuplicate(
     name: duplicateProjectName(source.name),
     description: source.description,
     project_type: source.project_type,
+    custom_project_type: source.custom_project_type,
     target_users: source.target_users,
     team_size: source.team_size,
     sprint_length: source.sprint_length,
@@ -41,5 +42,6 @@ export function createProjectDuplicate(
     pressure_test: source.pressure_test,
     pressure_tested_at: source.pressure_tested_at,
     pressure_test_blueprint_version: source.pressure_test_blueprint_version,
+    last_generation_request_id: null,
   };
 }

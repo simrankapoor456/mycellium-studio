@@ -2,13 +2,14 @@ import type { DiscoveryFact, FactCategory, ReadinessAssessment } from "@/lib/dom
 
 export const DISCOVERY_CATEGORY_COPY: Record<FactCategory, { label: string; question: string }> = {
   business_objective: { label: "Business objective", question: "What should this product change for the person or business behind it?" },
-  problem: { label: "Problem", question: "What painful situation does this create in the user's real workflow?" },
+  product_type: { label: "Product type", question: "Which product form best fits this experience?" },
+  problem: { label: "Problem", question: "Where does the current approach break down for the person using it?" },
   target_users: { label: "Target users", question: "Who should feel that the first version was made specifically for them?" },
-  use_cases: { label: "Primary use case", question: "What is the one outcome that person must be able to complete in the first release?" },
+  use_cases: { label: "Primary outcome", question: "What is the one outcome the first version must help the user accomplish?" },
   success_metrics: { label: "Success measure", question: "What observable result would convince you the first release is working?" },
   functional_requirements: { label: "Core capability", question: "Which capability is essential to make that outcome possible?" },
   non_functional_requirements: { label: "Quality expectation", question: "Which security, accessibility, reliability, or performance expectation cannot be compromised?" },
-  constraints: { label: "Constraint", question: "Which deadline, budget, platform, or policy boundary will shape the design most?" },
+  constraints: { label: "Constraint", question: "Which budget, platform, policy, or delivery boundary will shape the design most?" },
   assumptions: { label: "Assumption", question: "Which important belief are you relying on but have not validated yet?" },
   risks: { label: "Risk", question: "What could make this product unsafe, frustrating, or not worth shipping?" },
   architecture_decisions: { label: "Technical boundary", question: "Is any technical boundary already decided, or should the architecture stay open for now?" },

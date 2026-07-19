@@ -306,7 +306,7 @@ function inferMissingRequirements(brief: string): string[] {
     missingRequirements.push("handoff or export format");
   }
 
-  if (!/deadline|sprint|week/.test(normalizedBrief)) {
+  if (!/target date|sprint|week/.test(normalizedBrief)) {
     missingRequirements.push("timeline or delivery target");
   }
 

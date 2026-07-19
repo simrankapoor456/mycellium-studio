@@ -5,7 +5,7 @@ import { useState } from "react";
 import { GraphNodeDetail } from "@/components/discovery/GraphNodeDetail";
 import type { DiscoveryContext, DiscoveryReviewInput, ProductGraph } from "@/lib/domain/discovery/schemas";
 
-const CATEGORY_COLUMNS = ["business_objective", "problem", "target_users", "use_cases", "success_metrics", "functional_requirements", "non_functional_requirements", "constraints", "assumptions", "risks", "architecture_decisions", "included_scope", "excluded_scope", "technical_preferences", "dependencies", "unknowns"] as const;
+const CATEGORY_COLUMNS = ["business_objective", "product_type", "problem", "target_users", "use_cases", "success_metrics", "functional_requirements", "non_functional_requirements", "constraints", "assumptions", "risks", "architecture_decisions", "included_scope", "excluded_scope", "technical_preferences", "dependencies", "unknowns"] as const;
 
 type LivingProductGraphProps = Readonly<{
   graph: ProductGraph;

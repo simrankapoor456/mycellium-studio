@@ -67,6 +67,7 @@ export const ProductBlueprintSchema = z.object({
   projectId: z.string().uuid(),
   projectName: z.string().trim().min(1).max(120),
   projectType: ProjectTypeSchema,
+  customProjectType: z.string().trim().min(1).max(120).nullable().default(null),
   summary: z.string().trim().min(1).max(4_000),
   generationSource: GenerationSourceSchema,
   version: z.number().int().positive(),

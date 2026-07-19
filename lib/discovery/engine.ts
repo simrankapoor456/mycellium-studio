@@ -25,9 +25,10 @@ import {
 
 const CATEGORY_ORDER = [
   "business_objective",
-  "problem",
+  "product_type",
   "target_users",
   "use_cases",
+  "problem",
   "success_metrics",
   "functional_requirements",
   "constraints",
@@ -43,6 +44,7 @@ const CATEGORY_ORDER = [
 
 const CATEGORY_CONFIG: Record<FactCategory, { label: string; question: string; weight: number; critical: boolean; single: boolean }> = {
   business_objective: { ...DISCOVERY_CATEGORY_COPY.business_objective, weight: 14, critical: true, single: true },
+  product_type: { ...DISCOVERY_CATEGORY_COPY.product_type, weight: 0, critical: false, single: true },
   problem: { ...DISCOVERY_CATEGORY_COPY.problem, weight: 14, critical: true, single: true },
   target_users: { ...DISCOVERY_CATEGORY_COPY.target_users, weight: 14, critical: true, single: false },
   use_cases: { ...DISCOVERY_CATEGORY_COPY.use_cases, weight: 14, critical: true, single: false },
@@ -65,6 +67,7 @@ type ProjectSeed = Readonly<{
   description: string | null;
   targetUsers: string | null;
   constraints: string | null;
+  productTypeLabel?: string | null;
 }>;
 
 type AdvanceDiscoveryInput = Readonly<{
@@ -81,7 +84,19 @@ export function createInitialDiscoveryContext(project: ProjectSeed, now: string)
   const seedFacts: DiscoveryFact[] = [];
 
   if (project.description?.trim()) {
-    seedFacts.push(createFact("business_objective", "Starting idea", project.description, "inferred", [], now));
+    const sourceFacts = extractDeterministicFacts(project.description, "business_objective");
+    seedFacts.push(...sourceFacts.map((fact) => createFact(
+      fact.category,
+      fact.label,
+      fact.value,
+      "inferred",
+      [],
+      now,
+      Math.min(fact.confidence, 0.72),
+    )));
+  }
+  if (project.productTypeLabel?.trim()) {
+    seedFacts.push(createFact("product_type", "Product type", project.productTypeLabel, "confirmed", [], now));
   }
   if (project.targetUsers?.trim()) {
     seedFacts.push(createFact("target_users", "Initial target users", project.targetUsers, "inferred", [], now));
@@ -315,7 +330,7 @@ function extractDeterministicFacts(message: string, fallbackCategory: FactCatego
   if (/\b(freelanc(?:e|er|ers)|designer|consultant|contractor|student|founder|customer|operator|team|user)\b/.test(normalized)) categories.add("target_users");
   if (/\b(use case|workflow|invoic\w*|track|create|send|manage|review|approve)\b/.test(normalized)) categories.add("use_cases");
   if (/\b(success|metric|measure|faster|reduce|increase|conversion|retention)\b/.test(normalized)) categories.add("success_metrics");
-  if (/\b(must|only|deadline|budget|without|cannot|can't|platform|policy|minimal)\b/.test(normalized)) categories.add("constraints");
+  if (/\b(must|only|budget|without|cannot|can't|platform|policy|minimal)\b/.test(normalized)) categories.add("constraints");
   if (/\b(risk|concern|worry|unsafe|security|fraud|failure)\b/.test(normalized)) categories.add("risks");
   if (/\b(feature|support|allow|need to|should be able)\b/.test(normalized)) categories.add("functional_requirements");
   if (/\b(in scope|include in|first release includes|must include)\b/.test(normalized)) categories.add("included_scope");
@@ -419,6 +434,10 @@ function calculateUnresolvedDecisionIds(
 }
 
 function questionReasonFor(category: FactCategory): string {
+  if (category === "use_cases") {
+    return "This helps Mycel Core separate the essential experience from features that can wait.";
+  }
+
   if (CATEGORY_CONFIG[category].critical) {
     return "This decision shapes the core product outcome and the scope built around it.";
   }

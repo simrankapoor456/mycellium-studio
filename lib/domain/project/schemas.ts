@@ -12,12 +12,13 @@ export const SprintLengthSchema = z.enum([
 export const ProjectStatusSchema = z.enum(["discovery", "ready", "planned", "archived"]);
 
 const OptionalTextSchema = (maximum: number) =>
-  z.string().trim().max(maximum).transform((value) => value || null);
+  z.string().trim().max(maximum).optional().transform((value) => value || null);
 
-export const ProjectCreateInputSchema = z.object({
+const ProjectInputFieldsSchema = z.object({
   name: z.string().trim().min(1, "Enter a project name.").max(120),
-  description: OptionalTextSchema(2_000),
+  description: OptionalTextSchema(20_000),
   projectType: ProjectTypeSchema,
+  customProjectType: OptionalTextSchema(120),
   targetUsers: OptionalTextSchema(1_000),
   teamSize: z.coerce.number().int().min(1).max(50),
   sprintLength: SprintLengthSchema,
@@ -25,6 +26,18 @@ export const ProjectCreateInputSchema = z.object({
   planningDepth: PlanningDepthSchema,
   constraints: OptionalTextSchema(5_000),
 });
+
+function validateCustomProjectType(input: { projectType: z.infer<typeof ProjectTypeSchema>; customProjectType: string | null }, context: z.core.$RefinementCtx) {
+  if (input.projectType === "custom" && !input.customProjectType) {
+    context.addIssue({
+      code: "custom",
+      message: "Describe the custom product type.",
+      path: ["customProjectType"],
+    });
+  }
+}
+
+export const ProjectCreateInputSchema = ProjectInputFieldsSchema.superRefine(validateCustomProjectType);
 
 export const ProjectRenameInputSchema = z.object({
   projectId: z.string().uuid(),
@@ -35,11 +48,11 @@ export const ProjectIdInputSchema = z.object({
   projectId: z.string().uuid(),
 });
 
-export const ProjectMetadataUpdateInputSchema = ProjectCreateInputSchema.omit({
+export const ProjectMetadataUpdateInputSchema = ProjectInputFieldsSchema.omit({
   name: true,
 }).extend({
   projectId: z.string().uuid(),
-});
+}).superRefine(validateCustomProjectType);
 
 const JsonObjectSchema = z.custom<Json>((value) => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -51,6 +64,7 @@ export const ProjectOutputSchema = z.object({
   name: z.string().min(1).max(120),
   description: z.string().nullable(),
   project_type: ProjectTypeSchema.nullable(),
+  custom_project_type: z.string().nullable().default(null),
   target_users: z.string().nullable(),
   team_size: z.number().int().nullable(),
   sprint_length: SprintLengthSchema.nullable(),
@@ -70,6 +84,7 @@ export const ProjectOutputSchema = z.object({
   pressure_test: JsonObjectSchema.nullable().default(null),
   pressure_tested_at: z.string().datetime({ offset: true }).nullable().default(null),
   pressure_test_blueprint_version: z.number().int().positive().nullable().default(null),
+  last_generation_request_id: z.string().uuid().nullable().default(null),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
