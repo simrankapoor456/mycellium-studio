@@ -14,7 +14,7 @@ const navigation = [
 
 export function MarketingHeader() {
   return (
-    <header className="border-b border-line/80 bg-canvas/95">
+    <header className="marketing-header border-b border-line/80 bg-canvas/95">
       <Container className="flex min-h-20 items-center justify-between gap-5">
         <BrandLogo />
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
