@@ -12,7 +12,7 @@ export function ReviewFactList({ context, pending, onMutate }: ReviewFactListPro
   return (
     <section className="review-facts">
       <div className="section-intro"><div><span className="eyebrow">What I heard</span><h2>Your product foundation</h2></div><span>{context.facts.length} rooted details</span></div>
-      {context.facts.map((fact) => (
+      {context.facts.filter((fact) => fact.deletedAt === null).map((fact) => (
         <form key={fact.id} onSubmit={(event: FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           const data = new FormData(event.currentTarget);
@@ -28,7 +28,10 @@ export function ReviewFactList({ context, pending, onMutate }: ReviewFactListPro
           <textarea defaultValue={fact.value} name="value" rows={2} />
           <select aria-label={`Confidence for ${fact.label}`} defaultValue={fact.status} name="status"><option value="confirmed">Known</option><option value="inferred">Working assumption</option><option value="unknown">Still unknown</option><option value="rejected">Not part of the plan</option></select>
           <button disabled={pending} type="submit">Save change</button>
-          {fact.status === "inferred" ? <button disabled={pending} onClick={() => onMutate({ action: "reject_assumption", factId: fact.id })} type="button">Remove assumption</button> : null}
+          {fact.status !== "confirmed" ? <button disabled={pending} onClick={() => onMutate({ action: "confirm_fact", factId: fact.id })} type="button">Confirm</button> : null}
+          {fact.status !== "unknown" ? <button disabled={pending} onClick={() => onMutate({ action: "mark_unknown", factId: fact.id })} type="button">Mark unknown</button> : null}
+          <button disabled={pending} onClick={() => onMutate({ action: "reject_assumption", factId: fact.id })} type="button">Reject</button>
+          <button disabled={pending} onClick={() => onMutate({ action: "delete_fact", factId: fact.id })} type="button">Delete</button>
           {fact.status === "unknown" && !context.acceptedUnknownFactIds.includes(fact.id) ? <button disabled={pending} onClick={() => onMutate({ action: "accept_unknown", factId: fact.id })} type="button">Plan around this unknown</button> : null}
         </form>
       ))}

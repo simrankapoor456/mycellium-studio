@@ -12,10 +12,19 @@ export const DISCOVERY_CATEGORY_COPY: Record<FactCategory, { label: string; ques
   assumptions: { label: "Assumption", question: "Which important belief are you relying on but have not validated yet?" },
   risks: { label: "Risk", question: "What could make this product unsafe, frustrating, or not worth shipping?" },
   architecture_decisions: { label: "Technical boundary", question: "Is any technical boundary already decided, or should the architecture stay open for now?" },
+  included_scope: { label: "Included scope", question: "Which capability must stay inside the first release boundary?" },
+  excluded_scope: { label: "Excluded scope", question: "What should explicitly wait until later?" },
+  technical_preferences: { label: "Technical preference", question: "Is there a technical preference worth preserving, or should this stay open?" },
+  dependencies: { label: "Dependency", question: "Which outside system or data source could control whether the product works?" },
   unknowns: { label: "Open question", question: "Which unresolved choice would be most useful to settle next?" },
 };
 
 export const MYCELLIUM_COPY = {
+  engineState: {
+    ai_enhanced: "Mycel Core · AI enhanced",
+    reliable: "Mycel Core · Reliable mode",
+    ai_unavailable_reliable: "Mycel Core · AI unavailable, Reliable mode active",
+  },
   mode: {
     ai: "AI-guided discovery",
     fallback: "Reliable mode",

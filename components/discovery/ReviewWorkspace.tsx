@@ -6,6 +6,7 @@ import { useState } from "react";
 import { BlueprintCompletion } from "@/components/blueprint/BlueprintCompletion";
 import { ArchitectureReveal } from "@/components/discovery/ArchitectureReveal";
 import { ReadinessRoots } from "@/components/discovery/ReadinessRoots";
+import { ReviewChallenges } from "@/components/discovery/ReviewChallenges";
 import { ReviewContradictions } from "@/components/discovery/ReviewContradictions";
 import { ReviewFactList } from "@/components/discovery/ReviewFactList";
 import { ProjectWorkspaceNav } from "@/components/projects/ProjectWorkspaceNav";
@@ -64,7 +65,7 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
     setError("");
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/blueprint`, { method: "POST" });
+      const response = await fetch(`/api/projects/${projectId}/blueprint`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId: crypto.randomUUID() }) });
       const responseBody: unknown = await response.json();
 
       if (!response.ok) {
@@ -98,6 +99,7 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
       {error ? <div className="form-message" role="alert"><strong>We hit a pause.</strong><p>{error}</p>{generationFailed ? <p>{MYCELLIUM_COPY.export.unavailableAfterFailure}</p> : null}</div> : null}
       <ReviewFactList context={context} onMutate={(input) => void handleMutation(input)} pending={pending} />
       <ReviewContradictions context={context} onMutate={(input) => void handleMutation(input)} pending={pending} />
+      <ReviewChallenges context={context} onMutate={(input) => void handleMutation(input)} pending={pending} />
       <footer className="review-approval"><div><strong>{approved ? MYCELLIUM_COPY.review.approvedTitle : MYCELLIUM_COPY.review.pendingTitle}</strong><p>{approved ? MYCELLIUM_COPY.review.approvedDetail : MYCELLIUM_COPY.review.pendingDetail}</p></div>{approved ? <button disabled={generationState === "generating"} onClick={() => void handleArchitect()} type="button">{generationState === "generating" ? MYCELLIUM_COPY.generation.active : MYCELLIUM_COPY.generation.idle}</button> : <button disabled={pending} onClick={() => void handleMutation({ action: "approve" })} type="button">Approve this foundation</button>}</footer>
       {hasBlueprint ? <Link className="review-export-link" href={`/projects/${projectId}/export`}>Export the current Product Blueprint →</Link> : <p className="review-export-locked">{MYCELLIUM_COPY.export.lockedDescription}</p>}
     </main>

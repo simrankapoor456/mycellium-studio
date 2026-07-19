@@ -95,7 +95,7 @@ export function ProductGraphHero() {
       <div aria-hidden="true" className="signature-hero-graph__light" ref={lightRef} />
       <div className="signature-hero-graph__header">
         <span>Live Product Graph</span>
-        <span>Fixed demo data</span>
+        <span>Fixed example data</span>
       </div>
       <ProductGraph
         activeLevel={4}

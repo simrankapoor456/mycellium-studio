@@ -1,5 +1,5 @@
 import { FaqSection } from "@/components/marketing/FaqSection";
-import { FeatureShowcase } from "@/components/marketing/FeatureShowcase";
+import { FeatureOverview } from "@/components/marketing/FeatureOverview";
 import { FinalCtaSection } from "@/components/marketing/FinalCtaSection";
 import { IdealUsersSection } from "@/components/marketing/IdealUsersSection";
 import { JourneySection } from "@/components/marketing/JourneySection";
@@ -25,7 +25,7 @@ export default function HomePage() {
         <JourneySection />
         <ProblemSection />
         <PhilosophySection />
-        <FeatureShowcase />
+        <FeatureOverview />
         <IdealUsersSection />
         <TrustSection />
         <PricingSection />

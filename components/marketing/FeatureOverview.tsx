@@ -15,14 +15,10 @@ const capabilities = [
 ] as const;
 
 function statusTone(status: string) {
-  if (status === "Available") {
-    return "success" as const;
-  }
-
-  return "neutral" as const;
+  return status === "Available" ? ("success" as const) : ("neutral" as const);
 }
 
-export function FeatureShowcase() {
+export function FeatureOverview() {
   return (
     <section className="py-24 sm:py-32">
       <Container>

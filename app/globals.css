@@ -1401,6 +1401,9 @@ marker path {
 .review-facts select,
 .review-contradictions input,
 .review-contradictions select,
+.living-graph__edit textarea,
+.living-graph__resolution input,
+.living-graph__resolution select,
 .blueprint-editor input,
 .blueprint-editor textarea,
 .blueprint-editor select { width: 100%; border: 1px solid var(--color-line-strong); border-radius: 0.45rem; background: var(--color-surface); padding: 0.7rem; color: var(--color-ink); }
@@ -1410,6 +1413,8 @@ marker path {
 .review-approval button,
 .review-facts button,
 .review-contradictions button,
+.review-challenges button,
+.living-graph__detail button,
 .architecture-reveal button,
 .blueprint-editor button,
 .blueprint-exports a { min-height: 2.75rem; border: 1px solid var(--color-forest); background: var(--color-forest); padding: 0.7rem 1rem; color: white; font-weight: 800; }
@@ -1443,13 +1448,23 @@ marker path {
 .living-graph__detail h3 { margin-top: 0.35rem; color: var(--color-forest); font-weight: 800; }
 .living-graph__detail p { margin-top: 0.35rem; line-height: 1.55; }
 .living-graph__detail small { display: block; margin-top: 0.5rem; color: color-mix(in srgb, var(--color-ink) 65%, transparent); }
+.living-graph__detail > a { display: block; margin-top: 0.6rem; color: var(--color-forest); font-size: 0.72rem; font-weight: 800; text-decoration: underline; }
+.living-graph__metadata { display: grid; gap: 0.6rem; margin-top: 0.85rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.living-graph__metadata dt { color: var(--color-moss); font: 700 0.6rem var(--font-mono); text-transform: uppercase; }
+.living-graph__metadata dd { margin-top: 0.2rem; overflow-wrap: anywhere; font-size: 0.72rem; }
+.living-graph__edit, .living-graph__resolution { display: grid; gap: 0.55rem; margin-top: 1rem; border-top: 1px solid var(--color-line); padding-top: 0.85rem; }
+.living-graph__edit label { color: var(--color-forest); font-size: 0.75rem; font-weight: 800; }
+.living-graph__actions, .living-graph__challenge > div { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.65rem; }
+.living-graph__detail button { min-height: 2.35rem; padding: 0.45rem 0.65rem; }
+.living-graph__actions button:not(:first-child), .living-graph__challenge button { border-color: var(--color-line-strong); background: transparent; color: var(--color-forest); }
+.living-graph__challenge { margin-top: 1rem; border: 1px solid color-mix(in srgb, var(--color-gold) 55%, var(--color-line)); padding: 0.75rem; }
 
 .review-workspace { max-width: 70rem; margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); }
 .review-workspace > header .eyebrow { display: block; margin-top: 2rem; }
 .review-workspace h1 { max-width: 48rem; margin-top: 0.65rem; font-size: clamp(2.4rem, 6vw, 5rem); line-height: 0.96; }
 .review-workspace > header p { max-width: 46rem; margin-block: 1rem 2rem; color: color-mix(in srgb, var(--color-ink) 67%, transparent); font-size: 1.05rem; line-height: 1.7; }
 .review-workspace > .readiness-roots { margin-block: 2rem; border: 1px solid var(--color-line); padding: 1rem; }
-.review-facts, .review-contradictions { border-top: 2px solid var(--color-forest); }
+.review-facts, .review-contradictions, .review-challenges { border-top: 2px solid var(--color-forest); }
 .section-intro { display: flex; justify-content: space-between; padding-block: 1rem; }
 .section-intro h2, .review-contradictions h2 { font-size: 1.6rem; }
 .review-facts form { display: grid; gap: 0.75rem; border-top: 1px solid var(--color-line); padding-block: 1rem; }
@@ -1460,6 +1475,14 @@ marker path {
 .review-facts button[type="button"] { border-color: var(--color-line-strong); background: transparent; color: var(--color-forest); }
 .review-contradictions { margin-top: 2rem; padding-top: 1rem; }
 .review-contradictions form { display: grid; gap: 0.75rem; margin-top: 1rem; border: 1px solid color-mix(in srgb, var(--color-clay) 45%, var(--color-line)); padding: 1rem; }
+.review-challenges { margin-top: 2rem; padding-top: 1rem; }
+.review-challenges h2 { margin-top: 0.35rem; font-size: 1.6rem; }
+.review-challenges article { display: grid; gap: 0.6rem; margin-top: 0.85rem; border: 1px solid var(--color-line); padding: 1rem; }
+.review-challenges article[data-severity="critical"] { border-color: var(--color-clay); }
+.review-challenges article > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.review-challenges article > div:last-child { justify-content: flex-start; }
+.review-challenges button { min-height: 2.5rem; padding: 0.55rem 0.7rem; }
+.review-challenges button + button { border-color: var(--color-line-strong); background: transparent; color: var(--color-forest); }
 .review-approval { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 2rem; border-top: 2px solid var(--color-forest); padding-top: 1.5rem; }
 .review-approval p { margin-top: 0.25rem; color: color-mix(in srgb, var(--color-ink) 65%, transparent); }
 .review-export-link, .review-export-locked { display: block; margin-top: 1rem; border: 1px solid var(--color-line); padding: 0.9rem 1rem; color: var(--color-forest); font-weight: 800; }
@@ -1485,6 +1508,11 @@ marker path {
 .blueprint-understanding { display: grid; gap: 1rem; }
 .blueprint-understanding > div:last-child { display: grid; gap: 0.4rem; align-content: start; }
 .blueprint-understanding > div:last-child span { border-left: 2px solid var(--color-gold); padding-left: 0.75rem; }
+.blueprint-context-sections { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.blueprint-context-sections > section { border: 1px solid var(--color-line); background: var(--color-surface); padding: 1rem; }
+.blueprint-context-sections h2 { color: var(--color-forest); font-size: 1rem; font-weight: 800; }
+.blueprint-context-sections ul { display: grid; gap: 0.35rem; margin-top: 0.6rem; padding-left: 1.1rem; list-style: disc; }
+.blueprint-context-sections p { margin-top: 0.6rem; color: color-mix(in srgb, var(--color-ink) 60%, transparent); }
 .blueprint-graph { margin-top: 1.5rem; overflow-x: auto; border: 1px solid var(--color-line); background: linear-gradient(140deg, var(--color-surface), color-mix(in srgb, var(--color-sage) 45%, white)); padding: 1rem; }
 .blueprint-graph__track { display: grid; grid-template-columns: repeat(7, minmax(10rem, 1fr)); gap: 1rem; min-width: 76rem; }
 .blueprint-graph__track section { position: relative; display: grid; align-content: start; gap: 0.6rem; }
@@ -1510,6 +1538,15 @@ marker path {
 .blueprint-editor__grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .blueprint-review h2, .blueprint-exports h2 { margin-top: 0.5rem; color: var(--color-forest); font: 800 1.8rem var(--font-display); }
 .blueprint-review p { margin-top: 0.75rem; border-left: 2px solid var(--color-gold); padding-left: 0.75rem; }
+.pressure-test { scroll-margin-top: 8rem; margin-top: 1.5rem; border: 1px solid var(--color-line); background: color-mix(in srgb, var(--color-sage) 35%, var(--color-surface)); padding: clamp(1rem, 3vw, 2rem); }
+.pressure-test > header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.pressure-test h2 { margin-top: 0.45rem; color: var(--color-forest); font: 800 clamp(1.5rem, 3vw, 2.2rem) var(--font-display); }
+.pressure-test header p, .pressure-test > p { margin-top: 0.4rem; color: color-mix(in srgb, var(--color-ink) 65%, transparent); }
+.pressure-test button { min-height: 2.75rem; border: 1px solid var(--color-forest); background: var(--color-forest); padding: 0.7rem 1rem; color: white; font-weight: 800; }
+.pressure-test__results { display: grid; gap: 1rem; margin-top: 1.25rem; border-top: 1px solid var(--color-line); padding-top: 1rem; }
+.pressure-test__results > span { color: var(--color-moss); font: 700 0.68rem var(--font-mono); }
+.pressure-test__results h3 { color: var(--color-forest); font-weight: 800; }
+.pressure-test__results ul { display: grid; gap: 0.35rem; margin-top: 0.45rem; padding-left: 1.1rem; list-style: disc; }
 .blueprint-exports { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
 .blueprint-exports > div:last-child { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .lineage-panel { position: fixed; z-index: var(--z-dialog); right: 1rem; bottom: 1rem; left: 1rem; max-height: min(38rem, 80dvh); overflow-y: auto; border: 1px solid var(--color-forest); background: var(--color-surface); box-shadow: var(--elevation-floating); padding: 1.25rem; }
@@ -1569,6 +1606,7 @@ marker path {
   .review-facts form button[type="button"] { grid-column: 4; }
   .blueprint-overview dl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .blueprint-understanding { grid-template-columns: 1.2fr 0.8fr; }
+  .blueprint-context-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lineage-panel { top: 6rem; bottom: auto; left: auto; width: min(26rem, calc(100vw - 2rem)); }
   .blueprint-export-panel__formats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .blueprint-export-panel[data-compact="true"] { grid-template-columns: minmax(15rem, 0.8fr) minmax(22rem, 1.2fr); align-items: center; }

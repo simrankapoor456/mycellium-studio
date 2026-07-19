@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import type { ProductBlueprint } from "@/lib/domain/blueprint/schemas";
 
-type GraphEntity = { id: string; title: string; description: string; lineage: ProductBlueprint["goals"][number]["lineage"]; kind: string };
+type GraphEntity = { id: string; title: string; description: string; lineage: ProductBlueprint["goals"][number]["lineage"]; kind: string; manuallyEdited: boolean };
 
 export function BlueprintGraph({ blueprint, onSelect }: { blueprint: ProductBlueprint; onSelect: (entity: GraphEntity) => void }) {
   const [selected, setSelected] = useState<string | null>(null);

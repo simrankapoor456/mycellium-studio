@@ -6,7 +6,7 @@ export function DiscoverWorkflowStage() {
   return (
     <div className="workflow-stage">
       <WorkflowStageHeader
-        description="A short exchange separates what the team knows from what still needs evidence. No model request is made in this fixed demonstration."
+        description="A short exchange separates what the team knows from what still needs evidence. No model request is made in this fixed example."
         label="Discover"
         output="Facts, uncertainty, readiness"
         title="Turn the first claim into grounded product context."
