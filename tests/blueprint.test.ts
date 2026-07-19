@@ -6,6 +6,7 @@ import { generateDeterministicBlueprint, validateBlueprintLineage } from "@/lib/
 import { advanceDiscovery, createInitialDiscoveryContext } from "@/lib/discovery/engine";
 import { ProductBlueprintSchema } from "@/lib/domain/blueprint/schemas";
 import { ProjectOutputSchema } from "@/lib/domain/project/schemas";
+import { generateReliablePressureTest } from "@/lib/mycel-core/execution/blueprint";
 
 const projectId = "42ad2ff0-4835-47d1-b3fe-d6c1f58863a2";
 const now = "2026-07-18T00:00:00.000Z";
@@ -32,6 +33,14 @@ describe("canonical Product Blueprint", () => {
     const edited = applyBlueprintEdit(blueprint, { entityType: "requirement", entityId: requirement.id, changes: { title: "Send a reviewed invoice", status: "approved", owner: "Product lead" } }, "2026-07-18T01:00:00.000Z");
     expect(edited.version).toBe(2);
     expect(edited.requirements[0]).toMatchObject({ title: "Send a reviewed invoice", status: "approved", manuallyEdited: true, lineage: { source: "manual" } });
+    expect(ProductBlueprintSchema.parse(JSON.parse(blueprintToJson(edited)))).toEqual(edited);
+  });
+
+  it("includes the current Pressure Test summary in Markdown without changing canonical JSON", () => {
+    const blueprint = generateDeterministicBlueprint(project, approvedContext(), now);
+    const pressureTest = generateReliablePressureTest(blueprint);
+    expect(blueprintToMarkdown(blueprint, pressureTest)).toContain("## Pressure Test");
+    expect(ProductBlueprintSchema.parse(JSON.parse(blueprintToJson(blueprint)))).toEqual(blueprint);
   });
 
   it("exports the currently edited blueprint with hierarchy and safe CSV escaping", () => {

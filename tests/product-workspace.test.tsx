@@ -10,7 +10,7 @@ afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 describe("Phase 3B workspace interactions", () => {
   it("lets keyboard users select a graph node and read its detail", () => {
     const now = "2026-07-18T00:00:00.000Z";
-    const graph = buildProductGraph([{ id: "fact-users", category: "target_users", label: "Target users", value: "Independent designers", status: "confirmed", confidence: 1, sourceMessageIds: [], createdAt: now, updatedAt: now, manuallyEdited: false }], []);
+    const graph = buildProductGraph([{ id: "fact-users", category: "target_users", label: "Target users", value: "Independent designers", status: "confirmed", confidence: 1, sourceMessageIds: [], createdAt: now, updatedAt: now, manuallyEdited: false, deletedAt: null }], []);
     render(<LivingProductGraph graph={graph} />);
     const svgNode = screen.getByRole("button", { name: /Target users: Independent designers/ });
     fireEvent.keyDown(svgNode, { key: "Enter" });
