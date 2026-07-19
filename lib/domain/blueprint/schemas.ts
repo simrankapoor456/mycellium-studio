@@ -77,6 +77,11 @@ export const ProductBlueprintSchema = z.object({
     targetUsers: z.array(z.string().trim().min(1).max(500)).min(1).max(20),
     successMetrics: z.array(z.string().trim().min(1).max(500)).max(20),
   }),
+  assumptions: z.array(z.string().trim().min(1).max(1_000)).max(40).default([]),
+  constraints: z.array(z.string().trim().min(1).max(1_000)).max(40).default([]),
+  tradeOffs: z.array(z.string().trim().min(1).max(1_000)).max(40).default([]),
+  dependencies: z.array(z.string().trim().min(1).max(1_000)).max(40).default([]),
+  ownershipSuggestions: z.array(z.string().trim().min(1).max(500)).max(40).default([]),
   understanding: z.object({
     factIds: z.array(z.string().min(1)).max(120),
     unresolvedItems: z.array(z.string().trim().min(1).max(500)).max(40),
@@ -99,7 +104,7 @@ export const ProductBlueprintSchema = z.object({
     warnings: z.array(z.string().trim().min(1).max(1_000)).max(40),
     unresolvedFactCategories: z.array(FactCategorySchema),
   }),
-});
+}).strict();
 
 export const BlueprintEditInputSchema = z.object({
   entityType: z.enum(["goal", "requirement", "architecture", "scope", "epic", "story", "task", "sprint", "risk"]),
@@ -119,6 +124,7 @@ export const BlueprintEditInputSchema = z.object({
 export const BlueprintGenerationResponseSchema = z.object({
   blueprint: ProductBlueprintSchema,
   generationSource: z.enum(["ai", "fallback"]),
+  engineState: z.enum(["ai_enhanced", "reliable", "ai_unavailable_reliable"]),
 });
 
 export type Lineage = z.infer<typeof LineageSchema>;

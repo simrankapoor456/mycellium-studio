@@ -40,6 +40,20 @@ export async function createDiscoveryMessage(
     .single();
 
   if (error) {
+    if (error.code === "23505" && messageId) {
+      const { data: existing, error: existingError } = await supabase
+        .from("discovery_messages")
+        .select("*")
+        .eq("id", messageId)
+        .eq("project_id", input.projectId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!existingError && existing) {
+        return existing;
+      }
+    }
+
     throw error;
   }
 

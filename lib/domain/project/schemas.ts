@@ -67,6 +67,9 @@ export const ProjectOutputSchema = z.object({
   discovery_approved_at: z.string().datetime({ offset: true }).nullable().default(null),
   context_version: z.number().int().nonnegative().default(0),
   blueprint_version: z.number().int().nonnegative().default(0),
+  pressure_test: JsonObjectSchema.nullable().default(null),
+  pressure_tested_at: z.string().datetime({ offset: true }).nullable().default(null),
+  pressure_test_blueprint_version: z.number().int().positive().nullable().default(null),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });

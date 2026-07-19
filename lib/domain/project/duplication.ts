@@ -38,5 +38,8 @@ export function createProjectDuplicate(
     discovery_approved_at: source.discovery_approved_at,
     context_version: source.context_version,
     blueprint_version: source.blueprint_version,
+    pressure_test: source.pressure_test,
+    pressure_tested_at: source.pressure_tested_at,
+    pressure_test_blueprint_version: source.pressure_test_blueprint_version,
   };
 }

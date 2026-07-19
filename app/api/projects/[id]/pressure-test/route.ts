@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { orchestrateReviewChange } from "@/lib/mycel-core/orchestration";
+import { orchestratePressureTest } from "@/lib/mycel-core/orchestration";
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export const maxDuration = 30;
+
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const outcome = await orchestrateReviewChange(id, await readJson(request));
+  const outcome = await orchestratePressureTest(id, await readJson(request));
   return outcome.ok
     ? NextResponse.json(outcome.data)
     : NextResponse.json({ error: outcome.error, decision: outcome.decision }, { status: outcome.status });

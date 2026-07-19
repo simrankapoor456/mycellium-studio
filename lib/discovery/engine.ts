@@ -14,6 +14,7 @@ import {
   type ProductGraph,
   type ReadinessAssessment,
 } from "@/lib/domain/discovery/schemas";
+import { hasBlockingChallenges, mergeProductChallenges } from "@/lib/mycel-core/decision/challenges";
 import {
   buildContradictionDescription,
   buildDiscoveryAcknowledgement,
@@ -34,6 +35,10 @@ const CATEGORY_ORDER = [
   "non_functional_requirements",
   "assumptions",
   "architecture_decisions",
+  "included_scope",
+  "excluded_scope",
+  "technical_preferences",
+  "dependencies",
 ] as const satisfies readonly FactCategory[];
 
 const CATEGORY_CONFIG: Record<FactCategory, { label: string; question: string; weight: number; critical: boolean; single: boolean }> = {
@@ -48,6 +53,10 @@ const CATEGORY_CONFIG: Record<FactCategory, { label: string; question: string; w
   assumptions: { ...DISCOVERY_CATEGORY_COPY.assumptions, weight: 4, critical: false, single: false },
   risks: { ...DISCOVERY_CATEGORY_COPY.risks, weight: 6, critical: false, single: false },
   architecture_decisions: { ...DISCOVERY_CATEGORY_COPY.architecture_decisions, weight: 3, critical: false, single: false },
+  included_scope: { ...DISCOVERY_CATEGORY_COPY.included_scope, weight: 4, critical: false, single: false },
+  excluded_scope: { ...DISCOVERY_CATEGORY_COPY.excluded_scope, weight: 3, critical: false, single: false },
+  technical_preferences: { ...DISCOVERY_CATEGORY_COPY.technical_preferences, weight: 2, critical: false, single: false },
+  dependencies: { ...DISCOVERY_CATEGORY_COPY.dependencies, weight: 3, critical: false, single: false },
   unknowns: { ...DISCOVERY_CATEGORY_COPY.unknowns, weight: 0, critical: false, single: false },
 };
 
@@ -65,6 +74,7 @@ type AdvanceDiscoveryInput = Readonly<{
   mode: "ai" | "fallback";
   now: string;
   aiResponse?: AiDiscoveryResponse;
+  engineState?: "ai_enhanced" | "reliable" | "ai_unavailable_reliable";
 }>;
 
 export function createInitialDiscoveryContext(project: ProjectSeed, now: string): DiscoveryContext {
@@ -87,6 +97,9 @@ export function createInitialDiscoveryContext(project: ProjectSeed, now: string)
     facts: seedFacts,
     contradictions: [],
     acceptedUnknownFactIds: [],
+    challenges: [],
+    unresolvedDecisionIds: [],
+    approvalState: "pending",
     graph: buildProductGraph(seedFacts, []),
     updatedAt: now,
   } as const;
@@ -96,8 +109,9 @@ export function createInitialDiscoveryContext(project: ProjectSeed, now: string)
 
 export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnResponse {
   const previous = DiscoveryContextSchema.parse(input.context);
-  const rawFacts = input.aiResponse
-    ? AiDiscoveryResponseSchema.parse(input.aiResponse).facts
+  const aiResponse = input.aiResponse ? AiDiscoveryResponseSchema.parse(input.aiResponse) : null;
+  const rawFacts = aiResponse
+    ? [...aiResponse.extractedFacts, ...aiResponse.updatedFacts]
     : extractDeterministicFacts(input.message, chooseNextCategory(previous));
   const extractedFacts = rawFacts.map((fact) =>
     createFact(fact.category, fact.label, fact.value, fact.status, [input.messageId], input.now, fact.confidence),
@@ -105,29 +119,37 @@ export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnRes
   const { facts, updatedFacts } = mergeFacts(previous.facts, extractedFacts, input.now);
   const contradictions = detectContradictions(facts, previous.contradictions);
   const graph = buildProductGraph(facts, contradictions);
-  const context = DiscoveryContextSchema.parse({
+  const provisionalContext = DiscoveryContextSchema.parse({
     ...previous,
     version: previous.version + 1,
     facts,
     contradictions,
     graph,
+    approvalState: previous.approvalState === "approved" ? "stale" : "pending",
     updatedAt: input.now,
   });
+  const challenges = mergeProductChallenges(provisionalContext, input.now, aiResponse?.challenges ?? []);
+  const unresolvedDecisionIds = calculateUnresolvedDecisionIds(provisionalContext, challenges);
+  const context = DiscoveryContextSchema.parse({ ...provisionalContext, challenges, unresolvedDecisionIds });
   const readinessAssessment = calculateReadiness(context);
-  const nextQuestion = input.aiResponse?.nextQuestion || readinessAssessment.recommendedNextQuestion;
+  const nextQuestion = aiResponse?.assistantQuestion || readinessAssessment.recommendedNextQuestion;
   const acknowledgement = buildDiscoveryAcknowledgement(extractedFacts, input.messageId);
   const insight = buildDiscoveryInsight(readinessAssessment);
+  const assistantMessage = aiResponse?.assistantMessage || `${acknowledgement}\n\n${insight}`;
 
   return DiscoveryTurnResponseSchema.parse({
-    assistantMessage: `${acknowledgement}\n\n${insight}`,
+    assistantMessage,
     assistantQuestion: nextQuestion,
+    questionReason: aiResponse?.questionReason ?? questionReasonFor(chooseNextCategory(context)),
     extractedFacts,
     updatedFacts,
     unresolvedItems: readinessAssessment.areasNeedingClarification.map((category) => CATEGORY_CONFIG[category].label),
     contradictions: contradictions.filter((item) => item.status === "open"),
+    challenges,
     readinessAssessment,
     graphChanges: diffGraphs(previous.graph, graph),
     discoveryMode: input.mode,
+    engineState: input.engineState ?? (input.mode === "ai" ? "ai_enhanced" : "reliable"),
     context,
   });
 }
@@ -135,9 +157,10 @@ export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnRes
 export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAssessment {
   const context = DiscoveryContextSchema.parse(contextInput);
   const acceptedUnknowns = new Set(context.acceptedUnknownFactIds);
-  const confirmedFields = uniqueCategories(context.facts.filter((fact) => fact.status === "confirmed"));
-  const inferredFields = uniqueCategories(context.facts.filter((fact) => fact.status === "inferred"));
-  const unknownFacts = context.facts.filter((fact) => fact.status === "unknown");
+  const activeFacts = context.facts.filter((fact) => fact.deletedAt === null);
+  const confirmedFields = uniqueCategories(activeFacts.filter((fact) => fact.status === "confirmed"));
+  const inferredFields = uniqueCategories(activeFacts.filter((fact) => fact.status === "inferred"));
+  const unknownFacts = activeFacts.filter((fact) => fact.status === "unknown");
   const explicitlyUnknownFields = uniqueCategories(unknownFacts);
   const resolvedByUnknown = new Set(unknownFacts.filter((fact) => acceptedUnknowns.has(fact.id)).map((fact) => fact.category));
   const rooted = new Set<FactCategory>([...confirmedFields, ...inferredFields]);
@@ -150,7 +173,9 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
   }, 0)));
   const criticalGaps = CATEGORY_ORDER.filter((category) => CATEGORY_CONFIG[category].critical && !rooted.has(category) && !resolvedByUnknown.has(category));
   const openContradictions = context.contradictions.filter((item) => item.status === "open");
-  const status = criticalGaps.length === 0 && openContradictions.length === 0 && score >= 65
+  const openChallenges = context.challenges.filter((challenge) => challenge.status === "open");
+  const blockingChallenges = openChallenges.filter((challenge) => ["critical", "material"].includes(challenge.severity));
+  const status = criticalGaps.length === 0 && openContradictions.length === 0 && blockingChallenges.length === 0 && score >= 65
     ? "ready"
     : score >= 45 || criticalGaps.length <= 2
       ? "needs_review"
@@ -158,12 +183,13 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
   const nextCategory = chooseNextCategory(context);
 
   const readiness = ReadinessAssessmentSchema.parse({
-    score: Math.max(0, score - openContradictions.length * 10),
+    score: Math.max(0, score - openContradictions.length * 10 - blockingChallenges.length * 4),
     status,
     confirmedFields,
     explicitlyUnknownFields,
     criticalGaps,
     contradictions: openContradictions.map((item) => item.description),
+    openChallenges: openChallenges.map((challenge) => challenge.id),
     recommendedNextQuestion: status === "ready" ? "Review the structured understanding, then approve it when it reflects your intent." : CATEGORY_CONFIG[nextCategory].question,
     explanation: "Foundation progress calculated.",
     rootedAreas: CATEGORY_ORDER.filter((category) => rooted.has(category)),
@@ -174,7 +200,7 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
 
 export function canApproveDiscovery(context: DiscoveryContext): boolean {
   const readiness = calculateReadiness(context);
-  return readiness.status !== "discovering" && !context.contradictions.some((item) => item.status === "open");
+  return readiness.status !== "discovering" && !context.contradictions.some((item) => item.status === "open") && !hasBlockingChallenges(context);
 }
 
 export function applyDiscoveryReview(contextInput: DiscoveryContext, input: DiscoveryReviewInput, now: string): DiscoveryContext {
@@ -184,11 +210,36 @@ export function applyDiscoveryReview(contextInput: DiscoveryContext, input: Disc
   const acceptedUnknowns = new Set(context.acceptedUnknownFactIds);
 
   if (input.action === "edit_fact") {
+    ensureFactExists(facts, input.factId);
     facts = facts.map((fact) => fact.id === input.factId ? { ...fact, value: input.value, status: input.status, manuallyEdited: true, updatedAt: now } : fact);
   } else if (input.action === "reject_assumption") {
+    ensureFactExists(facts, input.factId);
     facts = facts.map((fact) => fact.id === input.factId ? { ...fact, status: "rejected" as const, manuallyEdited: true, updatedAt: now } : fact);
+  } else if (input.action === "confirm_fact") {
+    ensureFactExists(facts, input.factId);
+    facts = facts.map((fact) => fact.id === input.factId ? { ...fact, status: "confirmed" as const, manuallyEdited: true, deletedAt: null, updatedAt: now } : fact);
+  } else if (input.action === "mark_unknown") {
+    ensureFactExists(facts, input.factId);
+    facts = facts.map((fact) => fact.id === input.factId ? { ...fact, status: "unknown" as const, manuallyEdited: true, deletedAt: null, updatedAt: now } : fact);
+  } else if (input.action === "delete_fact") {
+    ensureFactExists(facts, input.factId);
+    acceptedUnknowns.delete(input.factId);
+    facts = facts.map((fact) => fact.id === input.factId ? { ...fact, status: "rejected" as const, manuallyEdited: true, deletedAt: now, updatedAt: now } : fact);
   } else if (input.action === "accept_unknown") {
+    ensureFactExists(facts, input.factId);
     acceptedUnknowns.add(input.factId);
+  } else if (input.action === "acknowledge_challenge") {
+    const challenge = context.challenges.find((item) => item.id === input.challengeId);
+    if (!challenge) throw new Error("Challenge not found.");
+    context.challenges = context.challenges.map((item) => item.id === input.challengeId ? { ...item, status: "acknowledged" as const, manuallyEdited: true, updatedAt: now } : item);
+  } else if (input.action === "accept_challenge_risk") {
+    const challenge = context.challenges.find((item) => item.id === input.challengeId);
+    if (!challenge) throw new Error("Challenge not found.");
+    context.challenges = context.challenges.map((item) => item.id === input.challengeId ? { ...item, status: "accepted_risk" as const, manuallyEdited: true, updatedAt: now } : item);
+  } else if (input.action === "resolve_challenge") {
+    const challenge = context.challenges.find((item) => item.id === input.challengeId);
+    if (!challenge) throw new Error("Challenge not found.");
+    context.challenges = context.challenges.map((item) => item.id === input.challengeId ? { ...item, status: "resolved" as const, manuallyEdited: true, updatedAt: now } : item);
   } else if (input.action === "resolve_contradiction") {
     const contradiction = contradictions.find((item) => item.id === input.contradictionId);
     if (!contradiction || !contradiction.factIds.includes(input.confirmedFactId)) throw new Error("Contradiction not found.");
@@ -196,20 +247,27 @@ export function applyDiscoveryReview(contextInput: DiscoveryContext, input: Disc
     facts = facts.map((fact) => contradiction.factIds.includes(fact.id) ? { ...fact, status: fact.id === input.confirmedFactId ? "confirmed" as const : "rejected" as const, manuallyEdited: true, updatedAt: now } : fact);
   }
 
+  const graph = buildProductGraph(facts, contradictions);
+  const challengeContext = DiscoveryContextSchema.parse({ ...context, facts, contradictions, graph });
+  const challenges = mergeProductChallenges(challengeContext, now);
+
   return DiscoveryContextSchema.parse({
     ...context,
     version: context.version + 1,
     facts,
     contradictions,
     acceptedUnknownFactIds: [...acceptedUnknowns],
-    graph: buildProductGraph(facts, contradictions),
+    challenges,
+    unresolvedDecisionIds: calculateUnresolvedDecisionIds(challengeContext, challenges),
+    approvalState: context.approvalState === "approved" ? "stale" : "pending",
+    graph,
     updatedAt: now,
   });
 }
 
 export function buildProductGraph(facts: readonly DiscoveryFact[], contradictions: DiscoveryContext["contradictions"]): ProductGraph {
   const contradictedIds = new Set(contradictions.filter((item) => item.status === "open").flatMap((item) => item.factIds));
-  const nodes = facts.filter((fact) => fact.status !== "rejected").map((fact) => ({
+  const nodes = facts.filter((fact) => fact.status !== "rejected" && fact.deletedAt === null).map((fact) => ({
     id: fact.id,
     category: fact.category,
     label: fact.label,
@@ -246,7 +304,7 @@ export function boundConversationContext<T extends { content: string }>(messages
   return bounded;
 }
 
-function extractDeterministicFacts(message: string, fallbackCategory: FactCategory): AiDiscoveryResponse["facts"] {
+function extractDeterministicFacts(message: string, fallbackCategory: FactCategory): AiDiscoveryResponse["extractedFacts"] {
   const normalized = message.toLowerCase();
   const unknown = /^(unknown|undecided|not sure|i don't know|i do not know|tbd|not applicable|n\/a)[.!\s]*$/i.test(message.trim());
   if (unknown) return [{ category: fallbackCategory, label: CATEGORY_CONFIG[fallbackCategory].label, value: message.trim(), status: "unknown", confidence: 1 }];
@@ -260,6 +318,10 @@ function extractDeterministicFacts(message: string, fallbackCategory: FactCatego
   if (/\b(must|only|deadline|budget|without|cannot|can't|platform|policy|minimal)\b/.test(normalized)) categories.add("constraints");
   if (/\b(risk|concern|worry|unsafe|security|fraud|failure)\b/.test(normalized)) categories.add("risks");
   if (/\b(feature|support|allow|need to|should be able)\b/.test(normalized)) categories.add("functional_requirements");
+  if (/\b(in scope|include in|first release includes|must include)\b/.test(normalized)) categories.add("included_scope");
+  if (/\b(out of scope|later release|not include|exclude|defer)\b/.test(normalized)) categories.add("excluded_scope");
+  if (/\b(technology|framework|database|hosting|platform preference|technical preference)\b/.test(normalized)) categories.add("technical_preferences");
+  if (/\b(depend|third[- ]party|external api|vendor|integration)\b/.test(normalized)) categories.add("dependencies");
   if (categories.size === 0) categories.add(fallbackCategory);
 
   return [...categories].slice(0, 5).map((category) => ({ category, label: CATEGORY_CONFIG[category].label, value: message.trim(), status: "confirmed" as const, confidence: 0.82 }));
@@ -269,7 +331,7 @@ function mergeFacts(existing: readonly DiscoveryFact[], extracted: readonly Disc
   const facts = existing.map((fact) => ({ ...fact }));
   const updatedFacts: DiscoveryFact[] = [];
   for (const candidate of extracted) {
-    const match = facts.find((fact) => fact.category === candidate.category && normalize(fact.value) === normalize(candidate.value));
+    const match = facts.find((fact) => fact.deletedAt === null && fact.category === candidate.category && normalize(fact.value) === normalize(candidate.value));
     if (match) {
       match.status = candidate.status;
       match.confidence = Math.max(match.confidence, candidate.confidence);
@@ -301,12 +363,12 @@ function detectContradictions(facts: readonly DiscoveryFact[], previous: Discove
 
 function chooseNextCategory(context: DiscoveryContext): FactCategory {
   const accepted = new Set(context.acceptedUnknownFactIds);
-  const covered = new Set(context.facts.filter((fact) => fact.status !== "rejected" && (fact.status !== "unknown" || accepted.has(fact.id))).map((fact) => fact.category));
+  const covered = new Set(context.facts.filter((fact) => fact.deletedAt === null && fact.status !== "rejected" && (fact.status !== "unknown" || accepted.has(fact.id))).map((fact) => fact.category));
   return CATEGORY_ORDER.find((category) => !covered.has(category)) ?? "unknowns";
 }
 
 function createFact(category: FactCategory, label: string, value: string, status: DiscoveryFact["status"], sourceMessageIds: string[], now: string, confidence = status === "confirmed" ? 0.85 : 0.6): DiscoveryFact {
-  return { id: stableId("fact", [category, normalize(value)]), category, label, value: value.trim(), status, confidence, sourceMessageIds, createdAt: now, updatedAt: now, manuallyEdited: false };
+  return { id: stableId("fact", [category, normalize(value)]), category, label, value: value.trim(), status, confidence, sourceMessageIds, createdAt: now, updatedAt: now, manuallyEdited: false, deletedAt: null };
 }
 
 function diffGraphs(before: ProductGraph, after: ProductGraph) {
@@ -336,4 +398,30 @@ function stableId(prefix: string, parts: readonly string[]): string {
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function ensureFactExists(facts: readonly DiscoveryFact[], factId: string): void {
+  if (!facts.some((fact) => fact.id === factId && fact.deletedAt === null)) {
+    throw new Error("Fact not found.");
+  }
+}
+
+function calculateUnresolvedDecisionIds(
+  context: DiscoveryContext,
+  challenges: DiscoveryContext["challenges"],
+): string[] {
+  const unknownIds = context.facts
+    .filter((fact) => fact.deletedAt === null && fact.status === "unknown" && !context.acceptedUnknownFactIds.includes(fact.id))
+    .map((fact) => fact.id);
+  const contradictionIds = context.contradictions.filter((item) => item.status === "open").map((item) => item.id);
+  const challengeIds = challenges.filter((item) => item.status === "open").map((item) => item.id);
+  return [...new Set([...unknownIds, ...contradictionIds, ...challengeIds])];
+}
+
+function questionReasonFor(category: FactCategory): string {
+  if (CATEGORY_CONFIG[category].critical) {
+    return "This decision shapes the core product outcome and the scope built around it.";
+  }
+
+  return "This will make the next architecture and delivery trade-off more grounded.";
 }

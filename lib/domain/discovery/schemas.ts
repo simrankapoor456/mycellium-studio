@@ -4,6 +4,7 @@ import type { Json } from "@/lib/supabase/database.types";
 
 export const DiscoveryRoleSchema = z.enum(["user", "assistant", "system"]);
 export const DiscoveryModeSchema = z.enum(["ai", "fallback"]);
+export const DiscoveryEngineStateSchema = z.enum(["ai_enhanced", "reliable", "ai_unavailable_reliable"]);
 export const FactCategorySchema = z.enum([
   "business_objective",
   "problem",
@@ -16,10 +17,31 @@ export const FactCategorySchema = z.enum([
   "assumptions",
   "risks",
   "architecture_decisions",
+  "included_scope",
+  "excluded_scope",
+  "technical_preferences",
+  "dependencies",
   "unknowns",
 ]);
 export const FactStatusSchema = z.enum(["confirmed", "inferred", "unknown", "rejected"]);
 export const ContradictionStatusSchema = z.enum(["open", "resolved"]);
+export const ChallengeCategorySchema = z.enum([
+  "broad_audience",
+  "unclear_outcome",
+  "conflicting_goals",
+  "excessive_scope",
+  "weak_metrics",
+  "risky_dependency",
+  "privacy",
+  "external_data",
+  "stale_data",
+  "bias",
+  "unsafe_automation",
+  "unsupported_integration",
+  "capacity",
+]);
+export const ChallengeSeveritySchema = z.enum(["critical", "material", "advisory"]);
+export const ChallengeStatusSchema = z.enum(["open", "acknowledged", "accepted_risk", "resolved"]);
 
 export const DiscoveryFactSchema = z.object({
   id: z.string().min(1).max(96),
@@ -32,6 +54,7 @@ export const DiscoveryFactSchema = z.object({
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   manuallyEdited: z.boolean(),
+  deletedAt: z.string().datetime({ offset: true }).nullable().default(null),
 });
 
 export const DiscoveryContradictionSchema = z.object({
@@ -41,6 +64,20 @@ export const DiscoveryContradictionSchema = z.object({
   status: ContradictionStatusSchema,
   resolution: z.string().trim().max(2_000).nullable(),
   sourceMessageIds: z.array(z.string().uuid()).max(20),
+});
+
+export const ProductChallengeSchema = z.object({
+  id: z.string().min(1).max(96),
+  category: ChallengeCategorySchema,
+  severity: ChallengeSeveritySchema,
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().min(1).max(1_000),
+  status: ChallengeStatusSchema,
+  sourceFactIds: z.array(z.string().min(1)).max(30),
+  sourceMessageIds: z.array(z.string().uuid()).max(30),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  manuallyEdited: z.boolean(),
 });
 
 export const GraphNodeSchema = z.object({
@@ -79,6 +116,7 @@ export const ReadinessAssessmentSchema = z.object({
   explicitlyUnknownFields: z.array(FactCategorySchema),
   criticalGaps: z.array(FactCategorySchema),
   contradictions: z.array(z.string().min(1)),
+  openChallenges: z.array(z.string().min(1)).max(40).default([]),
   recommendedNextQuestion: z.string().trim().min(1).max(500),
   explanation: z.string().trim().min(1).max(1_000),
   rootedAreas: z.array(FactCategorySchema),
@@ -92,6 +130,9 @@ export const DiscoveryContextSchema = z.object({
   facts: z.array(DiscoveryFactSchema).max(120),
   contradictions: z.array(DiscoveryContradictionSchema).max(30),
   acceptedUnknownFactIds: z.array(z.string().min(1)).max(40),
+  challenges: z.array(ProductChallengeSchema).max(40).default([]),
+  unresolvedDecisionIds: z.array(z.string().min(1)).max(60).default([]),
+  approvalState: z.enum(["pending", "approved", "stale"]).default("pending"),
   graph: ProductGraphSchema,
   updatedAt: z.string().datetime({ offset: true }),
 });
@@ -104,13 +145,16 @@ export const DiscoveryTurnInputSchema = z.object({
 export const DiscoveryTurnResponseSchema = z.object({
   assistantMessage: z.string().trim().min(1).max(2_000),
   assistantQuestion: z.string().trim().min(1).max(500),
+  questionReason: z.string().trim().min(1).max(500),
   extractedFacts: z.array(DiscoveryFactSchema).max(20),
   updatedFacts: z.array(DiscoveryFactSchema).max(20),
   unresolvedItems: z.array(z.string().trim().min(1).max(500)).max(20),
   contradictions: z.array(DiscoveryContradictionSchema).max(20),
+  challenges: z.array(ProductChallengeSchema).max(40),
   readinessAssessment: ReadinessAssessmentSchema,
   graphChanges: GraphChangesSchema,
   discoveryMode: DiscoveryModeSchema,
+  engineState: DiscoveryEngineStateSchema,
   context: DiscoveryContextSchema,
 });
 
@@ -120,13 +164,42 @@ export const AiDiscoveryFactSchema = z.object({
   value: z.string().trim().min(1).max(2_000),
   status: FactStatusSchema,
   confidence: z.number().min(0).max(1),
-});
+}).strict();
+
+export const AiChallengeProposalSchema = z.object({
+  category: ChallengeCategorySchema,
+  severity: ChallengeSeveritySchema,
+  title: z.string().trim().min(1).max(160),
+  description: z.string().trim().min(1).max(1_000),
+  sourceFactIds: z.array(z.string().min(1).max(96)).max(20),
+}).strict();
 
 export const AiDiscoveryResponseSchema = z.object({
-  acknowledgement: z.string().trim().min(1).max(1_000),
-  nextQuestion: z.string().trim().min(1).max(500),
-  facts: z.array(AiDiscoveryFactSchema).max(12),
-});
+  assistantMessage: z.string().trim().min(1).max(2_000),
+  assistantQuestion: z.string().trim().min(1).max(500),
+  questionReason: z.string().trim().min(1).max(500),
+  extractedFacts: z.array(AiDiscoveryFactSchema).max(12),
+  updatedFacts: z.array(AiDiscoveryFactSchema).max(12),
+  unresolvedItems: z.array(z.string().trim().min(1).max(500)).max(20),
+  contradictions: z.array(z.object({
+    category: FactCategorySchema,
+    description: z.string().trim().min(1).max(1_000),
+    conflictingValues: z.array(z.string().trim().min(1).max(2_000)).min(2).max(4),
+  })).max(12),
+  challenges: z.array(AiChallengeProposalSchema).max(12),
+  proposedGraphChanges: z.object({
+    relationships: z.array(z.object({
+      sourceCategory: FactCategorySchema,
+      targetCategory: FactCategorySchema,
+      kind: z.enum(["supports", "depends_on", "contradicts"]),
+    })).max(24),
+  }),
+  proposedReadinessSignals: z.object({
+    supportedCategories: z.array(FactCategorySchema).max(20),
+    unknownCategories: z.array(FactCategorySchema).max(20),
+  }),
+  generationMode: DiscoveryModeSchema,
+}).strict();
 
 export const DiscoveryReviewInputSchema = z.discriminatedUnion("action", [
   z.object({
@@ -136,7 +209,13 @@ export const DiscoveryReviewInputSchema = z.discriminatedUnion("action", [
     status: FactStatusSchema,
   }),
   z.object({ action: z.literal("reject_assumption"), factId: z.string().min(1) }),
+  z.object({ action: z.literal("confirm_fact"), factId: z.string().min(1) }),
+  z.object({ action: z.literal("mark_unknown"), factId: z.string().min(1) }),
+  z.object({ action: z.literal("delete_fact"), factId: z.string().min(1) }),
   z.object({ action: z.literal("accept_unknown"), factId: z.string().min(1) }),
+  z.object({ action: z.literal("acknowledge_challenge"), challengeId: z.string().min(1) }),
+  z.object({ action: z.literal("accept_challenge_risk"), challengeId: z.string().min(1) }),
+  z.object({ action: z.literal("resolve_challenge"), challengeId: z.string().min(1) }),
   z.object({
     action: z.literal("resolve_contradiction"),
     contradictionId: z.string().min(1),
@@ -166,6 +245,8 @@ export const DiscoveryMessageCreateSchema = z.object({
 export type FactCategory = z.infer<typeof FactCategorySchema>;
 export type DiscoveryFact = z.infer<typeof DiscoveryFactSchema>;
 export type DiscoveryContradiction = z.infer<typeof DiscoveryContradictionSchema>;
+export type ProductChallenge = z.infer<typeof ProductChallengeSchema>;
+export type ChallengeCategory = z.infer<typeof ChallengeCategorySchema>;
 export type ProductGraph = z.infer<typeof ProductGraphSchema>;
 export type GraphChanges = z.infer<typeof GraphChangesSchema>;
 export type ReadinessAssessment = z.infer<typeof ReadinessAssessmentSchema>;

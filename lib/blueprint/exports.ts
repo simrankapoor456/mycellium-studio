@@ -1,4 +1,5 @@
 import { ProductBlueprintSchema, type ProductBlueprint } from "@/lib/domain/blueprint/schemas";
+import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
 
 export type BlueprintExportFormat = "markdown" | "json" | "csv";
 
@@ -6,9 +7,10 @@ export function blueprintToJson(input: ProductBlueprint): string {
   return JSON.stringify(ProductBlueprintSchema.parse(input), null, 2);
 }
 
-export function blueprintToMarkdown(input: ProductBlueprint): string {
+export function blueprintToMarkdown(input: ProductBlueprint, pressureTestInput?: PressureTest | null): string {
   const blueprint = ProductBlueprintSchema.parse(input);
-  const lines = [`# ${blueprint.projectName}`, "", blueprint.summary, "", "## Understanding", `Business objective: ${blueprint.overview.businessObjective}`, "", "### Target users", ...blueprint.overview.targetUsers.map((item) => `- ${item}`), "", "### Success metrics", ...blueprint.overview.successMetrics.map((item) => `- ${item}`), "", "## Goals", ...blueprint.goals.map((item) => `- **${item.title}:** ${item.description}`), "", "## Requirements"];
+  const pressureTest = pressureTestInput ? PressureTestSchema.parse(pressureTestInput) : null;
+  const lines = [`# ${blueprint.projectName}`, "", blueprint.summary, "", "## Understanding", `Business objective: ${blueprint.overview.businessObjective}`, "", "### Target users", ...blueprint.overview.targetUsers.map((item) => `- ${item}`), "", "### Success metrics", ...blueprint.overview.successMetrics.map((item) => `- ${item}`), "", "### Assumptions", ...listOrNone(blueprint.assumptions), "", "### Constraints", ...listOrNone(blueprint.constraints), "", "### Dependencies", ...listOrNone(blueprint.dependencies), "", "### Trade-offs", ...listOrNone(blueprint.tradeOffs), "", "### Ownership suggestions", ...listOrNone(blueprint.ownershipSuggestions), "", "## Goals", ...blueprint.goals.map((item) => `- **${item.title}:** ${item.description}`), "", "## Requirements"];
   for (const item of blueprint.requirements) lines.push(`### ${item.id}: ${item.title}`, item.description, ...item.acceptanceCriteria.map((criterion) => `- ${criterion}`), lineageLine(item), "");
   lines.push("## Architecture");
   for (const item of blueprint.architectureDecisions) lines.push(`### ${item.id}: ${item.title}`, item.description, `Rationale: ${item.rationale}`, lineageLine(item), "");
@@ -18,7 +20,11 @@ export function blueprintToMarkdown(input: ProductBlueprint): string {
   for (const item of blueprint.stories) lines.push(`### ${item.id}: ${item.title}`, item.userStory, ...item.acceptanceCriteria.map((criterion) => `- ${criterion}`), "");
   lines.push("## Tasks", ...blueprint.tasks.map((item) => `- **${item.id}: ${item.title}** (${item.ownerType}, ${item.estimate ?? "unestimated"}) — ${item.description}`), "", "## Risks", ...blueprint.risks.map((item) => `- **${item.title} (${item.impact})** — ${item.description} Mitigation: ${item.mitigation}`), "", "## Sprint plan");
   for (const sprint of blueprint.sprintPlan) lines.push(`### ${sprint.title}`, sprint.goal, ...sprint.taskIds.map((id) => `- ${id}`), "");
-  lines.push("## Unresolved items", ...(blueprint.understanding.unresolvedItems.length ? blueprint.understanding.unresolvedItems.map((item) => `- ${item}`) : ["- None"]), "", `Generation source: ${blueprint.generationSource}`, `Schema version: ${blueprint.schemaVersion}`);
+  lines.push("## Unresolved items", ...(blueprint.understanding.unresolvedItems.length ? blueprint.understanding.unresolvedItems.map((item) => `- ${item}`) : ["- None"]), "");
+  if (pressureTest) {
+    lines.push("## Pressure Test", pressureTest.overallAssessment, "", "### Critical findings", ...(pressureTest.criticalFindings.length ? pressureTest.criticalFindings.map((item) => `- ${item}`) : ["- None"]), "", "### Recommended next actions", ...pressureTest.recommendedNextActions.map((item) => `- ${item}`), "", `Pressure Test mode: ${pressureTest.pressureTestMode}`, "");
+  }
+  lines.push(`Generation source: ${blueprint.generationSource}`, `Schema version: ${blueprint.schemaVersion}`);
   return lines.join("\n");
 }
 
@@ -45,4 +51,8 @@ function lineageLine(item: { lineage: { factIds: string[]; sourceMessageIds: str
 
 function csvCell(value: string | number) {
   return `"${String(value).replaceAll('"', '""')}"`;
+}
+
+function listOrNone(items: readonly string[]): string[] {
+  return items.length ? items.map((item) => `- ${item}`) : ["- None"];
 }

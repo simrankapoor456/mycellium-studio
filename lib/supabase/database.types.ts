@@ -35,6 +35,9 @@ type ProjectRow = {
   discovery_approved_at: string | null;
   context_version: number;
   blueprint_version: number;
+  pressure_test: Json | null;
+  pressure_tested_at: string | null;
+  pressure_test_blueprint_version: number | null;
   created_at: string;
   updated_at: string;
 };
@@ -59,6 +62,18 @@ type DiscoveryMessageRow = {
   structured_facts: Json | null;
   sequence_number: number;
   created_at: string;
+};
+
+type WorkflowRequestRow = {
+  id: string;
+  request_id: string;
+  operation: string;
+  project_id: string;
+  user_id: string;
+  status: string;
+  response_payload: Json | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Database = {
@@ -102,6 +117,9 @@ export type Database = {
           discovery_approved_at?: string | null;
           context_version?: number;
           blueprint_version?: number;
+          pressure_test?: Json | null;
+          pressure_tested_at?: string | null;
+          pressure_test_blueprint_version?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -138,6 +156,22 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Pick<DiscoveryRequestRow, "status" | "response_payload" | "updated_at">>;
+        Relationships: [];
+      };
+      workflow_requests: {
+        Row: WorkflowRequestRow;
+        Insert: {
+          id?: string;
+          request_id: string;
+          operation: string;
+          project_id: string;
+          user_id: string;
+          status?: string;
+          response_payload?: Json | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Pick<WorkflowRequestRow, "status" | "response_payload" | "updated_at">>;
         Relationships: [];
       };
     };

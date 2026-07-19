@@ -27,6 +27,18 @@ export async function failDiscoveryRequest(projectId: string, userId: string, re
   await supabase.from("discovery_requests").update({ status: "failed" }).eq("project_id", projectId).eq("request_id", requestId).eq("user_id", userId);
 }
 
+export async function countRecentDiscoveryRequests(projectId: string, userId: string, since: string): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("discovery_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", projectId)
+    .eq("user_id", userId)
+    .gte("created_at", since);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function persistDiscoveryState(projectId: string, userId: string, contextInput: DiscoveryContext, readinessInput: ReadinessAssessment) {
   const context = DiscoveryContextSchema.parse(contextInput);
   const readiness = ReadinessAssessmentSchema.parse(readinessInput);
@@ -36,7 +48,7 @@ export async function persistDiscoveryState(projectId: string, userId: string, c
 }
 
 export async function approveDiscoveryState(projectId: string, userId: string, contextInput: DiscoveryContext) {
-  const context = DiscoveryContextSchema.parse(contextInput);
+  const context = DiscoveryContextSchema.parse({ ...contextInput, approvalState: "approved" });
   const supabase = await createClient();
   const { data, error } = await supabase.from("projects").update({ discovery_context: toJson(context), approved_discovery_context: toJson(context), discovery_approved_at: new Date().toISOString(), context_version: context.version, status: "ready" }).eq("id", projectId).eq("user_id", userId).select("*").maybeSingle();
   if (error) throw error;

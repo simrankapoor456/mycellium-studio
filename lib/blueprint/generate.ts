@@ -8,7 +8,7 @@ import type { Project } from "@/lib/domain/project/schemas";
 
 export function generateDeterministicBlueprint(project: Project, approvedContextInput: DiscoveryContext, now: string): ProductBlueprint {
   const context = DiscoveryContextSchema.parse(approvedContextInput);
-  const usableFacts = context.facts.filter((fact) => fact.status === "confirmed" || fact.status === "inferred");
+  const usableFacts = context.facts.filter((fact) => fact.deletedAt === null && (fact.status === "confirmed" || fact.status === "inferred"));
   const objectiveFact = firstFact(usableFacts, "business_objective") ?? firstFact(usableFacts, "problem") ?? usableFacts[0];
   const objective = objectiveFact?.value ?? project.description ?? `Create a useful first release of ${project.name}.`;
   const targetFacts = factsFor(usableFacts, "target_users");
@@ -40,7 +40,9 @@ export function generateDeterministicBlueprint(project: Project, approvedContext
   }));
 
   const inScope = requirements.slice(0, 5).map((requirement, index) => ({ ...entity(`SCOPE-IN-${index + 1}`, requirement.title, requirement.description, requirement.priority, { ...requirement.lineage, requirementIds: [requirement.id], generatedFromIds: [requirement.id] }), boundary: "in" as const }));
-  const outOfScope = ["Team administration", "Billing and subscriptions", "Automatic external publishing"].map((title, index) => ({ ...entity(`SCOPE-OUT-${index + 1}`, title, `${title} remains outside the approved first release.`, "low", emptyLineage("fallback")), boundary: "out" as const }));
+  const excludedScopeFacts = factsFor(usableFacts, "excluded_scope");
+  const excludedScopeTitles = excludedScopeFacts.length > 0 ? excludedScopeFacts.map((fact) => fact.value) : ["Team administration", "Billing and subscriptions", "Automatic external publishing"];
+  const outOfScope = excludedScopeTitles.map((title, index) => ({ ...entity(`SCOPE-OUT-${index + 1}`, requirementTitle(title, index), `${title} remains outside the approved first release.`, "low", excludedScopeFacts[index] ? lineageFromFacts([excludedScopeFacts[index]], "fallback") : emptyLineage("fallback")), boundary: "out" as const }));
   const epics = requirements.slice(0, 4).map((requirement, index) => ({ ...entity(`EPIC-${index + 1}`, requirement.title, `Deliver the approved ${requirement.title.toLowerCase()} outcome.`, requirement.priority, { ...requirement.lineage, requirementIds: [requirement.id], generatedFromIds: [requirement.id] }), requirementIds: [requirement.id] }));
   const stories = epics.map((epic, index) => ({ ...entity(`STORY-${index + 1}`, `Complete ${epic.title.toLowerCase()}`, `A reviewable user flow for ${epic.title.toLowerCase()}.`, epic.priority, { ...epic.lineage, generatedFromIds: [epic.id] }), epicId: epic.id, userStory: `As ${targetUsers[0]}, I want to ${epic.title.toLowerCase()} so that I can achieve the approved product outcome.`, acceptanceCriteria: ["The happy path completes successfully.", "Errors are actionable and preserve user input.", "The workflow remains keyboard and mobile accessible."] }));
   const tasks = stories.flatMap((story, storyIndex) => [
@@ -67,6 +69,11 @@ export function generateDeterministicBlueprint(project: Project, approvedContext
     createdAt: now,
     updatedAt: now,
     overview: { businessObjective: objective, targetUsers, successMetrics: metricFacts.map((fact) => fact.value) },
+    assumptions: factsFor(usableFacts, "assumptions").map((fact) => fact.value),
+    constraints: factsFor(usableFacts, "constraints").map((fact) => fact.value),
+    tradeOffs: architectureDecisions.map((item) => `${item.title}: ${item.rationale}`),
+    dependencies: factsFor(usableFacts, "dependencies").map((fact) => fact.value),
+    ownershipSuggestions: [...new Set(tasks.map((task) => `${task.ownerType} ownership for ${task.title}`))],
     understanding: { factIds: usableFacts.map((fact) => fact.id), unresolvedItems: calculateUnresolved(context), acceptedUnknownFactIds: context.acceptedUnknownFactIds },
     goals,
     requirements,
@@ -83,14 +90,100 @@ export function generateDeterministicBlueprint(project: Project, approvedContext
 
 export function normalizeAiBlueprint(candidate: unknown, project: Project, context: DiscoveryContext, now: string): ProductBlueprint {
   const parsed = ProductBlueprintSchema.parse(candidate);
-  const normalized = ProductBlueprintSchema.parse({ ...parsed, projectId: project.id, projectName: project.name, projectType: project.project_type ?? "web-app", generationSource: "ai", version: 1, createdAt: now, updatedAt: now });
+  const goalIds = normalizedIds(parsed.goals, "GOAL");
+  const requirementIds = normalizedIds(parsed.requirements, "REQ");
+  const architectureIds = normalizedIds(parsed.architectureDecisions, "ARCH");
+  const inScopeIds = normalizedIds(parsed.scope.inScope, "SCOPE-IN");
+  const outOfScopeIds = normalizedIds(parsed.scope.outOfScope, "SCOPE-OUT");
+  const epicIds = normalizedIds(parsed.epics, "EPIC");
+  const storyIds = normalizedIds(parsed.stories, "STORY");
+  const taskIds = normalizedIds(parsed.tasks, "TASK");
+  const sprintIds = normalizedIds(parsed.sprintPlan, "SPRINT");
+  const riskIds = normalizedIds(parsed.risks, "RISK");
+  const entityIds = new Map([
+    ...goalIds,
+    ...requirementIds,
+    ...architectureIds,
+    ...inScopeIds,
+    ...outOfScopeIds,
+    ...epicIds,
+    ...storyIds,
+    ...taskIds,
+    ...sprintIds,
+    ...riskIds,
+  ]);
+  const validFactIds = new Set(context.facts.filter((fact) => fact.deletedAt === null).map((fact) => fact.id));
+  const validMessageIds = new Set(context.facts.flatMap((fact) => fact.sourceMessageIds));
+  const normalizeLineage = (lineage: Lineage): Lineage => ({
+    sourceMessageIds: lineage.sourceMessageIds.filter((id) => validMessageIds.has(id)),
+    factIds: lineage.factIds.filter((id) => validFactIds.has(id)),
+    requirementIds: lineage.requirementIds.flatMap((id) => {
+      const normalizedId = requirementIds.get(id);
+      return normalizedId ? [normalizedId] : [];
+    }),
+    generatedFromIds: lineage.generatedFromIds.flatMap((id) => {
+      const normalizedId = entityIds.get(id);
+      if (normalizedId) return [normalizedId];
+      return validFactIds.has(id) ? [id] : [];
+    }),
+    source: "ai",
+  });
+  const normalizeBase = <Entity extends ProductBlueprint["goals"][number]>(entity: Entity, id: string) => ({
+    ...entity,
+    id,
+    manuallyEdited: false,
+    lineage: normalizeLineage(entity.lineage),
+  });
+  const firstRequirementId = requirementIds.values().next().value;
+  const firstEpicId = epicIds.values().next().value;
+  const firstStoryId = storyIds.values().next().value;
+
+  const normalized = ProductBlueprintSchema.parse({
+    ...parsed,
+    projectId: project.id,
+    projectName: project.name,
+    projectType: project.project_type ?? "web-app",
+    generationSource: "ai",
+    version: 1,
+    createdAt: now,
+    updatedAt: now,
+    goals: parsed.goals.map((item) => normalizeBase(item, requiredMappedId(goalIds, item.id))),
+    requirements: parsed.requirements.map((item) => normalizeBase(item, requiredMappedId(requirementIds, item.id))),
+    architectureDecisions: parsed.architectureDecisions.map((item) => ({
+      ...normalizeBase(item, requiredMappedId(architectureIds, item.id)),
+      relatedRequirementIds: mappedIds(item.relatedRequirementIds, requirementIds, firstRequirementId),
+    })),
+    scope: {
+      inScope: parsed.scope.inScope.map((item) => normalizeBase(item, requiredMappedId(inScopeIds, item.id))),
+      outOfScope: parsed.scope.outOfScope.map((item) => normalizeBase(item, requiredMappedId(outOfScopeIds, item.id))),
+    },
+    epics: parsed.epics.map((item) => ({
+      ...normalizeBase(item, requiredMappedId(epicIds, item.id)),
+      requirementIds: mappedIds(item.requirementIds, requirementIds, firstRequirementId),
+    })),
+    stories: parsed.stories.map((item) => ({
+      ...normalizeBase(item, requiredMappedId(storyIds, item.id)),
+      epicId: epicIds.get(item.epicId) ?? firstEpicId,
+    })),
+    tasks: parsed.tasks.map((item) => ({
+      ...normalizeBase(item, requiredMappedId(taskIds, item.id)),
+      storyId: storyIds.get(item.storyId) ?? firstStoryId,
+      dependencyTaskIds: mappedIds(item.dependencyTaskIds, taskIds),
+      sprintId: item.sprintId ? sprintIds.get(item.sprintId) ?? null : null,
+    })),
+    sprintPlan: parsed.sprintPlan.map((item) => ({
+      ...normalizeBase(item, requiredMappedId(sprintIds, item.id)),
+      taskIds: mappedIds(item.taskIds, taskIds),
+    })),
+    risks: parsed.risks.map((item) => normalizeBase(item, requiredMappedId(riskIds, item.id))),
+  });
   const issues = validateBlueprintLineage(normalized, context);
   if (issues.length > 0) throw new Error(`Invalid blueprint lineage: ${issues.join("; ")}`);
   return normalized;
 }
 
 export function validateBlueprintLineage(blueprint: ProductBlueprint, context: DiscoveryContext): string[] {
-  const factIds = new Set(context.facts.map((fact) => fact.id));
+  const factIds = new Set(context.facts.filter((fact) => fact.deletedAt === null).map((fact) => fact.id));
   const requirementIds = new Set(blueprint.requirements.map((item) => item.id));
   const entityIds = new Set([...blueprint.goals, ...blueprint.requirements, ...blueprint.architectureDecisions, ...blueprint.scope.inScope, ...blueprint.scope.outOfScope, ...blueprint.epics, ...blueprint.stories, ...blueprint.tasks, ...blueprint.sprintPlan, ...blueprint.risks].map((item) => item.id));
   const issues: string[] = [];
@@ -132,7 +225,41 @@ function requirementTitle(value: string, index: number) {
 }
 
 function calculateUnresolved(context: DiscoveryContext): string[] {
-  const unknowns = context.facts.filter((fact) => fact.status === "unknown" && !context.acceptedUnknownFactIds.includes(fact.id)).map((fact) => `${fact.label}: ${fact.value}`);
+  const unknowns = context.facts.filter((fact) => fact.deletedAt === null && fact.status === "unknown" && !context.acceptedUnknownFactIds.includes(fact.id)).map((fact) => `${fact.label}: ${fact.value}`);
   const contradictions = context.contradictions.filter((item) => item.status === "open").map((item) => item.description);
   return [...unknowns, ...contradictions];
+}
+
+function normalizedIds(
+  items: readonly { id: string }[],
+  prefix: string,
+): Map<string, string> {
+  return new Map(items.map((item, index) => [item.id, `${prefix}-${index + 1}`]));
+}
+
+function requiredMappedId(ids: ReadonlyMap<string, string>, originalId: string): string {
+  const normalizedId = ids.get(originalId);
+
+  if (!normalizedId) {
+    throw new Error("Generated entity ID could not be normalized.");
+  }
+
+  return normalizedId;
+}
+
+function mappedIds(
+  input: readonly string[],
+  ids: ReadonlyMap<string, string>,
+  fallback?: string,
+): string[] {
+  const mapped = [...new Set(input.flatMap((id) => {
+    const normalizedId = ids.get(id);
+    return normalizedId ? [normalizedId] : [];
+  }))];
+
+  if (mapped.length === 0 && fallback) {
+    return [fallback];
+  }
+
+  return mapped;
 }
