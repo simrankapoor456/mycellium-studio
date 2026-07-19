@@ -1,4 +1,4 @@
-# Mycellium Studio MVP architecture
+# Mycellium Studio architecture
 
 ## Phase 2 objective
 
@@ -54,7 +54,7 @@ The migration under `supabase/migrations/` defines tables, checks, indexes, time
 
 ### Phase 1 planning and exports
 
-`lib/planner/` and `lib/exports/` remain pure and deterministic. They do not import authentication, Supabase, or UI code. Phase 2 does not connect the deterministic demonstration planner to persisted projects.
+`lib/planner/` and `lib/exports/` remain pure and deterministic. They do not import authentication, Supabase, or UI code. Phase 2 does not connect the deterministic example planner to persisted projects.
 
 ## Dependency direction
 
@@ -85,7 +85,7 @@ The app requires three public environment variables documented in `.env.example`
 
 ## Phase 3A presentation system
 
-Phase 3A adds a presentation layer without changing the trust boundary. Marketing content is rendered primarily as Server Components; only the product-stage tabs and form/dialog interactions cross the Client Component boundary. Fixed landing demonstration data lives in `lib/marketing/` and performs no network request.
+Phase 3A adds a presentation layer without changing the trust boundary. Marketing content is rendered primarily as Server Components; only the product-stage tabs and form/dialog interactions cross the Client Component boundary. Fixed landing example data lives in `lib/marketing/` and performs no network request.
 
 Semantic tokens in `app/globals.css` feed reusable components under `components/ui/` and `components/brand/`. Authentication and project pages reuse these components while retaining the same Phase 2 actions, validated operations, auth-scoped queries, and RLS policies. See [`docs/design-system.md`](./design-system.md) for the durable visual and interaction contract.
 
@@ -111,4 +111,24 @@ Route handlers derive identity from verified Supabase claims, re-read the owned 
 
 Lineage stores only user-visible references: source discovery message IDs, fact IDs, related requirement IDs, generated-from entity IDs, and `ai`, `fallback`, or `manual` source. Hidden model reasoning is neither requested nor persisted.
 
-The official OpenAI SDK exists only below `lib/ai/`. Both provider variables must be present before it runs. Requests use strict Zod-backed Responses API output, `store: false`, a 15-second timeout, and one SDK retry. An unavailable, timed-out, invalid, or lineage-inconsistent provider result falls back to the same canonical contracts.
+The official OpenAI SDK is reached only through the server-only Mycel Core AI layer. Both provider variables must be present before it runs. Requests use strict Zod-backed Responses API output, `store: false`, a 15-second timeout, and one SDK retry. An unavailable, timed-out, invalid, or lineage-inconsistent provider result falls back to the same canonical contracts.
+
+## Mycel Core intelligence boundary
+
+```text
+Route handler
+  -> Mycel Core orchestration
+      -> AI Layer: proposes typed discovery, blueprint, or Pressure Test output
+      -> Decision Layer: authenticates, authorizes, validates, gates, and normalizes
+      -> Deterministic Execution Layer: reads, computes, persists, and exports
+```
+
+The layers have one-way authority. Provider code cannot write project data. The Decision Layer owns owner checks, input limits, workflow transitions, readiness and contradiction gates, challenge disposition, rate policies, idempotency, trusted identifiers, and safe explanations. The execution layer is the only layer that reads or writes Supabase state and always supplies both the authenticated user ID and project ID.
+
+Discovery persists the user message before provider work, sends bounded visible history, validates any proposal against strict Zod contracts, merges memory deterministically, creates challenges, recalculates readiness, persists the assistant result, and derives the graph. Fact edits and review actions follow the same decision boundary. Confirmed facts are never silently replaced; material conflicts remain visible and can block approval.
+
+Blueprint generation requires an approved context with no blocking contradiction or unresolved material challenge. Generated identifiers are replaced with application-owned identifiers, and lineage references are filtered against persisted facts and messages. Manual edits increment the blueprint version and retain manual-edit metadata. Pressure Test results are version-linked snapshots stored separately from the blueprint and never apply changes automatically.
+
+Missing provider configuration and all bounded provider failures activate Reliable mode. Reliable mode uses the same canonical schemas, decisions, persistence paths, and UI workflow as AI-enhanced mode. The UI receives only the engine state and safe explanations, never credentials, raw provider data, or hidden reasoning.
+
+The `workflow_requests` table provides owner-scoped idempotency for blueprint generation and Pressure Test operations. The existing discovery request records continue to prevent duplicate discovery messages. Both tables are protected by RLS and project-ownership policies.

@@ -11,7 +11,7 @@ Deliverables:
 - Input format
 - Output schema
 - Success metrics
-- First demo scenario
+- First release scenario
 
 Acceptance criteria:
 
@@ -167,8 +167,8 @@ Possible additions:
 3. Add clarification question path.
 4. Add human approval gate.
 5. Add Jira or Trello payload preview.
-6. Polish first demo workflow.
-7. Record demo input and output examples.
+6. Polish first release workflow.
+7. Record release input and output examples.
 
 ## Week 4 Task List
 
@@ -176,5 +176,5 @@ Possible additions:
 2. Improve prompts using test results.
 3. Add basic error logging.
 4. Create user-facing documentation.
-5. Package the demo.
+5. Package the release.
 6. Decide whether to continue with n8n only or add a backend service.

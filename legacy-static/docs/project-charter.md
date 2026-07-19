@@ -70,9 +70,9 @@ The MVP does not need to automate the entire SDLC. It only needs to prove that t
 | Bad tickets pushed to tools | External systems get polluted | Require human approval before publishing |
 | Scope creep | MVP stalls | Keep version 1 focused on idea-to-sprint-plan |
 
-## First Demo Definition
+## First Release Definition
 
-The first demo should accept a plain project brief and return:
+The first release should accept a plain project brief and return:
 
 - Project summary
 - Epics
@@ -82,4 +82,4 @@ The first demo should accept a plain project brief and return:
 - Sprint plan
 - Optional Jira or Trello-ready payload preview
 
-The demo is successful if the planning output feels immediately usable.
+The release is successful if the planning output feels immediately usable.

@@ -2,7 +2,7 @@
 
 Mycellium Studio turns an early product idea into grounded understanding, architecture, requirements, and reviewable execution plans. Its AI Product Architect combines warm, precise discovery with a Living Product Graph, human approval, an editable Product Blueprint, and portable exports.
 
-## Phase 3B status
+## Mycel Core intelligence status
 
 Included:
 
@@ -21,6 +21,9 @@ Included:
 - Adaptive discovery with explicit facts, unknowns, contradictions, readiness, and graph changes
 - Persisted review approval, visible lineage, and an editable Product Blueprint
 - Optional server-only OpenAI Responses API structured output with deterministic fallback
+- Explicit AI, Decision, and Deterministic Execution layers under `lib/mycel-core/`
+- Owner-scoped workflow idempotency, rate policies, challenge gates, and trusted generated IDs
+- Persisted product challenges, graph fact controls, and non-mutating Pressure Test findings
 - Persisted Markdown, JSON, and CSV blueprint exports
 - Always-visible export navigation, locked-state guidance, direct downloads, and download success feedback
 - Centralized deterministic Mycellium voice for discovery, readiness, review, generation, errors, and exports
@@ -90,12 +93,13 @@ lib/domain/                  Canonical Zod contracts and pure business logic
 lib/projects/                Auth-scoped project persistence operations
 lib/discovery/               Auth-scoped discovery persistence operations
 lib/blueprint/               Blueprint generation, editing, persistence, and exports
-lib/ai/                      Server-only optional OpenAI provider boundary
+lib/mycel-core/              AI proposals, decision policies, and deterministic orchestration
+lib/ai/                      Compatibility export for the server-only provider boundary
 lib/voice/                   Centralized deterministic product voice and state copy
 lib/supabase/                Typed browser, server, and Proxy clients
 supabase/migrations/         Versioned schema, trigger, and RLS SQL
 tests/                       Pure unit and contract tests
-e2e/                         Authenticated Playwright export regression
+e2e/                         Authenticated Playwright workflow regressions
 docs/                        Architecture, setup, scope, and delivery boundaries
 legacy-static/               Verbatim pre-Next.js prototype snapshot
 ```

@@ -253,7 +253,7 @@ function buildReview(epics: Epic[], missingRequirements: string[], risks: Risk[]
     clarifying_questions: [
       ...missingRequirements.map((requirement) => `Please confirm the ${requirement}.`),
       "Who is the first target user for the MVP?",
-      "What must Sprint 1 include for the first demo to feel successful?",
+      "What must Sprint 1 include for the first release to feel successful?",
     ].slice(0, 5),
   };
 }
@@ -287,7 +287,7 @@ function buildRisks(missingRequirements: string[], brief: string): Risk[] {
     risks.push({
       risk: "External publishing can distract from validating the core workflow.",
       impact: "high",
-      mitigation: "Use portable files first and evaluate direct integrations in a later phase.",
+      mitigation: "Use portable files first and assess direct integrations in a later phase.",
     });
   }
 

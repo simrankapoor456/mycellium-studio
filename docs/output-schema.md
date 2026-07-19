@@ -72,3 +72,9 @@ Phase 3B preserves `PlanOutputSchema` 1.0 for the Phase 1 planner and introduces
 `ProductBlueprintSchema` 2.0 contains overview and understanding references; goals; requirements; architecture decisions; scope; epics; stories; acceptance criteria; tasks; dependencies; sprint assignments; risks; review warnings; status; priority; owner; estimates; and explicit lineage on every editable plan entity.
 
 Blueprint and structured-document views operate on the same parsed object. Controlled edits re-parse the complete document, increment its version, mark the entity manually edited, and change its lineage source to `manual`. Markdown, JSON, and normalized CSV exports parse the persisted 2.0 document immediately before serialization.
+
+The blueprint also carries explicit assumptions, constraints, trade-offs, dependencies, and ownership suggestions. AI-originated identifiers are not trusted: normalization replaces them with stable application identifiers and retains only lineage references that point to validated project facts and messages.
+
+## Pressure Test
+
+`lib/domain/pressure-test/schemas.ts` defines the separate strict Pressure Test contract: `overallAssessment`, `criticalFindings`, `scopeCuts`, `risks`, `questions`, `recommendedNextActions`, and `pressureTestMode`. Findings are linked to the blueprint version that was assessed and do not mutate the blueprint. Markdown may include the matching persisted summary; canonical blueprint JSON remains a fresh `ProductBlueprintSchema` serialization.

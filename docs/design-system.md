@@ -95,7 +95,7 @@ Only opacity and transform are animated. Root-path drawing runs once when the se
 
 ### Living Architecture signature system
 
-The signature experience keeps one Product Graph visible from the hero through the scroll story and the Discover, Architect, and Execute demonstration. Its visual grammar is semantic:
+The signature experience keeps one Product Graph visible from the hero through the scroll story and the Discover, Architect, and Execute example. Its visual grammar is semantic:
 
 - Nodes are named product artifacts, never decorative particles.
 - Edges show a traceable dependency or transformation.

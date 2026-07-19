@@ -33,7 +33,7 @@ Anti-reference: purple AI gradients, rounded-card grids, fake dashboards, testim
 1. Create the hand-authored rooted-M SVG asset family and metadata assets.
 2. Establish semantic color, type, spacing, focus, motion, and reduced-motion tokens.
 3. Add reusable brand and product primitives.
-4. Build the complete responsive landing page and interactive stage experience with fixed demo data.
+4. Build the complete responsive landing page and interactive stage experience with fixed example data.
 5. Polish authentication and confirmation-error presentation without changing auth behavior.
 6. Polish dashboard, project forms, cards, confirmation dialog, and project shell without changing persistence behavior.
 7. Add focused component and interaction tests.

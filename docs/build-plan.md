@@ -49,7 +49,7 @@ Status: implemented on `feat/fullstack-mvp`.
 
 - Added the original rooted-M SVG logo, favicon, touch icon, lockup, and social card.
 - Established semantic color, typography, spacing, focus, and motion tokens.
-- Built the complete responsive marketing experience and interactive product-stage demonstration.
+- Built the complete responsive marketing experience and interactive product-stage example.
 - Polished authentication, dashboard, project cards, forms, loading, error, and empty states.
 - Replaced browser confirmation prompts with an accessible native dialog.
 - Added metadata, canonical URL handling, Open Graph, and Twitter presentation.
@@ -64,7 +64,7 @@ Status: implemented on `feat/fullstack-mvp`.
 
 - Introduced the Living Architecture Product Graph as a shared hero, narrative, and workflow language.
 - Added a five-stage scroll story with a sticky desktop visualization and complete mobile/static fallback.
-- Rebuilt the fixed-data Discover, Architect, and Execute demonstration with keyboard-operable tabs.
+- Rebuilt the fixed-data Discover, Architect, and Execute example with keyboard-operable tabs.
 - Added readiness, scope, dependency, work-hierarchy, and sprint-allocation diagrams.
 - Defined explicit spatial elevation and motion tiers with reduced-motion behavior.
 - Carried calmer versions of the surface language into authentication, dashboard, project, empty, loading, and error states.

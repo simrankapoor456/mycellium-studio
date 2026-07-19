@@ -1,4 +1,4 @@
-# Supabase setup through Phase 3B
+# Supabase setup through Mycel Core
 
 The application needs a Supabase URL and publishable key only. Do not create, expose, or add a service-role key.
 
@@ -22,6 +22,8 @@ Apply [`supabase/migrations/20260717220000_phase_2_personal_foundation.sql`](../
 
 Then apply [`supabase/migrations/20260718000000_phase_3b_core_product.sql`](../supabase/migrations/20260718000000_phase_3b_core_product.sql). Migrations must run in timestamp order. Do not edit the already-applied Phase 2 migration.
 
+Finally apply [`supabase/migrations/20260718190000_mycel_core_intelligence.sql`](../supabase/migrations/20260718190000_mycel_core_intelligence.sql). It adds the separate Pressure Test snapshot, its blueprint-version link, and owner-scoped workflow idempotency records. Do not edit either earlier migration.
+
 With a locally authenticated Supabase CLI, link the intended project and run:
 
 ```bash
@@ -29,7 +31,7 @@ npx supabase link --project-ref YOUR_PROJECT_REF
 npx supabase db push
 ```
 
-Alternatively, open each migration in the Supabase SQL Editor, review the target project, and run it once in timestamp order. Together they create `profiles`, `projects`, ordered `discovery_messages`, Phase 3B approval/version fields, and project-scoped `discovery_requests`, with explicit RLS. Do not run them against an unrelated or production project without the normal review/backup process.
+Alternatively, open each migration in the Supabase SQL Editor, review the target project, and run it once in timestamp order. Together they create `profiles`, `projects`, ordered `discovery_messages`, approval/version fields, project-scoped `discovery_requests`, and owner-scoped `workflow_requests`, with explicit RLS. Do not run them against an unrelated or production project without the normal review/backup process.
 
 ## 3. Configure Auth
 
@@ -61,6 +63,7 @@ The callback verifies the one-time token on the server and then redirects to `/d
 - `projects`: personally owned project metadata plus JSON slots for later discovery/readiness/plan data.
 - `discovery_messages`: ordered, role-constrained messages that cascade when their project is deleted.
 - `discovery_requests`: project-scoped request UUIDs and completed response payloads for duplicate-turn protection.
+- `workflow_requests`: owner-scoped idempotency and bounded-rate records for blueprint generation and Pressure Test operations.
 
 RLS permits an authenticated user to:
 
@@ -68,6 +71,7 @@ RLS permits an authenticated user to:
 - select, insert, update, and delete only their projects;
 - access a discovery message only when both its `user_id` matches and its parent project is owned by that user;
 - insert discovery messages only beneath a project they own.
+- access workflow records only when the parent project belongs to them.
 
 Application queries also filter by `user_id`, providing defense in depth. RLS is still the authoritative database boundary.
 
@@ -118,6 +122,6 @@ Expected results for User B: the select and update return no rows; the insert fa
 - Add the three `NEXT_PUBLIC_*` values to the deployment environment; keep the publishable key only in its documented public variable.
 - Set `NEXT_PUBLIC_SITE_URL` to the exact deployed HTTPS origin.
 - Add the production confirmation callback to Supabase Auth redirect URLs.
-- Apply the checked-in migration to the deployment project's database.
+- Apply all checked-in migrations in timestamp order to the deployment project's database.
 - Keep `OPENAI_API_KEY` and `OPENAI_MODEL` blank for deterministic mode, or set both to enable the optional server-only provider.
 - Run signup, confirmation, login, project CRUD, logout, and the two-user isolation test against the deployed environment.

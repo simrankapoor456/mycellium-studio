@@ -342,7 +342,7 @@ function buildReview(epics, missing, risks) {
     clarifying_questions: [
       ...missing.map((item) => `Please confirm: ${item}`),
       "Who is the first target user for the MVP?",
-      "What must be included in Sprint 1 for the demo to feel successful?",
+      "What must be included in Sprint 1 for the first release to feel successful?",
     ].slice(0, 5),
   };
 }

@@ -43,7 +43,7 @@ This version avoids paid n8n subscriptions and does not require a backend. It is
 
 ## Recommended Next Stack
 
-- Static frontend for the first demo
+- Static frontend for the first release
 - Optional AI API later for stronger generation quality
 - Structured JSON schema as the internal output format
 - Markdown/JSON/CSV as the first export formats

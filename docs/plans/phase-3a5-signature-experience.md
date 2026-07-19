@@ -51,7 +51,7 @@ Total: 31/36. Phase 3A.5 is a focused signature upgrade, not a structural rewrit
 1. Define spatial elevation, lighting, perspective, and motion tokens with static and reduced-motion fallbacks.
 2. Build the interactive SVG Product Graph hero with pointer-responsive depth and a static semantic baseline.
 3. Add a five-chapter sticky narrative driven by IntersectionObserver, not scroll listeners.
-4. Redesign the Discover, Architect, and Execute demo around fixed conversational and planning data.
+4. Redesign the Discover, Architect, and Execute example around fixed conversational and planning data.
 5. Add six consistent diagrams: product graph, readiness view, scope boundary map, dependency map, work hierarchy, and sprint timeline.
 6. Carry restrained depth and productive state motion into authentication, dashboard, project shell, empty, and loading surfaces.
 7. Extend interaction, fallback, keyboard, rendering, and navigation tests.
