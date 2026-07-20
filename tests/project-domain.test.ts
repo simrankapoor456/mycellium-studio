@@ -70,7 +70,7 @@ describe("project form validation", () => {
   ])("rejects %s", (_label, override) => {
     const result = ProjectCreateInputSchema.safeParse({
       name: "Valid",
-      description: "",
+      description: "A clear project description.",
       projectType: "web-app",
       targetUsers: "",
       teamSize: 3,
@@ -82,6 +82,51 @@ describe("project form validation", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("requires only the core starting context and normalizes optional planning fields", () => {
+    const result = ProjectCreateInputSchema.parse({
+      name: "Living notes",
+      description: "Turn scattered product context into a grounded plan.",
+      projectType: "",
+      customProjectType: "",
+      targetUsers: "",
+      teamSize: "3",
+      sprintLength: "2-weeks",
+      capacity: "",
+      planningDepth: "",
+      constraints: "",
+    });
+
+    expect(result).toMatchObject({
+      projectType: null,
+      targetUsers: null,
+      capacity: null,
+      planningDepth: null,
+      constraints: null,
+    });
+  });
+
+  it.each([
+    ["Project name is required.", { name: "" }],
+    ["Project description is required.", { description: "" }],
+  ])("returns actionable required-field copy", (message, override) => {
+    const result = ProjectCreateInputSchema.safeParse({
+      name: "Living notes",
+      description: "A grounded product description.",
+      projectType: "",
+      customProjectType: "",
+      targetUsers: "",
+      teamSize: "3",
+      sprintLength: "2-weeks",
+      capacity: "",
+      planningDepth: "",
+      constraints: "",
+      ...override,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]?.message).toBe(message);
   });
 });
 

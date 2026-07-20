@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toAuthErrorMessage, toProjectErrorMessage } from "@/lib/errors/safe-error";
+import { classifySafeError, toAuthErrorMessage, toProjectErrorMessage } from "@/lib/errors/safe-error";
 import { safeApiError } from "@/lib/errors/api-error";
 
 describe("safe error mapping", () => {
@@ -31,5 +31,13 @@ describe("safe error mapping", () => {
     expect(message).not.toContain("postgres");
     expect(message).not.toContain("relation");
     expect(message).toBe("The project could not be saved. Please try again.");
+  });
+
+  it("separates network, authentication, permission, database, and unknown failures", () => {
+    expect(classifySafeError(new TypeError("fetch failed"))).toBe("network");
+    expect(classifySafeError({ status: 401 })).toBe("authentication");
+    expect(classifySafeError({ status: 403 })).toBe("permission");
+    expect(classifySafeError({ code: "23505" })).toBe("database");
+    expect(classifySafeError(new Error("private internal detail"))).toBe("unknown");
   });
 });

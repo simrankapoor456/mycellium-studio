@@ -54,8 +54,8 @@ describe("Phase 6 foundation experience", () => {
 
 describe("Phase 6 inputs and navigation", () => {
   const baseInput = { name: "Untitled system", description: "Loose notes", projectType: "custom", targetUsers: "Workspace owners", teamSize: 2, sprintLength: "2-weeks", capacity: 20, planningDepth: "balanced", constraints: "" };
-  it("requires and trims a custom product type", () => {
-    expect(ProjectCreateInputSchema.safeParse(baseInput).success).toBe(false);
+  it("keeps custom product detail optional and trims it when present", () => {
+    expect(ProjectCreateInputSchema.safeParse(baseInput).success).toBe(true);
     expect(ProjectCreateInputSchema.parse({ ...baseInput, customProjectType: "  Spatial tool  " }).customProjectType).toBe("Spatial tool");
   });
 
