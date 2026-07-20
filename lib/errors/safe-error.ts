@@ -1,3 +1,5 @@
+import type { ActionErrorKind, ActionState } from "@/lib/actions/action-state";
+
 type ErrorLike = {
   code?: unknown;
   message?: unknown;
@@ -6,6 +8,63 @@ type ErrorLike = {
 
 function asErrorLike(error: unknown): ErrorLike {
   return typeof error === "object" && error !== null ? error : {};
+}
+
+export function classifySafeError(error: unknown): Exclude<ActionErrorKind, "validation"> {
+  const candidate = asErrorLike(error);
+  const code = typeof candidate.code === "string" ? candidate.code.toLowerCase() : "";
+  const message = typeof candidate.message === "string" ? candidate.message.toLowerCase() : "";
+  const status = typeof candidate.status === "number" ? candidate.status : null;
+
+  if (
+    status === 401
+    || code.includes("jwt")
+    || code.includes("session")
+    || code === "refresh_token_not_found"
+  ) {
+    return "authentication";
+  }
+
+  if (status === 403 || code === "42501" || code.includes("permission")) {
+    return "permission";
+  }
+
+  if (
+    error instanceof TypeError
+    || status === 0
+    || code.includes("fetch")
+    || message.includes("failed to fetch")
+    || message.includes("network")
+  ) {
+    return "network";
+  }
+
+  if ((status !== null && status >= 500) || /^\d{5}$/.test(code) || code.startsWith("pgrst")) {
+    return "database";
+  }
+
+  return "unknown";
+}
+
+export function toActionFailure(
+  error: unknown,
+  messages: Readonly<Partial<Record<Exclude<ActionErrorKind, "validation">, string>>>,
+): ActionState {
+  const errorKind = classifySafeError(error);
+  const fallbackMessages: Record<Exclude<ActionErrorKind, "validation">, string> = {
+    network: "Could not reach the server. Check your connection and retry.",
+    authentication: "Your session expired. Sign in again, then retry.",
+    database: "The change could not be saved. Retry in a moment.",
+    permission: "You do not have permission to make this change.",
+    unknown: "The change could not be completed. Retry.",
+  };
+
+  return {
+    status: "error",
+    message: messages[errorKind] ?? fallbackMessages[errorKind],
+    errorKind,
+    retryable: errorKind !== "permission",
+  };
 }
 
 export function toAuthErrorMessage(error: unknown): string {

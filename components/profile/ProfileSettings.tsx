@@ -1,12 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { changeEmailAction, changePasswordAction, updateProfileAction } from "@/app/(protected)/settings/profile/actions";
-import { Button } from "@/components/ui/Button";
-import { FormField } from "@/components/ui/FormField";
+import { ComboboxField } from "@/components/forms/ComboboxField";
+import { TextField } from "@/components/forms/FormControls";
+import { DirtyIndicator, FormActionMessage, FormSubmitButton, SuccessToast } from "@/components/forms/FormStatus";
+import { useTrustedForm, useUnsavedChanges } from "@/components/forms/useTrustedForm";
 import { initialActionState, type ActionState } from "@/lib/actions/action-state";
+import { LOCATION_SUGGESTIONS, getTimezoneOptions } from "@/lib/domain/profile/options";
+import { EmailChangeInputSchema, PasswordChangeInputSchema, ProfileUpdateInputSchema } from "@/lib/domain/profile/schemas";
 
 type ProfileData = Readonly<{
   displayName: string;
@@ -17,11 +20,62 @@ type ProfileData = Readonly<{
   createdAt: string;
 }>;
 
+type IdentityValues = { displayName: string; avatarUrl: string; timezone: string; location: string };
+
 export function ProfileSettings({ profile }: { profile: ProfileData }) {
   const [profileState, profileAction] = useActionState(updateProfileAction, initialActionState);
   const [emailState, emailAction] = useActionState(changeEmailAction, initialActionState);
   const [passwordState, passwordAction] = useActionState(changePasswordAction, initialActionState);
+  const [identityValues, setIdentityValues] = useState<IdentityValues>({ displayName: profile.displayName, avatarUrl: profile.avatarUrl, timezone: profile.timezone, location: profile.location });
+  const [savedIdentity, setSavedIdentity] = useState(identityValues);
+  const [email, setEmail] = useState(profile.email);
+  const [savedEmail, setSavedEmail] = useState(profile.email);
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [successNotice, setSuccessNotice] = useState<{ id: number; message: string } | null>(null);
+  const successSequence = useRef(0);
+  const handledProfileSuccess = useRef<ActionState | null>(null);
+  const handledEmailSuccess = useRef<ActionState | null>(null);
+  const handledPasswordSuccess = useRef<ActionState | null>(null);
+  const identityDirty = JSON.stringify(identityValues) !== JSON.stringify(savedIdentity);
+  const emailDirty = email !== savedEmail;
+  const passwordDirty = Boolean(password || passwordConfirmation);
   const initials = getInitials(profile.displayName || profile.email);
+  useUnsavedChanges(identityDirty || emailDirty || passwordDirty);
+
+  useEffect(() => {
+    if (profileState.status !== "success" || handledProfileSuccess.current === profileState) return;
+    handledProfileSuccess.current = profileState;
+    const frame = window.requestAnimationFrame(() => {
+      setSavedIdentity(identityValues);
+      successSequence.current += 1;
+      setSuccessNotice({ id: successSequence.current, message: profileState.message });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [identityValues, profileState]);
+
+  useEffect(() => {
+    if (emailState.status !== "success" || handledEmailSuccess.current === emailState) return;
+    handledEmailSuccess.current = emailState;
+    const frame = window.requestAnimationFrame(() => {
+      setSavedEmail(email);
+      successSequence.current += 1;
+      setSuccessNotice({ id: successSequence.current, message: emailState.message });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [email, emailState]);
+
+  useEffect(() => {
+    if (passwordState.status !== "success" || handledPasswordSuccess.current === passwordState) return;
+    handledPasswordSuccess.current = passwordState;
+    const frame = window.requestAnimationFrame(() => {
+      setPassword("");
+      setPasswordConfirmation("");
+      successSequence.current += 1;
+      setSuccessNotice({ id: successSequence.current, message: passwordState.message });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [passwordState]);
 
   return (
     <main className="profile-settings">
@@ -32,13 +86,7 @@ export function ProfileSettings({ profile }: { profile: ProfileData }) {
       </header>
 
       <section aria-label="Account identity" className="profile-settings__identity">
-        <div className="profile-avatar">
-          {profile.avatarUrl ? (
-            // User-provided avatar hosts are intentionally unrestricted.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img alt="Profile avatar" height={96} src={profile.avatarUrl} width={96} />
-          ) : <span aria-label={`Initials: ${initials}`}>{initials}</span>}
-        </div>
+        <Avatar value={profile.avatarUrl} fallback={initials} label="Profile avatar" />
         <div>
           <strong>{profile.displayName || "Account owner"}</strong>
           <span>{profile.email}</span>
@@ -47,26 +95,15 @@ export function ProfileSettings({ profile }: { profile: ProfileData }) {
       </section>
 
       <div className="profile-settings__grid">
-        <ProfileForm action={profileAction} profile={profile} state={profileState} />
+        <ProfileForm action={profileAction} dirty={identityDirty} onChange={setIdentityValues} state={profileState} values={identityValues} />
         <section aria-labelledby="security-heading" className="profile-settings__section profile-settings__security">
           <header className="profile-settings__section-header">
             <span className="eyebrow">Security</span>
             <h2 id="security-heading">Email and password</h2>
-            <p>Email changes require confirmation through Supabase. Password changes apply to this account after a successful request.</p>
+            <p>Email changes require confirmation through Supabase. Password changes apply after a successful request.</p>
           </header>
-
-          <form action={emailAction} className="profile-settings__form">
-            <TextField defaultValue={profile.email} error={emailState.fieldErrors?.email?.[0]} id="security-email" label="New email address" name="email" required type="email" />
-            <SubmitButton label="Request email change" pendingLabel="Sending request" />
-            <ActionMessage state={emailState} />
-          </form>
-
-          <form action={passwordAction} className="profile-settings__form">
-            <TextField autoComplete="new-password" error={passwordState.fieldErrors?.password?.[0]} hint="Use at least 12 characters." id="security-password" label="New password" minLength={12} name="password" required type="password" />
-            <TextField autoComplete="new-password" error={passwordState.fieldErrors?.passwordConfirmation?.[0]} id="security-password-confirmation" label="Confirm new password" minLength={12} name="passwordConfirmation" required type="password" />
-            <SubmitButton label="Change password" pendingLabel="Changing password" />
-            <ActionMessage state={passwordState} />
-          </form>
+          <EmailForm action={emailAction} dirty={emailDirty} email={email} onChange={setEmail} state={emailState} />
+          <PasswordForm action={passwordAction} confirmation={passwordConfirmation} dirty={passwordDirty} onConfirmationChange={setPasswordConfirmation} onPasswordChange={setPassword} password={password} state={passwordState} />
         </section>
       </div>
 
@@ -75,11 +112,33 @@ export function ProfileSettings({ profile }: { profile: ProfileData }) {
         <h2>Account and data removal</h2>
         <p>Self-service removal is not enabled because it requires a privileged server operation. Ask the operator of this deployment to remove the Auth account and its owned project data.</p>
       </aside>
+      {successNotice ? <SuccessToast key={successNotice.id} message={successNotice.message} /> : null}
     </main>
   );
 }
 
-function ProfileForm({ action, profile, state }: Readonly<{ action: (payload: FormData) => void; profile: ProfileData; state: ActionState }>) {
+function ProfileForm({ action, dirty, onChange, state, values }: Readonly<{ action: (payload: FormData) => void; dirty: boolean; onChange: (values: IdentityValues) => void; state: ActionState; values: IdentityValues }>) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const timezones = useMemo(() => getTimezoneOptions(), []);
+  const validate = useCallback((formData: FormData) => {
+    const parsed = ProfileUpdateInputSchema.safeParse({ displayName: formData.get("displayName"), avatarUrl: formData.get("avatarUrl"), timezone: formData.get("timezone"), location: formData.get("location") });
+    return parsed.success ? {} : parsed.error.flatten().fieldErrors;
+  }, []);
+  const trust = useTrustedForm({ dirty, formRef, serverState: state, validate, warnOnNavigate: false });
+
+  useEffect(() => {
+    if (values.timezone) return;
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!detected) return;
+    const frame = window.requestAnimationFrame(() => onChange({ ...values, timezone: detected }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [onChange, values]);
+
+  function update(name: keyof IdentityValues, value: string) {
+    onChange({ ...values, [name]: value });
+    trust.onFieldChange(name);
+  }
+
   return (
     <section aria-labelledby="profile-heading" className="profile-settings__section">
       <header className="profile-settings__section-header">
@@ -87,47 +146,64 @@ function ProfileForm({ action, profile, state }: Readonly<{ action: (payload: Fo
         <h2 id="profile-heading">Identity and context</h2>
         <p>These details shape how your account appears inside Mycellium. Saving here does not change your email.</p>
       </header>
-      <form action={action} className="profile-settings__form">
-        <TextField defaultValue={profile.displayName} error={state.fieldErrors?.displayName?.[0]} id="profile-display-name" label="Display name" maxLength={80} name="displayName" />
-        <TextField defaultValue={profile.avatarUrl} error={state.fieldErrors?.avatarUrl?.[0]} hint="Use a complete HTTPS image URL, or leave blank for initials." id="profile-avatar-url" label="Avatar URL" maxLength={2_000} name="avatarUrl" type="url" />
-        <TextField defaultValue={profile.timezone} error={state.fieldErrors?.timezone?.[0]} hint="For example, America/Los_Angeles." id="profile-timezone" label="Timezone" maxLength={100} name="timezone" />
-        <TextField defaultValue={profile.location} error={state.fieldErrors?.location?.[0]} id="profile-location" label="Location" maxLength={120} name="location" />
-        <SubmitButton label="Save profile" pendingLabel="Saving profile" />
-        <ActionMessage state={state} />
+      <form action={action} className="profile-settings__form" noValidate onSubmit={trust.onSubmit} ref={formRef}>
+        <TextField error={trust.fieldErrors.displayName?.[0]} id="profile-display-name" label="Display name" maxLength={80} name="displayName" onChange={(event) => update("displayName", event.currentTarget.value)} requirement="required" value={values.displayName} />
+        <div className="profile-avatar-editor">
+          <Avatar fallback={getInitials(values.displayName)} key={values.avatarUrl} label="Avatar preview" value={values.avatarUrl} />
+          <TextField error={trust.fieldErrors.avatarUrl?.[0]} hint="Use a complete HTTPS image URL. Upload support is deferred until storage infrastructure is approved." id="profile-avatar-url" label="Avatar URL" maxLength={2_000} name="avatarUrl" onChange={(event) => update("avatarUrl", event.currentTarget.value)} requirement="optional" type="url" value={values.avatarUrl} />
+        </div>
+        <ComboboxField error={trust.fieldErrors.timezone?.[0]} hint="Detected from your browser on first visit. Stored as an IANA timezone." id="profile-timezone" label="Timezone" name="timezone" onValueChange={(value) => update("timezone", value)} options={timezones} placeholder="Search timezones" value={values.timezone} />
+        <ComboboxField error={trust.fieldErrors.location?.[0]} hint="Search common locations or enter a city, region, and country." id="profile-location" label="Location" name="location" onValueChange={(value) => update("location", value)} options={LOCATION_SUGGESTIONS} placeholder="Search locations" value={values.location} />
+        <div className="form-save-row"><FormSubmitButton dirty={dirty} idleLabel="Save profile" pendingLabel="Saving profile" state={trust.state} /><DirtyIndicator dirty={dirty} /></div>
+        <FormActionMessage state={trust.state} />
       </form>
     </section>
   );
 }
 
-function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
-  const { pending } = useFormStatus();
-  return <Button aria-busy={pending} disabled={pending} type="submit">{pending ? pendingLabel : label}</Button>;
-}
-
-function ActionMessage({ state }: { state: ActionState }) {
-  if (state.status === "idle") return null;
-  return <p aria-live="polite" data-status={state.status} role={state.status === "error" ? "alert" : "status"}>{state.message}</p>;
-}
-
-function TextField({ error, hint, id, label, name, ...inputProps }: Readonly<{
-  error?: string | undefined;
-  hint?: string | undefined;
-  id: string;
-  label: string;
-  name: string;
-} & React.InputHTMLAttributes<HTMLInputElement>>) {
-  const descriptionId = `${id}-description`;
+function EmailForm({ action, dirty, email, onChange, state }: Readonly<{ action: (payload: FormData) => void; dirty: boolean; email: string; onChange: (value: string) => void; state: ActionState }>) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const validate = useCallback((formData: FormData) => {
+    const parsed = EmailChangeInputSchema.safeParse({ email: formData.get("email") });
+    return parsed.success ? {} : parsed.error.flatten().fieldErrors;
+  }, []);
+  const trust = useTrustedForm({ dirty, formRef, serverState: state, validate, warnOnNavigate: false });
   return (
-    <FormField error={error} hint={hint} htmlFor={id} label={label}>
-      <input
-        aria-describedby={error || hint ? descriptionId : undefined}
-        aria-invalid={Boolean(error)}
-        className="form-control mt-2"
-        id={id}
-        name={name}
-        {...inputProps}
-      />
-    </FormField>
+    <form action={action} className="profile-settings__form" noValidate onSubmit={trust.onSubmit} ref={formRef}>
+      <TextField error={trust.fieldErrors.email?.[0]} id="security-email" label="New email address" name="email" onChange={(event) => { onChange(event.currentTarget.value); trust.onFieldChange("email"); }} requirement="required" type="email" value={email} />
+      <div className="form-save-row"><FormSubmitButton dirty={dirty} idleLabel="Request email change" pendingLabel="Sending request" state={trust.state} /><DirtyIndicator dirty={dirty} /></div>
+      <FormActionMessage state={trust.state} />
+    </form>
+  );
+}
+
+function PasswordForm({ action, confirmation, dirty, onConfirmationChange, onPasswordChange, password, state }: Readonly<{ action: (payload: FormData) => void; confirmation: string; dirty: boolean; onConfirmationChange: (value: string) => void; onPasswordChange: (value: string) => void; password: string; state: ActionState }>) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const validate = useCallback((formData: FormData) => {
+    const parsed = PasswordChangeInputSchema.safeParse({ password: formData.get("password"), passwordConfirmation: formData.get("passwordConfirmation") });
+    return parsed.success ? {} : parsed.error.flatten().fieldErrors;
+  }, []);
+  const trust = useTrustedForm({ dirty, formRef, serverState: state, validate, warnOnNavigate: false });
+  return (
+    <form action={action} className="profile-settings__form" noValidate onSubmit={trust.onSubmit} ref={formRef}>
+      <TextField autoComplete="new-password" error={trust.fieldErrors.password?.[0]} hint="Use at least 12 characters." id="security-password" label="New password" maxLength={200} name="password" onChange={(event) => { onPasswordChange(event.currentTarget.value); trust.onFieldChange("password"); }} requirement="required" type="password" value={password} />
+      <TextField autoComplete="new-password" error={trust.fieldErrors.passwordConfirmation?.[0]} id="security-password-confirmation" label="Confirm new password" maxLength={200} name="passwordConfirmation" onChange={(event) => { onConfirmationChange(event.currentTarget.value); trust.onFieldChange("passwordConfirmation"); }} requirement="required" type="password" value={confirmation} />
+      <div className="form-save-row"><FormSubmitButton dirty={dirty} idleLabel="Change password" pendingLabel="Changing password" state={trust.state} /><DirtyIndicator dirty={dirty} /></div>
+      <FormActionMessage state={trust.state} />
+    </form>
+  );
+}
+
+function Avatar({ fallback, label, value }: { fallback: string; label: string; value: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="profile-avatar">
+      {value && !failed ? (
+        // User-provided avatar hosts are intentionally unrestricted.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img alt={label} height={96} onError={() => setFailed(true)} src={value} width={96} />
+      ) : <span aria-label={`Initials: ${fallback || "MS"}`}>{fallback || "MS"}</span>}
+    </div>
   );
 }
 

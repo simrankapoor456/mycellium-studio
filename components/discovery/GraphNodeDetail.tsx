@@ -47,7 +47,7 @@ export function GraphNodeDetail({ context, downstreamItems, messages, node, pend
         <div><dt>Downstream blueprint items</dt><dd>{downstreamItems.join(", ") || "None yet"}</dd></div>
       </dl>
       {sourceMessages.map((message) => <a href={`#message-${message.id}`} key={message.id}>Jump to source: {message.content.slice(0, 80)}</a>)}
-      <form className="living-graph__edit" onSubmit={handleEdit}><label htmlFor={`graph-value-${fact.id}`}>Edit this fact</label><textarea defaultValue={fact.value} id={`graph-value-${fact.id}`} name="value" rows={3} /><button disabled={pending} type="submit">Save fact</button></form>
+      <form className="living-graph__edit" onSubmit={handleEdit}><label htmlFor={`graph-value-${fact.id}`}>Edit this fact</label><textarea defaultValue={fact.value} id={`graph-value-${fact.id}`} name="value" required rows={3} /><button disabled={pending} type="submit">Save fact</button></form>
       <div className="living-graph__actions">
         <button disabled={pending} onClick={() => onMutate({ action: "confirm_fact", factId: fact.id })} type="button">Confirm</button>
         <button disabled={pending} onClick={() => onMutate({ action: "reject_assumption", factId: fact.id })} type="button">Reject</button>

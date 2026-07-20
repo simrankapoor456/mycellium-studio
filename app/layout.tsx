@@ -4,6 +4,7 @@ import "./globals.css";
 import "./phase-7-1.css";
 import "./phase-7-2.css";
 import "./living-product.css";
+import "./form-trust.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 

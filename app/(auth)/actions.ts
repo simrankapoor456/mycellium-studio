@@ -2,11 +2,11 @@
 
 import { redirect } from "next/navigation";
 
-import type { ActionState } from "@/lib/actions/action-state";
+import { validationActionState, type ActionState } from "@/lib/actions/action-state";
 import { getSafeReturnPath } from "@/lib/auth/return-path";
 import { LoginSchema, SignupSchema } from "@/lib/auth/schemas";
 import { getServerEnvironment } from "@/lib/env/server";
-import { toAuthErrorMessage } from "@/lib/errors/safe-error";
+import { classifySafeError, toAuthErrorMessage } from "@/lib/errors/safe-error";
 import { createClient } from "@/lib/supabase/server";
 
 export async function loginAction(
@@ -20,18 +20,14 @@ export async function loginAction(
   });
 
   if (!parsed.success) {
-    return {
-      status: "error",
-      message: "Check the highlighted fields.",
-      fieldErrors: parsed.error.flatten().fieldErrors,
-    };
+    return validationActionState("Fix the highlighted fields.", parsed.error.flatten().fieldErrors);
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
-    return { status: "error", message: toAuthErrorMessage(error) };
+    return authActionFailure(error);
   }
 
   redirect(returnPath);
@@ -50,11 +46,7 @@ export async function signupAction(
   });
 
   if (!parsed.success) {
-    return {
-      status: "error",
-      message: "Check the highlighted fields.",
-      fieldErrors: parsed.error.flatten().fieldErrors,
-    };
+    return validationActionState("Fix the highlighted fields.", parsed.error.flatten().fieldErrors);
   }
 
   const supabase = await createClient();
@@ -69,7 +61,7 @@ export async function signupAction(
   });
 
   if (error) {
-    return { status: "error", message: toAuthErrorMessage(error) };
+    return authActionFailure(error);
   }
 
   if (data.session) {
@@ -86,4 +78,12 @@ function buildConfirmationUrl(siteUrl: string, returnPath: string): string {
   const confirmationUrl = new URL("/auth/confirm", siteUrl);
   confirmationUrl.searchParams.set("next", returnPath);
   return confirmationUrl.toString();
+}
+
+function authActionFailure(error: unknown): ActionState {
+  const kind = classifySafeError(error);
+  if (kind === "network") {
+    return { status: "error", message: "Could not reach the server. Check your connection and retry.", errorKind: "network", retryable: true };
+  }
+  return { status: "error", message: toAuthErrorMessage(error), errorKind: "authentication", retryable: true };
 }

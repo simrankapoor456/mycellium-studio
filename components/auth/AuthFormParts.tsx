@@ -1,24 +1,12 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
-
-import { Button } from "@/components/ui/Button";
+import { FormActionMessage, FormSubmitButton } from "@/components/forms/FormStatus";
 import type { ActionState } from "@/lib/actions/action-state";
 
 export function AuthFormMessage({ state }: { state: ActionState }) {
-  if (state.status === "idle") {
-    return null;
-  }
-
-  return (
-    <p aria-live="polite" className={state.status === "success" ? "text-sm font-medium text-forest" : "text-sm font-medium text-clay"} role={state.status === "error" ? "alert" : "status"}>
-      {state.message}
-    </p>
-  );
+  return <FormActionMessage state={state} />;
 }
 
-export function AuthSubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
-  const { pending } = useFormStatus();
-
-  return <Button aria-busy={pending} className="w-full" disabled={pending} type="submit">{pending ? pendingLabel : label}</Button>;
+export function AuthSubmitButton({ label, pendingLabel, state }: { label: string; pendingLabel: string; state: ActionState }) {
+  return <div className="auth-submit"><FormSubmitButton idleLabel={label} pendingLabel={pendingLabel} state={state} /></div>;
 }

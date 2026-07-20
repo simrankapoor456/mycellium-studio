@@ -37,20 +37,27 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
   const [mobilePanel, setMobilePanel] = useState<"conversation" | "graph">("conversation");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [draft, setDraft] = useState("");
   const [lastChange, setLastChange] = useState<DiscoveryTurnResponse | null>(null);
   const [engineState, setEngineState] = useState(initialEngineState);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const message = String(new FormData(form).get("message") ?? "").trim();
+    const message = draft.trim();
 
-    if (!message || pending) {
+    if (!message) {
+      setError("Your answer is required.");
+      window.requestAnimationFrame(() => document.getElementById("discovery-message")?.focus());
+      return;
+    }
+
+    if (pending) {
       return;
     }
 
     setPending(true);
     setError("");
+    let requestFailure = "";
 
     try {
       const requestId = crypto.randomUUID();
@@ -62,7 +69,12 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
       const responseBody: unknown = await response.json();
 
       if (!response.ok) {
-        throw new Error(readErrorMessage(responseBody, "Discovery could not continue."));
+        requestFailure = response.status === 401
+          ? "Your session expired. Sign in again, then retry. Your answer is still here."
+          : response.status === 403
+            ? "You do not have permission to update this discovery. Your answer is still here."
+            : readErrorMessage(responseBody, "Discovery could not continue. Your answer is still here. Retry.");
+        throw new Error("Handled discovery failure");
       }
 
       const payload = DiscoveryTurnResponseSchema.parse(responseBody);
@@ -75,9 +87,9 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
       setReadiness(payload.readinessAssessment);
       setLastChange(payload);
       setEngineState(payload.engineState);
-      form.reset();
+      setDraft("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Discovery could not continue.");
+      setError(caught instanceof TypeError ? "Could not reach the server. Your answer is still here. Check your connection and retry." : requestFailure || "Discovery could not continue. Your answer is still here. Retry.");
     } finally {
       setPending(false);
     }
@@ -87,16 +99,24 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
     if (pending) return;
     setPending(true);
     setError("");
+    let requestFailure = "";
 
     try {
       const response = await fetch(`/api/projects/${projectId}/review`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
       const body: unknown = await response.json();
-      if (!response.ok) throw new Error(readErrorMessage(body, "That graph change could not be saved."));
+      if (!response.ok) {
+        requestFailure = response.status === 401
+          ? "Your session expired. Sign in again, then retry. Your graph edit is still here."
+          : response.status === 403
+            ? "You do not have permission to change this product graph."
+            : readErrorMessage(body, "That graph change could not be saved. Retry.");
+        throw new Error("Handled graph failure");
+      }
       const result = DiscoveryReviewResponseSchema.parse(body);
       setContext(result.context);
       setReadiness(result.readiness);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "That graph change could not be saved.");
+      setError(caught instanceof TypeError ? "Could not reach the server. Your graph edit is still here. Check your connection and retry." : requestFailure || "That graph change could not be saved. Retry.");
     } finally {
       setPending(false);
     }
@@ -120,7 +140,7 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
             {messages.length === 0 ? <article data-role="assistant"><span>Mycellium</span><p>{MYCELLIUM_COPY.emptyStates.discovery}</p><p>{readiness.recommendedNextQuestion}</p></article> : messages.map((message) => <article data-role={message.role} id={`message-${message.id}`} key={message.id}><span>{message.role === "user" ? "You" : "Mycellium"}</span>{message.content.split("\n").filter(Boolean).map((line, index) => <p key={`${message.id}-${index}`}>{line}</p>)}</article>)}
           </div>
           {lastChange ? <section aria-label="Latest understanding changes" className="discovery-change-summary"><div><strong>What became clearer</strong>{lastChange.extractedFacts.length ? lastChange.extractedFacts.map((fact) => <span key={fact.id}>{fact.label}: {fact.value}</span>) : <span>No new product decision yet</span>}</div><div><strong>Still needs clarity</strong>{lastChange.unresolvedItems.slice(0, 3).map((item) => <span key={item}>{item}</span>)}</div><div><strong>Product challenges</strong>{lastChange.challenges.filter((item) => item.status === "open").slice(0, 3).map((item) => <span key={item.id}>{item.title}: {item.description}</span>)}</div></section> : null}
-          <form className="discovery-composer" onSubmit={handleSubmit}><label htmlFor="discovery-message">Your answer</label><textarea disabled={pending} id="discovery-message" maxLength={4000} name="message" placeholder="Say what you know. ‘Undecided’ is a useful answer too." required rows={4} /><div><span>{error ? <span role="alert">{error}</span> : "One question, chosen for what matters next."}</span><button disabled={pending} type="submit">{pending ? "Thinking it through" : "Share answer"}</button></div></form>
+          <form className="discovery-composer" noValidate onSubmit={handleSubmit}><label htmlFor="discovery-message">Your answer</label><textarea aria-describedby="discovery-message-status" aria-invalid={Boolean(error)} disabled={pending} id="discovery-message" maxLength={4000} name="message" onChange={(event) => { setDraft(event.currentTarget.value); if (error) setError(""); }} placeholder="Say what you know. ‘Undecided’ is a useful answer too." required rows={4} value={draft} /><div><span id="discovery-message-status">{error ? <span role="alert">{error}</span> : "One question, chosen for what matters next."}</span><button disabled={pending} type="submit">{pending ? "Thinking it through" : "Share answer"}</button></div></form>
           {readiness.status !== "discovering" ? <Link className="discovery-review-link" href={`/projects/${projectId}/review`}>I think I understand it. Review the foundation →</Link> : null}
         </section>
         <div className="discovery-graph-panel" data-mobile-active={mobilePanel === "graph"}><LivingProductGraph context={context} downstreamItems={downstreamItems} graph={context.graph} messages={messages} onMutate={(input) => void handleGraphMutation(input)} pending={pending} /></div>

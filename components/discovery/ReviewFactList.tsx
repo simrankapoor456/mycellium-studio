@@ -32,7 +32,7 @@ export function ReviewFactList({ context, pending, blockingTargetIds = new Set()
           <section className="review-story" key={section.title}>
             <header><span className="eyebrow">Foundation</span><h2>{section.title}</h2><p>{section.description}</p></header>
             <div className="review-story__items">
-              {sectionFacts.map((fact) => <ReviewFact acceptedUnknown={context.acceptedUnknownFactIds.includes(fact.id)} blocking={blockingTargetIds.has(`review-fact-${fact.id}`)} fact={fact} key={fact.id} onBlockerRef={onBlockerRef} onMutate={onMutate} pending={pending} />)}
+              {sectionFacts.map((fact) => <ReviewFact acceptedUnknown={context.acceptedUnknownFactIds.includes(fact.id)} blocking={blockingTargetIds.has(`review-fact-${fact.id}`)} fact={fact} key={`${fact.id}:${fact.status}:${fact.value}`} onBlockerRef={onBlockerRef} onMutate={onMutate} pending={pending} />)}
             </div>
           </section>
         );
@@ -56,7 +56,6 @@ function ReviewFact({ acceptedUnknown, blocking, fact, onBlockerRef, onMutate, p
         const status = String(data.get("status"));
         if (!isFactStatus(status)) return;
         onMutate({ action: "edit_fact", factId: fact.id, value: String(data.get("value")), status });
-        setEditing(false);
       }}>
         <label>Statement<textarea autoFocus defaultValue={fact.value} name="value" required rows={4} /></label>
         <label>State<select defaultValue={fact.status} name="status"><option value="confirmed">Known</option><option value="inferred">Working assumption</option><option value="unknown">Still unknown</option><option value="rejected">Outside the plan</option></select></label>

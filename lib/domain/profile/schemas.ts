@@ -1,12 +1,26 @@
 import { z } from "zod";
 
 const optionalText = (maximum: number) => z.string().trim().max(maximum).transform((value) => value || null);
-const optionalUrl = z.string().trim().max(2_000).refine((value) => value === "" || z.url().safeParse(value).success, "Enter a complete web address.").transform((value) => value || null);
+const optionalHttpsUrl = z.string().trim().max(2_000).refine((value) => {
+  if (value === "") return true;
+  try { return new URL(value).protocol === "https:"; }
+  catch { return false; }
+}, "Please enter a valid HTTPS image URL.").transform((value) => value || null);
+
+const optionalTimezone = z.string().trim().max(100).refine((value) => {
+  if (value === "") return true;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: value }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}, "Choose a valid timezone.").transform((value) => value || null);
 
 export const ProfileUpdateInputSchema = z.object({
-  displayName: optionalText(80),
-  avatarUrl: optionalUrl,
-  timezone: optionalText(100),
+  displayName: z.string().trim().min(1, "Display name is required.").max(80),
+  avatarUrl: optionalHttpsUrl,
+  timezone: optionalTimezone,
   location: optionalText(120),
 });
 

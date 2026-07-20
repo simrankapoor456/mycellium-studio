@@ -8,36 +8,46 @@ export const SprintLengthSchema = z.enum([
   "2-weeks",
   "3-weeks",
   "4-weeks",
-]);
+], { error: "Sprint duration is required." });
 export const ProjectStatusSchema = z.enum(["discovery", "ready", "planned", "archived"]);
 
 const OptionalTextSchema = (maximum: number) =>
   z.string().trim().max(maximum).optional().transform((value) => value || null);
 
+const OptionalNumberSchema = (minimum: number, maximum: number) => z.preprocess(
+  (value) => value === "" || value === undefined || value === null ? null : value,
+  z.coerce.number().int().min(minimum).max(maximum).nullable(),
+);
+
+const RequiredTeamSizeSchema = z.preprocess(
+  (value) => value === "" || value === undefined || value === null ? undefined : value,
+  z.coerce.number({ error: "Team size is required." }).int().min(1, "Team size must be at least 1.").max(50, "Team size cannot exceed 50."),
+);
+
+const OptionalProjectTypeSchema = z.preprocess(
+  (value) => value === "" || value === undefined || value === null ? null : value,
+  ProjectTypeSchema.nullable(),
+);
+
+const OptionalPlanningDepthSchema = z.preprocess(
+  (value) => value === "" || value === undefined || value === null ? null : value,
+  PlanningDepthSchema.nullable(),
+);
+
 const ProjectInputFieldsSchema = z.object({
-  name: z.string().trim().min(1, "Enter a project name.").max(120),
-  description: OptionalTextSchema(20_000),
-  projectType: ProjectTypeSchema,
+  name: z.string().trim().min(1, "Project name is required.").max(120),
+  description: z.string().trim().min(1, "Project description is required.").max(20_000),
+  projectType: OptionalProjectTypeSchema,
   customProjectType: OptionalTextSchema(120),
   targetUsers: OptionalTextSchema(1_000),
-  teamSize: z.coerce.number().int().min(1).max(50),
+  teamSize: RequiredTeamSizeSchema,
   sprintLength: SprintLengthSchema,
-  capacity: z.coerce.number().int().min(1).max(200),
-  planningDepth: PlanningDepthSchema,
+  capacity: OptionalNumberSchema(1, 200),
+  planningDepth: OptionalPlanningDepthSchema,
   constraints: OptionalTextSchema(5_000),
 });
 
-function validateCustomProjectType(input: { projectType: z.infer<typeof ProjectTypeSchema>; customProjectType: string | null }, context: z.core.$RefinementCtx) {
-  if (input.projectType === "custom" && !input.customProjectType) {
-    context.addIssue({
-      code: "custom",
-      message: "Describe the custom product type.",
-      path: ["customProjectType"],
-    });
-  }
-}
-
-export const ProjectCreateInputSchema = ProjectInputFieldsSchema.superRefine(validateCustomProjectType);
+export const ProjectCreateInputSchema = ProjectInputFieldsSchema;
 
 export const ProjectRenameInputSchema = z.object({
   projectId: z.string().uuid(),
@@ -52,7 +62,7 @@ export const ProjectMetadataUpdateInputSchema = ProjectInputFieldsSchema.omit({
   name: true,
 }).extend({
   projectId: z.string().uuid(),
-}).superRefine(validateCustomProjectType);
+});
 
 const JsonObjectSchema = z.custom<Json>((value) => {
   return typeof value === "object" && value !== null && !Array.isArray(value);

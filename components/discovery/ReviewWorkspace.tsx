@@ -55,10 +55,13 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
 
   async function handleMutation(payload: DiscoveryReviewInput) {
     setPending(true); setError(""); setApprovalDetails(null);
+    let requestFailure = "";
     try {
       const response = await fetch(`/api/projects/${projectId}/review`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const body: unknown = await response.json();
       if (!response.ok) {
+        if (response.status === 401) { setError("Your session expired. Sign in again, then retry. Your review edit is still here."); return; }
+        if (response.status === 403) { setError("You do not have permission to change this foundation."); return; }
         const failure = readReviewFailure(body);
         setError(failure.error);
         if (failure.details) { setApprovalDetails(failure.details); focusFirstBlocker(failure.details); }
@@ -67,7 +70,10 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
       const result = DiscoveryReviewResponseSchema.parse(body);
       setContext(result.context); setReadiness(result.readiness); setApproved(result.approved);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "That review change could not be saved.");
+      requestFailure = caught instanceof TypeError
+        ? "Could not reach the server. Your review edit is still here. Check your connection and retry."
+        : "That review change could not be saved. Your edit is still here. Retry.";
+      setError(requestFailure);
     } finally { setPending(false); }
   }
 
