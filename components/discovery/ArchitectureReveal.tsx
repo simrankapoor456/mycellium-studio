@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { Button } from "@/components/ui/Button";
 import type { BlueprintGenerationResponse } from "@/lib/domain/blueprint/schemas";
 import { MYCELLIUM_COPY } from "@/lib/voice/mycellium";
 
@@ -78,7 +79,7 @@ export function ArchitectureReveal({ result, onComplete }: Readonly<{ result?: B
       <span className="eyebrow">Architecture formed</span>
       <h1>{STAGES[stage]}</h1>
       <p>{result ? MYCELLIUM_COPY.engineState[result.engineState] : "Mycel Core - Reliable mode"}. Built from the persisted foundation.</p>
-      <button onClick={finish} type="button">Open blueprint now</button>
+      <Button onClick={finish} type="button">Open blueprint now</Button>
     </section>
   );
 }

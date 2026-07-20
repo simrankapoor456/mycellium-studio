@@ -40,7 +40,7 @@ export function BlueprintWorkspace({ projectId, projectName, initialBlueprint, i
           <button aria-pressed={mode === "document"} onClick={() => setMode("document")}>Structured document</button>
           <span>v{blueprint.version} - {blueprint.generationSource === "fallback" ? "Mycel Core, Reliable mode" : "Mycel Core, AI enhanced"}</span>
         </nav>
-        <BlueprintExportPanel available compact projectId={projectId} projectName={projectName} />
+        <BlueprintExportPanel available blueprintMeta={{ version: blueprint.version, updatedAt: blueprint.updatedAt }} compact projectId={projectId} projectName={projectName} />
       </div>
 
       <div className="blueprint-workspace__reading">
@@ -60,9 +60,9 @@ export function BlueprintWorkspace({ projectId, projectName, initialBlueprint, i
         </section>
         <BlueprintContextSections blueprint={blueprint} />
         {mode === "blueprint" ? <BlueprintGraph blueprint={blueprint} onSelect={setSelected} /> : <BlueprintDocument blueprint={blueprint} onSaved={handleSaved} onSelect={setSelected} projectId={projectId} />}
-        <section className="blueprint-review" id="review"><span className="eyebrow">Blueprint confidence</span><h2>{blueprint.review.qualityScore}% of the plan is firmly rooted</h2>{blueprint.review.warnings.length ? blueprint.review.warnings.map((warning) => <p key={warning}>{warning}</p>) : <p>No concerns need your attention right now.</p>}</section>
+        <section className="blueprint-review" id="review"><span className="eyebrow">Calculated foundation coverage</span><h2>{blueprint.review.qualityScore}% of the blueprint is supported by the current foundation</h2>{blueprint.review.warnings.length ? blueprint.review.warnings.map((warning) => <p key={warning}>{warning}</p>) : <p>No current review warning needs attention.</p>}</section>
         <PressureTestPanel initialPressureTest={pressureTest} key={blueprint.version} onUpdated={setPressureTest} projectId={projectId} />
-        <BlueprintExportPanel available projectId={projectId} projectName={projectName} />
+        <BlueprintExportPanel available blueprintMeta={{ version: blueprint.version, updatedAt: blueprint.updatedAt }} projectId={projectId} projectName={projectName} />
       </div>
       {selected ? <BlueprintLineagePanel facts={facts} onClose={() => setSelected(null)} selected={selected} /> : null}
     </div>
