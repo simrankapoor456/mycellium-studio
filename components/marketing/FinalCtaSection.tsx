@@ -1,18 +1,17 @@
-import Image from "next/image";
-
+import { BrandMark } from "@/components/brand/BrandMark";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
 export function FinalCtaSection() {
   return (
-    <section className="final-cta py-20 text-paper sm:py-28">
-      <Container className="grid items-center gap-10 sm:grid-cols-[1fr_auto]">
+    <section className="final-cta living-final-cta">
+      <Container className="living-final-cta__layout">
         <div>
-          <h2 className="display-type balanced-text max-w-4xl text-4xl leading-[1.05] sm:text-6xl">Give the next product decision a stronger foundation.</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-paper/70">Bring the rough idea. Mycellium will help uncover the product, make the architecture traceable, and turn it into work you can carry forward.</p>
-          <ButtonLink className="final-cta__action mt-8" href="/signup">Start your project</ButtonLink>
+          <h2>Give the next product decision a living foundation.</h2>
+          <p>Bring the context you have. Keep every useful question, decision, and output connected as the product takes shape.</p>
+          <ButtonLink className="final-cta__action" href="/signup">Start your project</ButtonLink>
         </div>
-        <Image alt="" height={128} src="/brand/mycellium-mark-light.svg" width={128} />
+        <BrandMark animated className="living-final-cta__mark" />
       </Container>
     </section>
   );

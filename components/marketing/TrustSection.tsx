@@ -1,30 +1,32 @@
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 
-const principles = [
-  ["AI drafts, humans approve", "Generated proposals remain editable and require deliberate review."],
-  ["Projects stay user-owned", "Authentication and row-level security keep personal project data isolated."],
-  ["Keys stay server-side", "Provider credentials never belong in browser code or project content."],
-  ["Validation and fallback", "Schema checks and deterministic planning provide an explicit recovery path."],
-  ["No silent publishing", "External systems receive nothing without a future, user-initiated integration flow."],
+const layers = [
+  ["Context and persisted state", "The product reads only the owned, visible material needed for the current task."],
+  ["Proposal layer", "Configured AI can propose structured output. Reliable mode provides the same contract without a provider."],
+  ["Decision layer", "Identity, ownership, validation, readiness, and approval policies determine what may continue."],
+  ["Deterministic execution", "Only trusted application code persists graph changes, blueprints, lineage, and exports."],
 ] as const;
 
 export function TrustSection() {
   return (
-    <section className="py-24 sm:py-32">
-      <Container className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr]">
-        <SectionHeading
-          description="Product judgment cannot be delegated to a model. Mycellium is designed to make uncertainty and approval visible."
-          eyebrow="Human review and security"
-          title="Useful assistance, explicit authority."
-        />
-        <div className="divide-y divide-line border-y border-line">
-          {principles.map(([title, description]) => (
-            <article className="grid gap-2 py-6 sm:grid-cols-[11rem_1fr] sm:gap-8" key={title}>
-              <h3 className="font-bold text-forest">{title}</h3>
-              <p className="leading-7 text-ink/65">{description}</p>
-            </article>
-          ))}
+    <section className="mycel-core-section">
+      <Container>
+        <header><h2>Intelligence with explicit authority.</h2><p>Mycel Core separates proposals from decisions and execution, so product judgment remains visible.</p></header>
+        <div className="mycel-core-section__system">
+          <ol>
+            {layers.map(([name, description], index) => (
+              <li key={name}><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><div><h3>{name}</h3><p>{description}</p></div></li>
+            ))}
+          </ol>
+          <aside>
+            <strong>Human review is the boundary.</strong>
+            <p>Generated proposals stay editable. Product data remains owner-scoped. Nothing publishes to another system silently.</p>
+            <dl>
+              <div><dt>Provider unavailable</dt><dd>Reliable mode</dd></div>
+              <div><dt>Foundation unresolved</dt><dd>Continue discovery</dd></div>
+              <div><dt>Blueprint approved</dt><dd>Export current state</dd></div>
+            </dl>
+          </aside>
         </div>
       </Container>
     </section>

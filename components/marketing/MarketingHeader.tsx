@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { ButtonLink } from "@/components/ui/Button";
@@ -13,31 +16,58 @@ const navigation = [
 ] as const;
 
 export function MarketingHeader() {
+  const [open, setOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState("");
+
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveHref(`#${visible.target.id}`);
+      },
+      { rootMargin: "-28% 0px -60%", threshold: [0.05, 0.2, 0.5] },
+    );
+
+    for (const [, href] of navigation) {
+      const section = document.querySelector(href);
+      if (section) observer.observe(section);
+    }
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <header className="marketing-header border-b border-line/80 bg-canvas/95">
-      <Container className="flex min-h-20 items-center justify-between gap-5">
-        <BrandLogo />
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+    <header className="public-header">
+      <Container>
+        <div className="public-header__capsule">
+          <BrandLogo light />
+          <nav className="public-header__desktop-nav" aria-label="Primary navigation">
+            {navigation.map(([label, href]) => (
+              <Link aria-current={activeHref === href ? "location" : undefined} data-active={activeHref === href} href={href} key={href} onClick={() => setActiveHref(href)}>{label}</Link>
+            ))}
+          </nav>
+          <div className="public-header__actions">
+            <ButtonLink href="/login" variant="quiet">Log in</ButtonLink>
+            <ButtonLink className="public-header__start" href="/signup">Start free</ButtonLink>
+            <button
+              aria-controls="public-mobile-navigation"
+              aria-expanded={open}
+              aria-label={open ? "Close navigation" : "Open navigation"}
+              className="public-header__menu-button"
+              onClick={() => setOpen((current) => !current)}
+              type="button"
+            >
+              <span /><span />
+            </button>
+          </div>
+        </div>
+        <nav aria-label="Mobile navigation" className="public-header__mobile-nav" data-open={open} id="public-mobile-navigation">
           {navigation.map(([label, href]) => (
-            <Link className="min-h-11 px-3 py-3 text-sm font-semibold text-ink/65 hover:text-forest" href={href} key={href}>
-              {label}
-            </Link>
+            <Link aria-current={activeHref === href ? "location" : undefined} data-active={activeHref === href} href={href} key={href} onClick={() => { setActiveHref(href); setOpen(false); }}>{label}</Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <ButtonLink className="px-3" href="/login" variant="quiet">Log in</ButtonLink>
-          <ButtonLink className="hidden sm:inline-flex" href="/signup">Start free</ButtonLink>
-        </div>
       </Container>
-      <nav className="overflow-x-auto border-t border-line/60 px-5 lg:hidden" aria-label="Page navigation">
-        <div className="mx-auto flex w-max min-w-full justify-center">
-          {navigation.map(([label, href]) => (
-            <Link className="min-h-11 whitespace-nowrap px-3 py-3 text-sm font-semibold text-ink/65" href={href} key={href}>
-              {label}
-            </Link>
-          ))}
-        </div>
-      </nav>
     </header>
   );
 }

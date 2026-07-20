@@ -1,13 +1,59 @@
-import { ProductGraphHero } from "@/components/marketing/ProductGraphHero";
+"use client";
+
+import { type PointerEvent, useRef } from "react";
+
+import { BrandMark } from "@/components/brand/BrandMark";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
 export function LandingHero() {
-  return <section className="signature-hero overflow-hidden border-b border-line py-20 sm:py-28 lg:min-h-[calc(100dvh-5rem)] lg:py-24">
-    <div aria-hidden="true" className="signature-hero__atmosphere" />
-    <Container className="grid items-center gap-14 lg:grid-cols-[0.78fr_1.22fr] xl:gap-20">
-      <div className="reveal max-w-3xl lg:py-12"><p className="mb-6 font-mono text-sm font-bold text-moss">Mycel Core · Product intelligence</p><h1 className="display-type balanced-text text-[clamp(3.5rem,7vw,8.5rem)] leading-[0.87] text-forest">Intelligence that <em>grows</em> with you.</h1><p className="mt-8 max-w-[62ch] text-xl leading-9 text-ink/70">Bring the scattered context. Mycel Core turns it into grounded discovery, traceable architecture, and a Product Blueprint that keeps its reasoning.</p><div className="mt-9 flex flex-wrap gap-3"><ButtonLink href="/signup">Start your project</ButtonLink><ButtonLink href="#how-it-works" variant="secondary">See how it works</ButtonLink></div><p className="mt-5 text-sm text-ink/70">Start privately. Use AI-guided discovery or Mycellium’s reliable built-in planning engine.</p></div>
-      <ProductGraphHero />
-    </Container>
-  </section>;
+  const environmentRef = useRef<HTMLDivElement>(null);
+  const markStageRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
+  const positionRef = useRef({ x: 0, y: 0 });
+
+  function settleEnvironment() {
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    frameRef.current = null;
+    if (environmentRef.current) environmentRef.current.style.transform = "translate3d(0, 0, 0)";
+    if (markStageRef.current) markStageRef.current.style.transform = "translate3d(0, 0, 0)";
+  }
+
+  function moveEnvironment(event: PointerEvent<HTMLElement>) {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    positionRef.current = {
+      x: (event.clientX - bounds.left) / bounds.width - 0.5,
+      y: (event.clientY - bounds.top) / bounds.height - 0.5,
+    };
+
+    if (frameRef.current !== null) return;
+    frameRef.current = requestAnimationFrame(() => {
+      const { x, y } = positionRef.current;
+      if (environmentRef.current) environmentRef.current.style.transform = `translate3d(${x * -10}px, ${y * -8}px, 0) scale(1.025)`;
+      if (markStageRef.current) markStageRef.current.style.transform = `translate3d(${x * 5}px, ${y * 4}px, 0)`;
+      frameRef.current = null;
+    });
+  }
+
+  return (
+    <section className="living-hero" onPointerLeave={settleEnvironment} onPointerMove={moveEnvironment}>
+      <div aria-hidden="true" className="living-hero__environment" ref={environmentRef} />
+      <div aria-hidden="true" className="living-hero__grain" />
+      <Container className="living-hero__inner">
+        <p className="living-hero__kicker">Living product intelligence</p>
+        <div className="living-hero__mark-stage" ref={markStageRef}>
+          <span aria-hidden="true" className="living-hero__halo" />
+          <BrandMark animated className="living-hero__mark" label="Mycellium Studio living network" />
+        </div>
+        <h1>Ideas take <em>root</em>. Products take shape.</h1>
+        <p className="living-hero__summary">Turn scattered product context into grounded discovery, architecture, and an editable Product Blueprint.</p>
+        <div className="living-hero__actions">
+          <ButtonLink href="/signup">Start your project <span aria-hidden="true">&rarr;</span></ButtonLink>
+          <ButtonLink href="#how-it-works" variant="secondary">See how it works</ButtonLink>
+        </div>
+      </Container>
+    </section>
+  );
 }

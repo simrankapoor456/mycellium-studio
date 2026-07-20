@@ -57,19 +57,18 @@ export function ScrollProductNarrative() {
   }, []);
 
   return (
-    <section className="scroll-story border-b border-line py-24 sm:py-32" id="how-it-works">
+    <section className="scroll-story living-story" id="how-it-works">
       <Container>
-        <header className="max-w-4xl">
-          <p className="font-mono text-sm font-bold text-moss">Living Architecture</p>
-          <h2 className="display-type balanced-text mt-5 text-[clamp(2.75rem,6vw,6.5rem)] leading-[0.94] text-forest">
-            Watch ambiguity become a connected product system.
+        <header className="living-story__header">
+          <h2>
+            From scattered thoughts to a living product.
           </h2>
-          <p className="mt-7 max-w-[64ch] text-lg leading-8 text-ink/70">
-            The same seed remains visible while questions, requirements, system boundaries, and delivery work gain structure around it.
+          <p>
+            The original context stays visible while questions, requirements, boundaries, and an editable blueprint form around it.
           </p>
         </header>
 
-        <div className="mt-16 grid items-start gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+        <div className="living-story__layout">
           <figure className="scroll-story__visual spatial-surface">
             <div className="scroll-story__visual-header">
               <span>{activeStage.label}</span>
@@ -113,7 +112,7 @@ export function ScrollProductNarrative() {
           </ol>
         </div>
         <noscript>
-          <p className="mt-8 text-sm text-ink/70">Seed, discovery, structured understanding, architecture, and execution remain connected in one reviewable product graph.</p>
+          <p>Context, discovery, structured understanding, architecture, and output remain connected in one reviewable product graph.</p>
         </noscript>
       </Container>
     </section>
