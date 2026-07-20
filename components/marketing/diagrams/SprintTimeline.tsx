@@ -11,7 +11,7 @@ export function SprintTimeline() {
       <div className="diagram-heading"><span>Sprint allocation timeline</span><span>Dependency aware</span></div>
       <svg aria-describedby={descriptionId} aria-labelledby={titleId} className="diagram-canvas" role="img" viewBox="0 0 660 300">
         <title id={titleId}>Sprint allocation timeline</title>
-        <desc id={descriptionId}>Identity and the project model lead into CRUD and ownership states, followed by the discovery continuation point across three sprints.</desc>
+        <desc id={descriptionId}>The reviewed foundation leads into a core journey and then hardening across three proposed sprints.</desc>
         <defs>
           <marker id={`${titleId}-arrow`} markerHeight="8" markerWidth="8" orient="auto" refX="7" refY="4"><path d="M0 0L8 4L0 8Z" /></marker>
         </defs>
@@ -31,7 +31,7 @@ export function SprintTimeline() {
           );
         })}
       </svg>
-      <figcaption className="diagram-note">Later work begins only after the identity and ownership path is stable.</figcaption>
+      <figcaption className="diagram-note">Later work begins only after its dependencies and trust boundaries are stable.</figcaption>
     </figure>
   );
 }

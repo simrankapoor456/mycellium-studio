@@ -1,8 +1,9 @@
+import { BrandMark } from "@/components/brand/BrandMark";
 import { Container } from "@/components/ui/Container";
 
 const layers = [
   ["Context and persisted state", "The product reads only the owned, visible material needed for the current task."],
-  ["Proposal layer", "Configured AI can propose structured output. Reliable mode provides the same contract without a provider."],
+  ["Proposal layer", "Configured AI can propose structured output. Reliable mode supplies schema-valid deterministic output without a provider."],
   ["Decision layer", "Identity, ownership, validation, readiness, and approval policies determine what may continue."],
   ["Deterministic execution", "Only trusted application code persists graph changes, blueprints, lineage, and exports."],
 ] as const;
@@ -18,13 +19,20 @@ export function TrustSection() {
               <li key={name}><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><div><h3>{name}</h3><p>{description}</p></div></li>
             ))}
           </ol>
-          <aside>
-            <strong>Human review is the boundary.</strong>
-            <p>Generated proposals stay editable. Product data remains owner-scoped. Nothing publishes to another system silently.</p>
+          <aside className="human-review-panel">
+            <div className="human-review-panel__heading">
+              <BrandMark className="human-review-panel__mark" />
+              <div>
+                <span>Capability rules</span>
+                <strong>Human review controls what advances.</strong>
+              </div>
+            </div>
+            <p>This is a map of product behavior, not a live project status. Proposals stay editable, data remains owner-scoped, and external publishing is not implemented.</p>
             <dl>
-              <div><dt>Provider unavailable</dt><dd>Reliable mode</dd></div>
-              <div><dt>Foundation unresolved</dt><dd>Continue discovery</dd></div>
-              <div><dt>Blueprint approved</dt><dd>Export current state</dd></div>
+              <div><dt><span>Condition</span>AI provider unavailable</dt><dd><span>System response</span>Reliable mode remains available</dd></div>
+              <div><dt><span>Condition</span>Foundation unresolved</dt><dd><span>System response</span>Continue discovery or resolve decisions</dd></div>
+              <div><dt><span>Condition</span>Foundation approved</dt><dd><span>System response</span>Architect the product</dd></div>
+              <div><dt><span>Condition</span>Blueprint available</dt><dd><span>System response</span>Review, edit, or export saved state</dd></div>
             </dl>
           </aside>
         </div>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { PROJECT_START_HREF } from "@/lib/marketing/links";
 
 const navigation = [
   ["Product", "#product"],
@@ -37,6 +38,23 @@ export function MarketingHeader() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    function closeOnHashChange() {
+      setOpen(false);
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("hashchange", closeOnHashChange);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("hashchange", closeOnHashChange);
+    };
+  }, []);
+
   return (
     <header className="public-header">
       <Container>
@@ -49,7 +67,7 @@ export function MarketingHeader() {
           </nav>
           <div className="public-header__actions">
             <ButtonLink href="/login" variant="quiet">Log in</ButtonLink>
-            <ButtonLink className="public-header__start" href="/signup">Start free</ButtonLink>
+            <ButtonLink className="public-header__start" href={PROJECT_START_HREF}>Start your project</ButtonLink>
             <button
               aria-controls="public-mobile-navigation"
               aria-expanded={open}

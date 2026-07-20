@@ -1,7 +1,7 @@
 import { useId, type RefObject } from "react";
 
 import { cn } from "@/lib/class-names";
-import { productGraphEdges, productGraphNodes, signatureStoryStages } from "@/lib/marketing/signature-experience";
+import { productGraphEdges, productGraphNodes } from "@/lib/marketing/signature-experience";
 
 export type ProductGraphLayerRefs = {
   back: RefObject<SVGGElement | null>;
@@ -27,6 +27,15 @@ function graphLayer(level: number) {
   }
 
   return "front";
+}
+
+type GraphState = "current" | "connected" | "emerging" | "future";
+
+function graphState(level: number, activeLevel: number): GraphState {
+  if (level === activeLevel) return "current";
+  if (level < activeLevel) return "connected";
+  if (level === activeLevel + 1) return "emerging";
+  return "future";
 }
 
 export function ProductGraph({ activeLevel, ariaLabel, className, entry = false, layerRefs }: ProductGraphProps) {
@@ -62,6 +71,7 @@ export function ProductGraph({ activeLevel, ariaLabel, className, entry = false,
                   d={edge.path}
                   data-active={edge.level <= activeLevel}
                   data-level={edge.level}
+                  data-state={graphState(edge.level, activeLevel)}
                   fill="none"
                   key={edge.id}
                   pathLength="1"
@@ -77,6 +87,7 @@ export function ProductGraph({ activeLevel, ariaLabel, className, entry = false,
                   data-active={node.level <= activeLevel}
                   data-kind={node.kind}
                   data-level={node.level}
+                  data-state={graphState(node.level, activeLevel)}
                   key={node.id}
                   transform={`translate(${node.x - node.width / 2} ${node.y - 22})`}
                 >
@@ -89,11 +100,17 @@ export function ProductGraph({ activeLevel, ariaLabel, className, entry = false,
           </g>
         ))}
       </svg>
-      <ol aria-label="Product graph stages" className="product-graph-mobile">
-        {signatureStoryStages.map((stage) => (
-          <li data-active={stage.level <= activeLevel} key={stage.id}>
-            <span>{stage.label}</span>
-            <strong>{stage.artifact}</strong>
+      <ul aria-label="Product graph state key" className="product-graph-legend">
+        {(["current", "connected", "emerging", "future"] as const).map((state) => (
+          <li data-state={state} key={state}><span aria-hidden="true" />{state}</li>
+        ))}
+      </ul>
+      <ol aria-label="Product graph structure" className="product-graph-mobile">
+        {productGraphNodes.map((node) => (
+          <li data-state={graphState(node.level, activeLevel)} key={node.id}>
+            <span>{node.label}</span>
+            <strong>{node.detail}</strong>
+            <small>{graphState(node.level, activeLevel)}</small>
           </li>
         ))}
       </ol>

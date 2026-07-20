@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import type { ActionState } from "@/lib/actions/action-state";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 import { LoginSchema, SignupSchema } from "@/lib/auth/schemas";
 import { getServerEnvironment } from "@/lib/env/server";
 import { toAuthErrorMessage } from "@/lib/errors/safe-error";
@@ -12,6 +13,7 @@ export async function loginAction(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const returnPath = getSafeReturnPath(formData.get("returnTo"));
   const parsed = LoginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -32,13 +34,14 @@ export async function loginAction(
     return { status: "error", message: toAuthErrorMessage(error) };
   }
 
-  redirect("/dashboard");
+  redirect(returnPath);
 }
 
 export async function signupAction(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const returnPath = getSafeReturnPath(formData.get("returnTo"));
   const parsed = SignupSchema.safeParse({
     displayName: formData.get("displayName"),
     email: formData.get("email"),
@@ -61,7 +64,7 @@ export async function signupAction(
     password: parsed.data.password,
     options: {
       data: { display_name: parsed.data.displayName },
-      emailRedirectTo: `${environment.NEXT_PUBLIC_SITE_URL}/auth/confirm`,
+      emailRedirectTo: buildConfirmationUrl(environment.NEXT_PUBLIC_SITE_URL, returnPath),
     },
   });
 
@@ -70,11 +73,17 @@ export async function signupAction(
   }
 
   if (data.session) {
-    redirect("/dashboard");
+    redirect(returnPath);
   }
 
   return {
     status: "success",
     message: "Check your email to confirm your account, then sign in.",
   };
+}
+
+function buildConfirmationUrl(siteUrl: string, returnPath: string): string {
+  const confirmationUrl = new URL("/auth/confirm", siteUrl);
+  confirmationUrl.searchParams.set("next", returnPath);
+  return confirmationUrl.toString();
 }

@@ -44,18 +44,18 @@ export const signatureStoryStages = [
 export type SignatureStageId = (typeof signatureStoryStages)[number]["id"];
 
 export const productGraphNodes = [
-  { id: "seed", label: "Seed", detail: "Shared planning space", x: 360, y: 52, width: 116, level: 0, kind: "seed" },
-  { id: "need", label: "User need", detail: "One source of context", x: 132, y: 152, width: 136, level: 1, kind: "question" },
-  { id: "unknown", label: "Open question", detail: "What must be shared?", x: 360, y: 152, width: 150, level: 1, kind: "question" },
-  { id: "constraint", label: "Constraint", detail: "Personal first", x: 588, y: 152, width: 132, level: 1, kind: "question" },
-  { id: "requirement", label: "Requirement", detail: "Reviewable context", x: 92, y: 276, width: 142, level: 2, kind: "requirement" },
-  { id: "scope", label: "Scope", detail: "Projects and discovery", x: 268, y: 276, width: 142, level: 2, kind: "requirement" },
-  { id: "identity", label: "Identity", detail: "Verified ownership", x: 452, y: 276, width: 142, level: 3, kind: "architecture" },
-  { id: "data", label: "Data boundary", detail: "Validated project state", x: 628, y: 276, width: 142, level: 3, kind: "architecture" },
-  { id: "epic", label: "Epic", detail: "Secure foundation", x: 148, y: 402, width: 132, level: 4, kind: "execution" },
-  { id: "story", label: "Story", detail: "Create a project", x: 360, y: 402, width: 132, level: 4, kind: "execution" },
-  { id: "task", label: "Task", detail: "Validate ownership", x: 572, y: 402, width: 132, level: 4, kind: "execution" },
-  { id: "sprint", label: "Sprint 01", detail: "Foundation sequence", x: 360, y: 504, width: 148, level: 4, kind: "sprint" },
+  { id: "seed", label: "Seed", detail: "Original intent", x: 360, y: 52, width: 116, level: 0, kind: "seed" },
+  { id: "need", label: "User need", detail: "Desired outcome", x: 132, y: 152, width: 136, level: 1, kind: "question" },
+  { id: "unknown", label: "Open question", detail: "Evidence needed", x: 360, y: 152, width: 150, level: 1, kind: "question" },
+  { id: "constraint", label: "Constraint", detail: "Boundary identified", x: 588, y: 152, width: 132, level: 1, kind: "question" },
+  { id: "requirement", label: "Requirement", detail: "Reviewed behavior", x: 92, y: 276, width: 142, level: 2, kind: "requirement" },
+  { id: "scope", label: "Scope", detail: "Included and excluded", x: 268, y: 276, width: 142, level: 2, kind: "requirement" },
+  { id: "identity", label: "Identity", detail: "Trusted actor", x: 452, y: 276, width: 142, level: 3, kind: "architecture" },
+  { id: "data", label: "Data boundary", detail: "Validated state", x: 628, y: 276, width: 142, level: 3, kind: "architecture" },
+  { id: "epic", label: "Epic", detail: "Outcome group", x: 148, y: 402, width: 132, level: 4, kind: "execution" },
+  { id: "story", label: "Story", detail: "User value", x: 360, y: 402, width: 132, level: 4, kind: "execution" },
+  { id: "task", label: "Task", detail: "Implementation step", x: 572, y: 402, width: 132, level: 4, kind: "execution" },
+  { id: "sprint", label: "Sprint 01", detail: "Delivery sequence", x: 360, y: 504, width: 148, level: 4, kind: "sprint" },
 ] as const;
 
 export const productGraphEdges = [
@@ -76,32 +76,32 @@ export const productGraphEdges = [
 ] as const;
 
 export const discoverConversation = [
-  { speaker: "Founder", message: "Small teams lose the reasoning behind a product before the first sprint begins." },
-  { speaker: "Mycellium", message: "Who needs that reasoning, and what decision should it improve first?" },
-  { speaker: "Founder", message: "A founder and engineering lead need to agree on scope before creating tickets." },
+  { speaker: "Builder", message: "I have a product direction, but the primary need and boundary are still unclear." },
+  { speaker: "Mycellium", message: "What outcome should change, and who needs it first?" },
+  { speaker: "Builder", message: "The outcome is clearer. The primary user and constraints still need evidence." },
 ] as const;
 
 export const discoveredFacts = [
-  "The first users are founders and engineering leads in small teams.",
-  "The product must preserve decisions before ticket creation.",
-  "Reviewable scope is more urgent than team collaboration.",
+  "The original intent is recorded without turning it into a requirement.",
+  "The desired outcome is clear enough to review.",
+  "The primary user and constraints remain open decisions.",
 ] as const;
 
 export const architectureSummary = {
-  goal: "Create one private, reviewable source of product context.",
-  inScope: ["Personal projects", "Discovery context", "Ownership controls"],
-  outOfScope: ["Team administration", "Billing", "External publishing"],
-  risks: ["Assumptions presented as facts", "Provider coupling", "Unclear project boundaries"],
-  decisions: ["Server-verified identity", "Schema-valid project contracts", "Provider-independent discovery state"],
+  goal: "Turn reviewed product context into a traceable blueprint.",
+  inScope: ["Confirmed needs", "Reviewed scope", "Core requirements"],
+  outOfScope: ["Unverified assumptions", "Deferred capabilities", "Unowned dependencies"],
+  risks: ["Assumptions presented as facts", "Unclear boundaries", "Missing recovery paths"],
+  decisions: ["Explicit trust boundaries", "Schema-valid contracts", "Traceable state changes"],
 } as const;
 
 export const executionSummary = {
-  epic: "Secure personal project foundation",
-  stories: ["Create a private project", "Review project context", "Protect user-owned records"],
-  tasks: ["Validate form input", "Persist project metadata", "Apply ownership filters", "Verify error states"],
+  epic: "Deliver the approved product foundation",
+  stories: ["Establish the core outcome", "Protect trusted state", "Verify the primary journey"],
+  tasks: ["Validate inputs", "Persist approved changes", "Enforce access rules", "Verify recovery states"],
   sprints: [
-    { label: "Sprint 01", work: "Identity and model" },
-    { label: "Sprint 02", work: "CRUD and ownership" },
-    { label: "Sprint 03", work: "Discovery handoff" },
+    { label: "Sprint 01", work: "Foundation and model" },
+    { label: "Sprint 02", work: "Core journey" },
+    { label: "Sprint 03", work: "Hardening and release" },
   ],
 } as const;

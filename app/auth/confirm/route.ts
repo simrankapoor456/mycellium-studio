@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { createClient } from "@/lib/supabase/server";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 
 const ConfirmationSchema = z.object({
   token_hash: z.string().min(1),
@@ -10,6 +11,7 @@ const ConfirmationSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const returnPath = getSafeReturnPath(request.nextUrl.searchParams.get("next"));
   const parsed = ConfirmationSchema.safeParse({
     token_hash: request.nextUrl.searchParams.get("token_hash"),
     type: request.nextUrl.searchParams.get("type"),
@@ -23,9 +25,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(returnPath, request.url));
     }
   }
 
-  return NextResponse.redirect(new URL("/login?error=confirmation", request.url));
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("error", "confirmation");
+  loginUrl.searchParams.set("next", returnPath);
+  return NextResponse.redirect(loginUrl);
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import "./phase-7-1.css";
+import "./phase-7-2.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -47,7 +48,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html data-scroll-behavior="smooth" lang="en">
       <body>{children}</body>
     </html>
   );

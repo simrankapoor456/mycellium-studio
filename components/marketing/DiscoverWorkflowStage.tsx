@@ -6,7 +6,7 @@ export function DiscoverWorkflowStage() {
   return (
     <div className="workflow-stage">
       <WorkflowStageHeader
-        description="A short exchange separates what the team knows from what still needs evidence. No model request is made in this fixed example."
+        description="A short exchange separates current evidence from open questions. No model request is made in this fixed sequence."
         label="Discover"
         output="Facts, uncertainty, readiness"
         title="Turn the first claim into grounded product context."
@@ -16,7 +16,7 @@ export function DiscoverWorkflowStage() {
           <h4 id="discover-conversation-title">Conversation</h4>
           <ol className="conversation-thread">
             {discoverConversation.map((message) => (
-              <li data-speaker={message.speaker === "Founder" ? "human" : "system"} key={message.message}>
+              <li data-speaker={message.speaker === "Builder" ? "human" : "system"} key={message.message}>
                 <span>{message.speaker}</span>
                 <p>{message.message}</p>
               </li>
@@ -30,7 +30,7 @@ export function DiscoverWorkflowStage() {
           </ul>
           <div className="uncertainty-callout">
             <span>Uncertainty to resolve</span>
-            <p>Which parts of product context must become collaborative first, and which can remain personal?</p>
+            <p>Which primary user and boundary still need evidence before scope can settle?</p>
           </div>
         </section>
       </div>

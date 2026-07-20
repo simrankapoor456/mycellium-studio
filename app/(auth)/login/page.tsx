@@ -3,18 +3,20 @@ import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/LoginForm";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { getSafeReturnPath } from "@/lib/auth/return-path";
 
 export const metadata: Metadata = {
   title: "Log in",
   description: "Return to your private Mycellium Studio project workspace.",
 };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  if (await getCurrentUser()) {
-    redirect("/dashboard");
-  }
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string }> }) {
+  const { error, next } = await searchParams;
+  const returnPath = getSafeReturnPath(next);
 
-  const { error } = await searchParams;
+  if (await getCurrentUser()) {
+    redirect(returnPath);
+  }
 
   return (
     <section aria-labelledby="login-title" className="auth-form-page">
@@ -26,7 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           The confirmation link is invalid or expired. Request a new confirmation email by signing up again.
         </p>
       ) : null}
-      <LoginForm />
+      <LoginForm returnTo={returnPath} />
     </section>
   );
 }

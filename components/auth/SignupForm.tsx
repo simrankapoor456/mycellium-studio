@@ -7,12 +7,14 @@ import { signupAction } from "@/app/(auth)/actions";
 import { AuthFormMessage, AuthSubmitButton } from "@/components/auth/AuthFormParts";
 import { FormField } from "@/components/ui/FormField";
 import { initialActionState } from "@/lib/actions/action-state";
+import { getAuthHref } from "@/lib/auth/return-path";
 
-export function SignupForm() {
+export function SignupForm({ returnTo = "/dashboard" }: { returnTo?: string }) {
   const [state, action] = useActionState(signupAction, initialActionState);
 
   return (
     <form action={action} className="mt-8 space-y-5">
+      <input name="returnTo" type="hidden" value={returnTo} />
       <FormField error={state.fieldErrors?.displayName?.[0]} htmlFor="signup-name" label="Name">
         <input aria-describedby={state.fieldErrors?.displayName?.[0] ? "signup-name-description" : undefined} autoComplete="name" className="form-control mt-2" id="signup-name" name="displayName" required />
       </FormField>
@@ -27,7 +29,7 @@ export function SignupForm() {
       </FormField>
       <AuthFormMessage state={state} />
       <AuthSubmitButton label="Create account" pendingLabel="Creating account" />
-      <p className="text-center text-sm text-ink/65">Already have an account? <Link className="font-bold text-forest underline-offset-4 hover:underline" href="/login">Sign in</Link></p>
+      <p className="text-center text-sm text-ink/65">Already have an account? <Link className="font-bold text-forest underline-offset-4 hover:underline" href={getAuthHref("/login", returnTo)}>Sign in</Link></p>
     </form>
   );
 }

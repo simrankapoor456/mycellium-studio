@@ -1,13 +1,19 @@
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
-const questions = [
-  ["What is Mycellium Studio?", "Mycellium Studio is an AI Product Architect in development. It is designed to help teams move from a rough idea through discovery, product architecture, requirements, and execution planning while keeping human review explicit."],
+export const faqItems = [
+  ["What is Mycellium Studio?", "Mycellium Studio is a personal product-intelligence workspace. It connects early context, discovery, reviewed foundations, architecture, and an editable Product Blueprint while keeping decisions visible."],
   ["How is this different from Jira or Linear?", "Jira and Linear manage understood work exceptionally well. Mycellium focuses on the earlier reasoning that establishes product context, scope, architecture, risks, and reviewable requirements before tickets become the center of gravity."],
-  ["Is AI required?", "No. Mycellium's reliable built-in planning engine supports the complete discovery and blueprint path without an AI provider. When AI is configured, it adds another guided interpretation layer behind the same validated contracts."],
-  ["What is Reliable mode?", "Reliable mode is Mycellium's deterministic planning engine. The same validated input produces the same structured result without randomness or an external model request."],
-  ["How is project data handled?", "Personal projects use cookie-based authentication, server-side identity verification, ownership-scoped queries, and PostgreSQL row-level security. Provider API keys are not exposed to the browser."],
-  ["Can I edit and export the output?", "Yes. The Product Blueprint is editable, every change is saved with lineage, and the current saved version can be downloaded as Markdown, JSON, or CSV."],
+  ["Is AI required?", "No. Mycellium can operate without an external AI provider through deterministic Reliable mode. When a provider is configured, it may enhance interpretation and generation while the same validation, review, and persistence boundaries continue to apply."],
+  ["What is Reliable mode?", "Reliable mode is a typed deterministic fallback. It produces predictable, schema-valid planning output without an external model request; it is not presented as identical to AI-enhanced interpretation."],
+  ["How is project data handled?", "Project access is authenticated and ownership-scoped. Server-side identity checks and PostgreSQL row-level security protect personal project data. Provider credentials remain server-side and are not exposed to the browser."],
+  ["Can I edit and export the output?", "Yes. The Product Blueprint is editable, saved changes retain their source, and the current saved version can be downloaded as Markdown, JSON, or CSV."],
+  ["What product types are supported?", "Mycellium includes validated choices for web, mobile, desktop, APIs, developer tools, connected hardware, and other product forms, plus a custom label. The workflow remains domain-agnostic."],
+  ["Can I upload files?", "No. File upload is not supported. Source material is entered through the product's text fields and guided discovery flow."],
+  ["Does Mycellium support shared workspaces?", "Not currently. Projects have one authenticated owner; shared ownership, collaboration, and organization administration are not available."],
+  ["Is there billing or a paid plan?", "No billing flow is implemented. The Pricing section describes current access and unavailable shared-workspace capabilities without publishing a fabricated price."],
+  ["Does it connect to external tools?", "No external integrations or publishing workflow are implemented. Markdown, JSON, and CSV downloads are the available portability paths."],
+  ["Can I delete my account?", "Self-service account deletion is not implemented. The operator of the deployment must handle an account and owned-data removal request through a privileged server process."],
 ] as const;
 
 export function FaqSection() {
@@ -16,7 +22,7 @@ export function FaqSection() {
       <Container className="grid gap-14 lg:grid-cols-[0.7fr_1.3fr]">
         <SectionHeading title="Questions worth answering before the work begins." />
         <div className="border-t border-line">
-          {questions.map(([question, answer]) => (
+          {faqItems.map(([question, answer]) => (
             <details className="group border-b border-line" key={question}>
               <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-5 text-lg font-bold text-forest">
                 {question}
