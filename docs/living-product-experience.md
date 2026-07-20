@@ -6,14 +6,14 @@ Mycellium Studio now expresses one continuous idea across its public and product
 
 > Ideas take root. Knowledge connects. Products grow.
 
-The signature interaction is a 12-beat living product story. One seed gathers signal, roots, relationships, and evidence. Human judgment stabilizes that understanding into a foundation. Architecture and a Product Blueprint then organize the work before learning returns as a new seed.
+The signature interaction is a 12-beat living product story. Fragmented context resolves into intent, roots, relationships, and evidence. Human judgment stabilizes that understanding into a foundation. Architecture and a Product Blueprint then organize the work before learning returns as a new seed.
 
 ## Architectural decisions
 
-- `ScrollProductNarrative` is the only cinematic public section. Its complete copy and SVG graph exist before JavaScript enhancement.
+- `ScrollProductNarrative` is the only cinematic public section. Its complete copy and deterministic signature SVG exist before JavaScript enhancement.
 - GSAP and ScrollTrigger are imported only through `lib/motion/gsap-client.ts` and scoped to the story or Foundation component.
 - `MarketingMotionProvider` lazy-loads Lenis only on the public landing route. Authenticated routes keep native scrolling.
-- Foundation geometry is deterministic presentation data. Product state still comes from the existing typed discovery context and readiness calculation.
+- Foundation geometry is deterministic presentation data arranged as evidence roots, seven branches, readiness, and Blueprint progression. Product state still comes from the existing typed discovery context and readiness calculation.
 - The architecture reveal starts only after the existing generation request has returned and persisted a real blueprint. It never represents network progress.
 - Blueprint and dashboard refinements consume existing project and blueprint fields. They add no state, tables, events, or persistence.
 
@@ -43,7 +43,7 @@ The public motion dial is 6 of 10. Product motion is 3 of 10.
 
 - Lenis is dynamically imported after the public page becomes interactive.
 - GSAP remains route-scoped; no second animation runtime was added.
-- The story uses the existing SVG graph. No image sequence, video, WebGL, or continuous render loop is downloaded.
+- The story uses a lightweight deterministic SVG composition. No image sequence, video, WebGL, or continuous render loop is downloaded.
 - ScrollTrigger updates imperative transforms and state boundaries rather than React state on every scroll frame.
 - Foundation animation runs once and cleans up its GSAP context.
 - All visual surfaces reserve their dimensions before enhancement.

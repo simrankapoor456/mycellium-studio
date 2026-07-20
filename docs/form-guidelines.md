@@ -22,6 +22,33 @@ Mycellium forms make requirements, progress, recovery, and saved state explicit.
 6. Reset sensitive or dirty state only after confirmed success or an explicit user reset.
 7. Disable the submit control while its request is pending.
 
+## Discovery composer
+
+- One stable current question sits directly above the answer field.
+- Share answer is the primary action. Mark unknown and Ask later are secondary controls and require no text.
+- Explain why this matters uses a native details disclosure.
+- Review current foundation remains reachable regardless of readiness state.
+- Enter inserts a line break. Control or Command plus Enter submits and is declared with helper text and `aria-keyshortcuts`.
+- Pending state disables all turn actions and exposes busy state. Failure keeps the answer in place.
+- Success updates the current question and a truthful change summary without inserting duplicate question copy into the conversation.
+
+## Foundation fact actions
+
+- Edit fact opens a bounded editor with Save changes and Cancel.
+- Confirm fact is primary only when confirmation is relevant.
+- Keep unknown is secondary. Confirm assumption is a success action only for an explicit unknown that has not been accepted for carry-forward.
+- Reject from foundation is quiet because it is reversible through later editing.
+- Delete fact is destructive and always opens a native confirmation dialog.
+- Mutation feedback stays beside the affected fact, uses status or alert semantics, and returns focus predictably after success.
+- A failed mutation keeps the editor and values intact.
+
+## Blueprint and export
+
+- Blueprint edits use the shared loading button and retain uncontrolled field values after a failed request.
+- Architecture generation shows no fabricated percent or inferred network stage. It waits for a complete validated persisted result.
+- Locked export formats are explanatory articles, not disabled buttons.
+- Available export buttons report the real response filename, size, Blueprint version, and saved timestamp.
+
 ## Project creation
 
 Only project name, project description, sprint duration, and team size are required. Product type remains visible but optional. Target users, planning depth, estimated sprint capacity, and constraints live under Advanced planning. Missing planning metadata remains nullable and is inferred later by existing discovery and deterministic blueprint defaults.
