@@ -100,6 +100,10 @@ The spatial easing curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product surfaces u
 
 The animated mark forms once through Spark, Connect, Grow, Form, and Settle. It is complete from the start in the document, does not delay content, and becomes immediately static under `prefers-reduced-motion: reduce`.
 
+Phase 7.2 adds one client-only GSAP boundary for selected public transitions. `useGSAP`, a local scope, `gsap.matchMedia()`, and explicit revert cleanup are required. SplitText is limited to one major transition and its semantic text exists before enhancement. Authenticated work keeps CSS feedback and native scrolling.
+
+Lenis is installed but dormant. It does not wrap the root, authentication, product, editor, dialog, or settings experiences. Native scrolling remains the baseline for anchors, keyboard input, browser history, touch devices, and reduced motion.
+
 ## Accessibility
 
 - Semantic landmarks and ordered headings define each page.
@@ -128,12 +132,15 @@ Review widths are 375, 768, 1024, and 1440 pixels.
 
 ## Performance boundaries
 
-- No WebGL, large animation library, autoplay video, or continuous particle loop.
+- GSAP and Lenis are approved only as route-scoped, progressive enhancements under the premium interaction foundation; neither is mounted globally or required for meaning.
+- No WebGL, autoplay video, continuous particle loop, or second animation and smooth-scroll runtime.
 - SVG and CSS construct the environment and identity.
 - Brand PNGs are generated once and only the needed favicon, touch icon, or social image is loaded.
 - Layout dimensions are reserved before animation.
 - Static meaning exists before JavaScript enhancement.
 - Large blur is restricted to bounded floating surfaces.
+
+See [`docs/premium-interaction-foundation.md`](./premium-interaction-foundation.md) for client-only integration, cleanup, reduced-motion, and public-only scrolling rules.
 
 ## Voice and content
 

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/phase-7-1-review.md"><strong>View the product experience</strong></a>
+  <a href="docs/phase-7-2-review.md"><strong>View the product experience</strong></a>
   &nbsp;&middot;&nbsp;
   <a href="docs/mvp-architecture.md"><strong>Explore the architecture</strong></a>
   &nbsp;&middot;&nbsp;
@@ -87,6 +87,7 @@ The proposal layer cannot write application data. The Decision Layer owns authen
 - Tailwind CSS 4 plus centralized semantic CSS tokens
 - Supabase SSR authentication, PostgreSQL, and row-level security
 - OpenAI Responses API as an optional server-only proposal source
+- GSAP with a client-only adapter for selected public transitions; Lenis remains dormant
 - Vitest, Testing Library, and Playwright
 - ESLint and npm audit
 
@@ -161,6 +162,8 @@ legacy-static/               Preserved pre-Next.js prototype
 - [Art direction](docs/phase-7-1-art-direction.md)
 - [Design system](docs/design-system.md)
 - [Phase 7.1 review](docs/phase-7-1-review.md)
+- [Phase 7.2 review](docs/phase-7-2-review.md)
+- [Phase 7.3 scroll-story concept](docs/phase-7-3-scroll-story-concept.md)
 - [MVP architecture](docs/mvp-architecture.md)
 - [Supabase and authentication setup](docs/supabase-setup.md)
 - [Canonical output contract](docs/output-schema.md)
@@ -178,9 +181,9 @@ legacy-static/               Preserved pre-Next.js prototype
 
 ## Project status
 
-Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; and the Phase 7.1 identity, public experience, authentication styling, and shared application shell.
+Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; and the Phase 7.2 route, trust, interaction, and profile refinements.
 
-Active development: the deeper workspace compositions for Discovery, Review, Foundation Map, Generation, Blueprint, Export, and Profile are reserved for Phase 7.2.
+Active development: the deeper scroll story and Living Product Graph are reserved for Phase 7.3. Advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
 
 Intentionally deferred: billing, teams, collaboration, and external integrations.
 
