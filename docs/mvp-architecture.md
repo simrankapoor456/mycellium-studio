@@ -140,3 +140,29 @@ Phase 6 preserves the same trust boundary while making workflow state explicit. 
 The project journey derives availability from persisted discovery, approval, and blueprint fields. Export remains reachable before a blueprint so the unavailable state can explain the correct next action. The Foundation Map is a pure projection of canonical facts, gaps, contradictions, and challenges; it creates no parallel readiness state.
 
 Profile settings update the existing owner-protected `profiles` row. Password and email changes use Supabase Auth server flows. Account removal remains guidance because the browser-facing application has no privileged credential. The additive Phase 6 migration extends project types and profile metadata without changing existing RLS policies. Team storage and permissions remain deferred.
+
+## Phase 7.1 presentation boundary
+
+Phase 7.1 changes composition and shared presentation without moving a trust boundary or adding product capability.
+
+```text
+Public routes
+  -> environmental landing composition
+  -> floating public navigation
+  -> production brand and social assets
+
+Protected layout
+  -> verified server identity
+  -> shared workspace navigation
+  -> existing persisted journey state
+  -> unchanged route actions and operations
+
+Shared primitives
+  -> semantic tokens
+  -> buttons, fields, surfaces, status, overlays, and loading states
+  -> existing domain contracts and accessibility behavior
+```
+
+`app/phase-7-1.css` provides the semantic identity and surface tokens while `app/globals.css` remains the compatibility layer for established workspace composition. `BrandMark`, `BrandLogo`, and `WorkspaceNavigation` are presentation components only. Project cards derive their richer status labels from already persisted readiness and blueprint data; no parallel dashboard state is introduced.
+
+The public application may be cinematic, but authenticated routes deliberately use lower motion, lower luminosity, and denser information hierarchy. Discovery, Review, Foundation Map, Generation, Blueprint, Export, and Profile retain their Phase 6 internal composition until Phase 7.2. Their data loading, server actions, API routes, ownership filters, RLS policies, idempotency, lineage, and exports are unchanged.

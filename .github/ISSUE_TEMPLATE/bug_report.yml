@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a reproducible problem in Mycellium Studio.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, session data, personal content, or security exploit details. Use the private process in SECURITY.md for security concerns.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain the observed behavior and its product impact.
+      placeholder: A clear, concise description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Use synthetic content and the smallest reliable sequence.
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: What should have happened instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      options:
+        - Public experience
+        - Authentication
+        - Dashboard and project shell
+        - Discovery
+        - Foundation Review
+        - Blueprint and export
+        - Profile
+        - Build or tooling
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and viewport
+      placeholder: Chrome 126, 1440 x 900
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add sanitized console output or genuine screenshots if they help.
