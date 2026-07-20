@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/Button";
+
 const GENERATION_STAGES = [
   "Grounding the product understanding",
   "Checking unresolved decisions",
@@ -16,7 +18,7 @@ export function GenerationWorkspace({ error, onRetry, onReturn }: Readonly<{ err
   return (
     <main className="generation-workspace" aria-busy={!failed} aria-live="polite">
       <div className="generation-workspace__core" aria-hidden="true"><span /><span /><span /></div>
-      <span className="eyebrow">Mycel Core · architecture</span>
+      <span className="eyebrow">Mycel Core / architecture</span>
       <h1>{failed ? "The blueprint needs another pass." : "Your foundation is becoming a blueprint."}</h1>
       <p>{failed ? error : "The approved context is safe. Mycel Core is validating each layer before anything is persisted."}</p>
       <ol>
@@ -26,7 +28,7 @@ export function GenerationWorkspace({ error, onRetry, onReturn }: Readonly<{ err
           </li>
         ))}
       </ol>
-      {failed ? <div className="generation-workspace__actions"><button onClick={onRetry} type="button">Retry blueprint generation</button><button onClick={onReturn} type="button">Return to foundation review</button></div> : null}
+      {failed ? <div className="generation-workspace__actions"><Button onClick={onRetry} type="button">Retry blueprint generation</Button><Button onClick={onReturn} type="button" variant="secondary">Return to foundation review</Button></div> : null}
     </main>
   );
 }

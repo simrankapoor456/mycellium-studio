@@ -11,7 +11,7 @@ export function AuthFormMessage({ state }: { state: ActionState }) {
   }
 
   return (
-    <p className={state.status === "success" ? "text-sm font-medium text-forest" : "text-sm font-medium text-clay"} role="status">
+    <p aria-live="polite" className={state.status === "success" ? "text-sm font-medium text-forest" : "text-sm font-medium text-clay"} role={state.status === "error" ? "alert" : "status"}>
       {state.message}
     </p>
   );
@@ -20,5 +20,5 @@ export function AuthFormMessage({ state }: { state: ActionState }) {
 export function AuthSubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
 
-  return <Button className="w-full" disabled={pending} type="submit">{pending ? pendingLabel : label}</Button>;
+  return <Button aria-busy={pending} className="w-full" disabled={pending} type="submit">{pending ? pendingLabel : label}</Button>;
 }

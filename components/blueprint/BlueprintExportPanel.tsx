@@ -70,6 +70,7 @@ export function BlueprintExportPanel({ available, projectId, projectName, compac
       <div className="blueprint-export-panel__formats" aria-label="Blueprint export formats">
         {EXPORT_FORMATS.map((format) => (
           <button
+            aria-busy={state.status === "preparing" && state.format.id === format.id}
             disabled={!available || state.status === "preparing"}
             key={format.id}
             onClick={() => void handleDownload(format)}
@@ -80,7 +81,7 @@ export function BlueprintExportPanel({ available, projectId, projectName, compac
           </button>
         ))}
       </div>
-      <p aria-live="polite" className="blueprint-export-panel__status" role="status">{statusMessage}</p>
+      <p aria-live="polite" className="blueprint-export-panel__status" role={state.status === "error" ? "alert" : "status"}>{statusMessage}</p>
       <a aria-hidden="true" className="sr-only" ref={downloadLink} tabIndex={-1}>Download</a>
     </section>
   );
