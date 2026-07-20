@@ -39,14 +39,25 @@ test("keeps public navigation and calls to action functional", async ({ page }) 
     await expect(page.locator(target)).toHaveCount(1);
   }
 
-  await expect(page.getByRole("link", { name: /Start your project/ }).first()).toHaveAttribute("href", "/signup");
+  await expect(page.getByRole("link", { name: /Start your project/ }).first()).toHaveAttribute("href", "/signup?next=%2Fprojects%2Fnew");
   await expect(page.getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "#how-it-works");
   await expect(page.getByRole("link", { name: "Log in" }).first()).toHaveAttribute("href", "/login");
-  await expect(page.getByRole("link", { name: "Start free" }).first()).toHaveAttribute("href", "/signup");
+  await expect(page.getByRole("link", { name: "Start your project" }).first()).toHaveAttribute("href", "/signup?next=%2Fprojects%2Fnew");
 
   await page.getByRole("link", { name: "How it works" }).first().click();
   await expect(page).toHaveURL(/#how-it-works$/);
   await expect(page.locator("#how-it-works")).toBeInViewport();
+
+  await page.getByRole("link", { name: "Start your project" }).first().click();
+  await expect(page).toHaveURL(/\/signup\?next=%2Fprojects%2Fnew$/);
+  await expect(page.getByRole("heading", { name: /Give the first project a foundation/ })).toBeVisible();
+});
+
+test("provides a useful not-found recovery route", async ({ page }) => {
+  const response = await page.goto("/a-route-that-does-not-exist", { waitUntil: "domcontentloaded" });
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "This path does not connect." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
 });
 
 test("makes the mobile menu operable and reduced motion immediate", async ({ page }) => {

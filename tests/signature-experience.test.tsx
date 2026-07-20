@@ -13,10 +13,12 @@ describe("signature Product Graph", () => {
     const { container } = render(<ProductGraph activeLevel={0} ariaLabel="Static product graph" />);
 
     expect(screen.getByRole("img", { name: "Static product graph" })).toBeInTheDocument();
-    expect(screen.getByRole("list", { name: "Product graph stages" })).toBeInTheDocument();
-    expect(screen.getByText("Sprint 01")).toBeInTheDocument();
-    expect(screen.getByText("Execution plan")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Product graph structure" })).toBeInTheDocument();
+    expect(screen.getAllByText("Sprint 01")).toHaveLength(2);
+    expect(screen.getAllByText("Delivery sequence")).toHaveLength(2);
     expect(container.querySelector('[data-kind="sprint"]')).toHaveAttribute("data-active", "false");
+    expect(container.querySelector('[data-kind="sprint"]')).toHaveAttribute("data-state", "future");
+    expect(screen.getByRole("list", { name: "Product graph state key" })).toHaveTextContent("emerging");
   });
 
   it("lets keyboard and pointer users select every scroll-story chapter", async () => {

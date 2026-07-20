@@ -20,7 +20,7 @@ describe("Phase 7.1 public identity", () => {
 
   it("keeps the primary and secondary landing actions visible by name", () => {
     render(<LandingHero />);
-    expect(screen.getByRole("link", { name: /Start your project/ })).toHaveAttribute("href", "/signup");
+    expect(screen.getByRole("link", { name: /Start your project/ })).toHaveAttribute("href", "/signup?next=%2Fprojects%2Fnew");
     expect(screen.getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "#how-it-works");
   });
 

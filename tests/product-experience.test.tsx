@@ -35,7 +35,7 @@ describe("Mycellium brand and navigation", () => {
     expect(screen.getAllByRole("link", { name: "Pricing" })[0]).toHaveAttribute("href", "#pricing");
     expect(screen.getAllByRole("link", { name: "FAQ" })[0]).toHaveAttribute("href", "#faq");
     expect(screen.getByRole("link", { name: "Log in" })).toHaveAttribute("href", "/login");
-    expect(screen.getByRole("link", { name: "Start free" })).toHaveAttribute("href", "/signup");
+    expect(screen.getByRole("link", { name: "Start your project" })).toHaveAttribute("href", "/signup?next=%2Fprojects%2Fnew");
   });
 });
 
@@ -72,8 +72,8 @@ describe("interactive product experience", () => {
   it("keeps available and future pricing actions honest", () => {
     render(<PricingSection />);
 
-    expect(screen.getByRole("link", { name: "Start free" })).toHaveAttribute("href", "/signup");
-    expect(screen.getByRole("button", { name: "Coming soon" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Start your project" })).toHaveAttribute("href", "/signup?next=%2Fprojects%2Fnew");
+    expect(screen.getByRole("button", { name: "Not available" })).toBeDisabled();
   });
 
   it("defines a reduced-motion fallback", () => {
@@ -93,7 +93,7 @@ describe("authentication form integrity", () => {
 
     expect(screen.getByLabelText("Email")).toHaveAttribute("autocomplete", "email");
     expect(screen.getByLabelText("Password")).toHaveAttribute("autocomplete", "current-password");
-    expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/signup");
+    expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/signup?next=%2Fdashboard");
   });
 
   it("keeps signup fields labeled without fake social authentication", () => {
@@ -102,6 +102,6 @@ describe("authentication form integrity", () => {
     expect(screen.getByLabelText("Name")).toHaveAttribute("autocomplete", "name");
     expect(screen.getAllByLabelText(/password/i)).toHaveLength(2);
     expect(screen.queryByText(/Google|GitHub|Facebook/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login?next=%2Fdashboard");
   });
 });
