@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/phase-7-2-review.md"><strong>View the product experience</strong></a>
+  <a href="docs/living-product-experience.md"><strong>View the product experience</strong></a>
   &nbsp;&middot;&nbsp;
   <a href="docs/mvp-architecture.md"><strong>Explore the architecture</strong></a>
   &nbsp;&middot;&nbsp;
@@ -78,7 +78,7 @@ The proposal layer cannot write application data. The Decision Layer owns authen
 - **Mycel Core:** AI proposals, product decisions, and deterministic execution have separate authority.
 - **Reliable mode:** missing or invalid provider output falls back safely without changing the product contract.
 - **Product Blueprint:** architecture, requirements, work structure, and exports remain editable and versioned.
-- **Living interface:** a radial identity, environmental public story, calm workspace shell, reduced motion, and responsive composition form one coherent system.
+- **Living interface:** a 12-beat product story, intelligent Foundation Map, architecture reveal, calm workspace shell, reduced motion, and responsive composition form one coherent system.
 
 ## Technology
 
@@ -87,7 +87,7 @@ The proposal layer cannot write application data. The Decision Layer owns authen
 - Tailwind CSS 4 plus centralized semantic CSS tokens
 - Supabase SSR authentication, PostgreSQL, and row-level security
 - OpenAI Responses API as an optional server-only proposal source
-- GSAP with a client-only adapter for selected public transitions; Lenis remains dormant
+- GSAP with scoped ScrollTrigger timelines and marketing-only Lenis smooth scrolling
 - Vitest, Testing Library, and Playwright
 - ESLint and npm audit
 
@@ -163,6 +163,7 @@ legacy-static/               Preserved pre-Next.js prototype
 - [Design system](docs/design-system.md)
 - [Phase 7.1 review](docs/phase-7-1-review.md)
 - [Phase 7.2 review](docs/phase-7-2-review.md)
+- [Living Product Experience](docs/living-product-experience.md)
 - [Phase 7.3 scroll-story concept](docs/phase-7-3-scroll-story-concept.md)
 - [MVP architecture](docs/mvp-architecture.md)
 - [Supabase and authentication setup](docs/supabase-setup.md)
@@ -181,9 +182,9 @@ legacy-static/               Preserved pre-Next.js prototype
 
 ## Project status
 
-Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; and the Phase 7.2 route, trust, interaction, and profile refinements.
+Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; route and trust refinements; and the Living Product Experience across public storytelling, Foundation, architecture, Blueprint, and dashboard surfaces.
 
-Active development: the deeper scroll story and Living Product Graph are reserved for Phase 7.3. Advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
+Active development: advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
 
 Intentionally deferred: billing, teams, collaboration, and external integrations.
 

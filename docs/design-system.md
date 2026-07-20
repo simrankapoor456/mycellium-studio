@@ -100,9 +100,9 @@ The spatial easing curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product surfaces u
 
 The animated mark forms once through Spark, Connect, Grow, Form, and Settle. It is complete from the start in the document, does not delay content, and becomes immediately static under `prefers-reduced-motion: reduce`.
 
-Phase 7.2 adds one client-only GSAP boundary for selected public transitions. `useGSAP`, a local scope, `gsap.matchMedia()`, and explicit revert cleanup are required. SplitText is limited to one major transition and its semantic text exists before enhancement. Authenticated work keeps CSS feedback and native scrolling.
+The Living Product Experience uses GSAP only in isolated Client Components. `useGSAP`, a local scope, `gsap.matchMedia()`, ScrollTrigger cleanup, and explicit revert cleanup are required. SplitText remains limited to one major transition and its semantic text exists before enhancement. Authenticated work keeps CSS feedback and native scrolling.
 
-Lenis is installed but dormant. It does not wrap the root, authentication, product, editor, dialog, or settings experiences. Native scrolling remains the baseline for anchors, keyboard input, browser history, touch devices, and reduced motion.
+Lenis is lazy-loaded by `MarketingMotionProvider` on the public landing route only. Touch remains native, form and nested-scroll surfaces are excluded, anchors retain their destinations, and reduced motion prevents the instance from starting. It never wraps authentication, product workspaces, dialogs, profile, or settings.
 
 ## Accessibility
 
