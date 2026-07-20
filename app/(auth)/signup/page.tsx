@@ -15,10 +15,10 @@ export default async function SignupPage() {
   }
 
   return (
-    <section aria-labelledby="signup-title">
-      <p className="font-mono text-sm font-bold text-moss">Personal workspace</p>
-      <h1 className="display-type mt-3 text-4xl text-forest" id="signup-title">Give the first project a foundation</h1>
-      <p className="mt-4 leading-7 text-ink/65">Create a private studio where rough ideas can become clear, traceable Product Blueprints.</p>
+    <section aria-labelledby="signup-title" className="auth-form-page">
+      <p className="auth-form-page__kicker">Personal workspace</p>
+      <h1 id="signup-title">Give the first project a foundation</h1>
+      <p>Create a private studio where scattered context can become a clear, traceable Product Blueprint.</p>
       <SignupForm />
     </section>
   );

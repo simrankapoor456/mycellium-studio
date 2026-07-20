@@ -28,8 +28,8 @@ export function ConfirmDialog({
       <button className="min-h-11 text-sm font-bold text-clay underline-offset-4 hover:underline" onClick={() => dialogRef.current?.showModal()} type="button">
         {triggerLabel}
       </button>
-      <dialog aria-describedby={descriptionId} aria-labelledby={titleId} className="dialog-backdrop m-auto w-[min(92vw,30rem)] rounded-xl border border-line bg-surface p-0 text-ink" ref={dialogRef}>
-        <div className="p-6 sm:p-7">
+      <dialog aria-describedby={descriptionId} aria-labelledby={titleId} className="dialog-backdrop ui-dialog" ref={dialogRef}>
+        <div className="ui-dialog__content">
           <h2 className="display-type text-2xl text-forest" id={titleId}>{title}</h2>
           <p className="mt-3 leading-7 text-ink/70" id={descriptionId}>{description}</p>
           <form action={formAction} className="mt-7 flex flex-wrap justify-end gap-3" onSubmit={() => dialogRef.current?.close()}>

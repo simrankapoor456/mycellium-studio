@@ -17,9 +17,10 @@ export function ProjectWorkspaceNav({ active, blueprintAvailable, discoveryStart
     { id: "blueprint", label: "Product Blueprint", meta: "Canopy", href: `/projects/${projectId}`, available: blueprintAvailable, complete: blueprintAvailable, active: active === "overview" && blueprintAvailable },
     { id: "export", label: "Export", meta: blueprintAvailable ? "Harvest" : "After blueprint", href: `/projects/${projectId}/export`, available: true, complete: false, active: active === "export" },
   ] as const;
+  const currentStep = steps.find((step) => step.active) ?? steps[0];
 
-  return <nav aria-label="Project journey" className="project-journey"><ol>{steps.map((step, index) => <li data-active={step.active} data-complete={step.complete} key={step.id}>
-    <span aria-hidden="true" className="project-journey__index">{step.complete ? "✓" : index + 1}</span>
+  return <nav aria-label="Project journey" className="project-journey"><div className="project-journey__summary"><span>Project journey</span><strong>{currentStep.label}</strong></div><ol>{steps.map((step, index) => <li data-active={step.active} data-complete={step.complete} key={step.id}>
+    <span aria-hidden="true" className="project-journey__index">{step.complete ? "\u2713" : index + 1}</span>
     {step.available ? <Link aria-current={step.active ? "step" : undefined} href={step.href}><strong>{step.label}</strong><small>{step.meta}</small></Link> : <span aria-disabled="true" title={lockedReason(step.id)}><strong>{step.label}</strong><small>{lockedReason(step.id)}</small></span>}
   </li>)}</ol></nav>;
 }

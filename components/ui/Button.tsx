@@ -6,11 +6,8 @@ type ButtonVariant = "primary" | "secondary" | "quiet" | "danger";
 
 function buttonClasses(variant: ButtonVariant, className?: string) {
   return cn(
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition-[color,background-color,border-color,transform] duration-200 disabled:cursor-not-allowed disabled:opacity-55",
-    variant === "primary" && "bg-forest text-paper hover:bg-forest-strong active:translate-y-px",
-    variant === "secondary" && "border border-line-strong bg-surface text-forest hover:border-forest",
-    variant === "quiet" && "text-forest hover:bg-surface-quiet",
-    variant === "danger" && "bg-clay text-paper hover:brightness-90",
+    "ui-button",
+    `ui-button--${variant}`,
     className,
   );
 }

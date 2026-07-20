@@ -19,10 +19,10 @@ export function FormField({
 
   return (
     <div className={className}>
-      <div className="form-field__label"><label className="block text-sm font-bold text-forest" htmlFor={htmlFor}>{label}</label>{labelAction}</div>
+      <div className="form-field__label"><label htmlFor={htmlFor}>{label}</label>{labelAction}</div>
       {children}
-      {error ? <p className="mt-2 text-sm font-medium text-clay" id={descriptionId}>{error}</p> : null}
-      {!error && hint ? <p className="mt-2 text-sm text-ink/70" id={descriptionId}>{hint}</p> : null}
+      {error ? <p className="form-field__message form-field__message--error" id={descriptionId}>{error}</p> : null}
+      {!error && hint ? <p className="form-field__message" id={descriptionId}>{hint}</p> : null}
     </div>
   );
 }
