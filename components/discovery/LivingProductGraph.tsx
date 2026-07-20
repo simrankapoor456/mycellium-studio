@@ -45,7 +45,7 @@ export function LivingProductGraph({ graph, context, downstreamItems = {}, messa
       </svg>
       <div aria-label="Structured product understanding" className="living-graph__list" role="list">{nodes.map((node) => <div key={node.id} role="listitem"><button aria-pressed={selected?.id === node.id} data-state={node.state} onClick={() => setSelectedId(node.id)}><span>{node.label}</span><strong>{node.value}</strong><small>{node.state}</small></button></div>)}</div>
       {selected && context && onMutate ? <GraphNodeDetail context={context} downstreamItems={downstreamItems[selected.id] ?? []} messages={messages} node={selected} onMutate={onMutate} pending={pending} /> : null}
-      {selected && (!context || !onMutate) ? <aside aria-live="polite" className="living-graph__detail"><span>{selected.category.replaceAll("_", " ")}</span><h3>{selected.label}</h3><p>{selected.value}</p><small>{selected.state === "inferred" ? "Working assumption — check this before approval" : selected.state === "unknown" ? "Intentionally left open" : selected.state === "contradicted" ? "Two answers are competing here" : "Rooted in discovery"}</small></aside> : null}
+      {selected && (!context || !onMutate) ? <aside aria-live="polite" className="living-graph__detail"><span>{selected.category.replaceAll("_", " ")}</span><h3>{selected.label}</h3><p>{selected.value}</p><small>{selected.state === "inferred" ? "Working assumption. Check this before approval" : selected.state === "unknown" ? "Intentionally left open" : selected.state === "contradicted" ? "Two answers are competing here" : "Rooted in discovery"}</small></aside> : null}
     </section>
   );
 }

@@ -127,7 +127,7 @@ export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], s
   if (facts.every((fact) => fact.status === "unknown")) {
     return selectStableCopy([
       "That's a useful unknown. I'll keep it visible instead of filling in the blank.",
-      "Fair — that decision is still open. We can design around the uncertainty for now.",
+      "Fair. That decision is still open. We can design around the uncertainty for now.",
       "Good to name what is not decided yet. I won't pretend we know more than we do.",
     ], seed);
   }
@@ -137,7 +137,7 @@ export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], s
   if (categories.has("target_users")) {
     return selectStableCopy([
       "That gives us a clearer picture of who this is for.",
-      "Good — the first user is coming into focus.",
+      "Good. The first user is coming into focus.",
       "Now we have someone specific to design for.",
     ], seed);
   }
@@ -145,7 +145,7 @@ export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], s
   if (categories.has("problem")) {
     return selectStableCopy([
       "That makes the pain much more concrete.",
-      "Good — now we can see where the current workflow breaks down.",
+      "Good. Now we can see where the current workflow breaks down.",
       "That gives the product a problem worth organizing around.",
     ], seed);
   }
@@ -153,7 +153,7 @@ export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], s
   if (categories.has("business_objective")) {
     return selectStableCopy([
       "That gives the product a sharper reason to exist.",
-      "Good — the outcome behind the idea is clearer now.",
+      "Good. The outcome behind the idea is clearer now.",
       "Now we know what this product needs to change.",
     ], seed);
   }
@@ -162,7 +162,7 @@ export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], s
 
   return selectStableCopy([
     `That adds real shape around ${joinNaturally(labels)}.`,
-    `Useful — ${joinNaturally(labels)} ${labels.length === 1 ? "is" : "are"} clearer now.`,
+    `Useful. ${joinNaturally(labels)} ${labels.length === 1 ? "is" : "are"} clearer now.`,
     `I can place ${joinNaturally(labels)} more confidently in the product foundation.`,
   ], seed);
 }

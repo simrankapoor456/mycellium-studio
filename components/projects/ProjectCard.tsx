@@ -24,6 +24,7 @@ export function ProjectCard({ project }: { project: Project }) {
     : readiness.success
       ? readiness.data.status === "ready" ? "Ready for review" : "Taking root"
       : "Not assessed";
+  const growthStage = project.blueprint_version > 0 ? 3 : project.discovery_approved_at ? 2 : project.discovery_context ? 1 : 0;
 
   return (
     <Card className="project-card interactive-lift">
@@ -35,6 +36,9 @@ export function ProjectCard({ project }: { project: Project }) {
         <Link className="underline-offset-4 hover:underline" href={`/projects/${project.id}`}>{project.name}</Link>
       </h2>
       <p className="project-card__description">{project.description || "Add a short product description to give this project more context."}</p>
+      <ol aria-label={`Product growth: ${stage}`} className="project-card__growth">
+        {["Context", "Discovery", "Foundation", "Blueprint"].map((label, index) => <li data-active={index <= growthStage} data-current={index === growthStage} key={label}><span aria-hidden="true" />{label}</li>)}
+      </ol>
       <dl className="project-card__state">
         <div><dt>Journey</dt><dd>{stage}</dd></div>
         <div><dt>Foundation</dt><dd>{foundation}</dd></div>

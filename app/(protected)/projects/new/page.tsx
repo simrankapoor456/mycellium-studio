@@ -16,7 +16,7 @@ export default function NewProjectPage() {
       <Card className="mt-5 p-6 sm:p-9">
         <p className="font-mono text-sm font-bold text-moss">A place for the idea to grow</p>
         <h1 className="display-type mt-3 text-4xl text-forest">Give the product a starting point</h1>
-        <p className="mt-4 max-w-2xl leading-7 text-ink/65">Share what is already known. It does not need to be polished — discovery will help uncover the rest.</p>
+        <p className="mt-4 max-w-2xl leading-7 text-ink/65">Share what is already known. It does not need to be polished. Discovery will help uncover the rest.</p>
         <ProjectForm />
       </Card>
     </main>

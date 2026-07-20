@@ -2,7 +2,7 @@ import type { FoundationArea } from "@/lib/discovery/foundation-map";
 
 export function FoundationMapDetail({ area }: { area: FoundationArea }) {
   return (
-    <div aria-live="polite" className="foundation-map__detail">
+    <div aria-live="polite" className="foundation-map__detail" id="foundation-map-detail">
       <div><span>Selected area</span><strong>{area.label}</strong><small>{foundationStateLabel(area.state)}</small></div>
       <ul>
         {area.facts.slice(0, 4).map((fact) => <li key={fact.id}><span>{fact.label}</span><strong>{fact.value}</strong></li>)}
