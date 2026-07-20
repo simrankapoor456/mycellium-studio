@@ -34,6 +34,10 @@ export async function beginWorkflowRequest(
     return { kind: "started" as const, request: data };
   }
 
+  if (isUnavailableBlueprintRequestLedger(error, operation)) {
+    return { kind: "untracked" as const };
+  }
+
   if (error.code !== "23505") {
     throw error;
   }
@@ -93,7 +97,7 @@ export async function completeWorkflowRequest(
     .eq("user_id", userId)
     .eq("operation", operation)
     .eq("request_id", requestId);
-  if (error) throw error;
+  if (error && !isUnavailableBlueprintRequestLedger(error, operation)) throw error;
 }
 
 export async function failWorkflowRequest(
@@ -126,7 +130,7 @@ export async function countRecentWorkflowRequests(
     .eq("user_id", userId)
     .eq("operation", operation)
     .gte("created_at", since);
-  if (error) throw error;
+  if (error && !isUnavailableBlueprintRequestLedger(error, operation)) throw error;
   return count ?? 0;
 }
 
@@ -149,4 +153,15 @@ export async function persistPressureTest(
     .eq("id", projectId)
     .eq("user_id", userId);
   if (error) throw error;
+}
+
+export function isUnavailableBlueprintRequestLedger(
+  error: unknown,
+  operation: WorkflowOperation,
+): boolean {
+  return operation === "blueprint_generation"
+    && typeof error === "object"
+    && error !== null
+    && "code" in error
+    && error.code === "PGRST205";
 }

@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import type { BlueprintEditInput, BlueprintEntityType, ProductBlueprint } from "@/lib/domain/blueprint/schemas";
+import { readJsonResponseSafely, readTypedApiError } from "@/lib/errors/response";
 
 type Editable = ProductBlueprint["goals"][number] & { acceptanceCriteria?: string[]; sprintId?: string | null };
 
@@ -20,10 +21,14 @@ export function BlueprintEntityEditor({ projectId, type, entity, sprints, onSave
     if ("sprintId" in entity) changes.sprintId = String(data.get("sprintId") || "") || null;
     try {
       const response = await fetch(`/api/projects/${projectId}/blueprint`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entityType: type, entityId: entity.id, changes }) });
-      const result = await response.json() as { blueprint?: ProductBlueprint; error?: string };
+      const parsedResponse = await readJsonResponseSafely(response);
+      const result = parsedResponse.ok && typeof parsedResponse.body === "object" && parsedResponse.body !== null
+        ? parsedResponse.body as { blueprint?: ProductBlueprint }
+        : {};
       if (response.status === 401) requestFailure = "Your session expired. Sign in again, then retry. Your changes are still here.";
       else if (response.status === 403) requestFailure = "You do not have permission to change this blueprint.";
-      else if (!response.ok || !result.blueprint) requestFailure = result.error || "The change could not be saved. Your edits are still here. Retry.";
+      else if (!parsedResponse.ok) requestFailure = "The blueprint change was interrupted. Your edits are still here. Retry.";
+      else if (!response.ok || !result.blueprint) requestFailure = readTypedApiError(parsedResponse.body, "The change could not be saved. Your edits are still here. Retry.").message;
       if (requestFailure || !result.blueprint) throw new Error("Handled blueprint failure");
       onSaved(result.blueprint);
     } catch (caught) {

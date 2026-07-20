@@ -76,7 +76,7 @@ export function ArchitectureReveal({ result, onComplete }: Readonly<{ result?: B
           ))}
         </svg>
       </div>
-      <span className="eyebrow">Architecture formed</span>
+      <span className="eyebrow">Completed / Architecture formed</span>
       <h1>{STAGES[stage]}</h1>
       <p>{result ? MYCELLIUM_COPY.engineState[result.engineState] : "Mycel Core - Reliable mode"}. Built from the persisted foundation.</p>
       <Button onClick={finish} type="button">Open blueprint now</Button>

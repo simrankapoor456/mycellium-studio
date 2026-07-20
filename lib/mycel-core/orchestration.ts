@@ -19,6 +19,7 @@ import { PressureTestRequestSchema, PressureTestSchema } from "@/lib/domain/pres
 import { getProductTypeLabel } from "@/lib/domain/project/labels";
 import { requestAiBlueprint, requestAiDiscovery, requestAiPressureTest } from "@/lib/mycel-core/ai/openai";
 import { isOpenAiConfigured } from "@/lib/mycel-core/ai/provider";
+import { isProviderTimeout } from "@/lib/mycel-core/ai/timeout";
 import { authorizeOwnedProject } from "@/lib/mycel-core/decision/authorize";
 import { decideBlueprintExport, decideBlueprintGeneration, decideContextApproval } from "@/lib/mycel-core/decision/readiness";
 import { canContinueDiscovery, isWithinRateLimit, MYCEL_POLICIES } from "@/lib/mycel-core/decision/policies";
@@ -30,6 +31,7 @@ import {
   normalizeAiBlueprint,
   normalizeAiPressureTest,
   persistBlueprint,
+  recoverPersistedBlueprintGeneration,
 } from "@/lib/mycel-core/execution/blueprint";
 import {
   advanceDiscovery,
@@ -59,6 +61,7 @@ import {
   persistPressureTest,
 } from "@/lib/mycel-core/execution/persistence";
 import { WorkflowRequestInputSchema, type CoreOutcome, type DecisionStatus, type EngineState } from "@/lib/mycel-core/types";
+import { logBlueprintGeneration, safeGenerationErrorCode } from "@/lib/mycel-core/generation-logging";
 
 const ExportFormatSchema = z.enum(["markdown", "json", "csv"]);
 
@@ -251,34 +254,41 @@ export async function orchestrateBlueprintGeneration(
   const foundationDecision = decideContextApproval(approvedContext, calculateReadiness(approvedContext));
   if (foundationDecision.status !== "allowed") return failure(409, foundationDecision.explanation, foundationDecision.status);
 
-  const requestState = await beginWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation");
-  if (requestState.kind === "completed") return success(BlueprintGenerationResponseSchema.parse(requestState.response));
+  const requestId = requestDecision.value.requestId;
+  logBlueprintGeneration("generation_start", { requestId });
+
+  const persistedResponse = recoverPersistedBlueprintGeneration(access.data.project, requestId);
+  if (persistedResponse) {
+    try {
+      await completeWorkflowRequest(access.data.project.id, access.data.userId, requestId, "blueprint_generation", persistedResponse);
+    } catch (error) {
+      logBlueprintGeneration("request_ledger_completion_failed", { requestId, errorCode: safeGenerationErrorCode(error) }, "warn");
+    }
+    logBlueprintGeneration("persisted_result_recovered", { requestId });
+    return success(persistedResponse);
+  }
+
+  const requestState = await beginWorkflowRequest(access.data.project.id, access.data.userId, requestId, "blueprint_generation");
+  if (requestState.kind === "untracked") {
+    logBlueprintGeneration("request_ledger_unavailable", { requestId }, "warn");
+  }
+  if (requestState.kind === "completed") {
+    logBlueprintGeneration("persisted_result_recovered", { requestId });
+    return success(BlueprintGenerationResponseSchema.parse(requestState.response));
+  }
   if (requestState.kind === "pending") return failure(409, "That architecture request is already being processed.", "denied");
   const rateDecision = await enforceWorkflowRate(access.data.project.id, access.data.userId, "blueprint_generation");
   if (!rateDecision.ok) {
-    await failWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation");
+    await failWorkflowRequest(access.data.project.id, access.data.userId, requestId, "blueprint_generation");
     return rateDecision;
   }
 
   try {
-    if (
-      access.data.project.last_generation_request_id === requestDecision.value.requestId
-      && access.data.project.plan
-    ) {
-      const persistedBlueprint = ProductBlueprintSchema.parse(access.data.project.plan);
-      const persistedResponse = BlueprintGenerationResponseSchema.parse({
-        blueprint: persistedBlueprint,
-        generationSource: persistedBlueprint.generationSource,
-        engineState: persistedBlueprint.generationSource === "ai" ? "ai_enhanced" : "reliable",
-      });
-      await completeWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation", persistedResponse);
-      return success(persistedResponse);
-    }
-
     const now = new Date().toISOString();
     const providerConfigured = isOpenAiConfigured();
     let blueprint = generateDeterministicBlueprint(access.data.project, approvedContext, now);
     let useAi = false;
+    logBlueprintGeneration("generation_mode_selected", { requestId, mode: providerConfigured ? "ai" : "reliable" });
 
     if (providerConfigured) {
       try {
@@ -287,8 +297,16 @@ export async function orchestrateBlueprintGeneration(
         if (proposalDecision.status === "allowed") {
           blueprint = normalizeAiBlueprint(proposalDecision.value, access.data.project, approvedContext, now);
           useAi = true;
+        } else {
+          logBlueprintGeneration("reliable_fallback", { requestId, reason: "invalid_provider_response" }, "warn");
         }
-      } catch {
+      } catch (error) {
+        const timeout = isProviderTimeout(error);
+        logBlueprintGeneration(timeout ? "provider_timeout" : "provider_failure", {
+          requestId,
+          errorCode: safeGenerationErrorCode(error),
+        }, "warn");
+        logBlueprintGeneration("reliable_fallback", { requestId, reason: timeout ? "provider_timeout" : "provider_failure" }, "warn");
         useAi = false;
         blueprint = generateDeterministicBlueprint(access.data.project, approvedContext, now);
       }
@@ -299,11 +317,18 @@ export async function orchestrateBlueprintGeneration(
       generationSource: blueprint.generationSource,
       engineState: resolveEngineState(providerConfigured, useAi),
     });
-    await persistBlueprint(access.data.project.id, access.data.userId, blueprint, requestDecision.value.requestId);
-    await completeWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation", response);
+    try {
+      await persistBlueprint(access.data.project.id, access.data.userId, blueprint, requestId);
+      logBlueprintGeneration("persistence_success", { requestId, mode: blueprint.generationSource });
+    } catch (error) {
+      logBlueprintGeneration("persistence_failure", { requestId, errorCode: safeGenerationErrorCode(error) }, "error");
+      throw error;
+    }
+    await completeWorkflowRequest(access.data.project.id, access.data.userId, requestId, "blueprint_generation", response);
     return success(response);
-  } catch {
-    await failWorkflowRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId, "blueprint_generation");
+  } catch (error) {
+    await failWorkflowRequest(access.data.project.id, access.data.userId, requestId, "blueprint_generation");
+    logBlueprintGeneration("generation_failure", { requestId, errorCode: safeGenerationErrorCode(error) }, "error");
     return failure(500, "The blueprint could not be saved.", "denied");
   }
 }

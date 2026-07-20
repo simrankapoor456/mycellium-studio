@@ -1,5 +1,6 @@
-import { ProductBlueprintSchema, type ProductBlueprint } from "@/lib/domain/blueprint/schemas";
+import { BlueprintGenerationResponseSchema, ProductBlueprintSchema, type BlueprintGenerationResponse, type ProductBlueprint } from "@/lib/domain/blueprint/schemas";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
+import type { Project } from "@/lib/domain/project/schemas";
 
 export { applyBlueprintEdit } from "@/lib/blueprint/editing";
 export {
@@ -8,6 +9,19 @@ export {
   validateBlueprintLineage,
 } from "@/lib/blueprint/generate";
 export { persistBlueprint } from "@/lib/blueprint/persistence";
+
+export function recoverPersistedBlueprintGeneration(
+  project: Project,
+  requestId: string,
+): BlueprintGenerationResponse | null {
+  if (project.last_generation_request_id !== requestId || !project.plan) return null;
+  const blueprint = ProductBlueprintSchema.parse(project.plan);
+  return BlueprintGenerationResponseSchema.parse({
+    blueprint,
+    generationSource: blueprint.generationSource,
+    engineState: blueprint.generationSource === "ai" ? "ai_enhanced" : "reliable",
+  });
+}
 
 export function generateReliablePressureTest(blueprintInput: ProductBlueprint): PressureTest {
   const blueprint = ProductBlueprintSchema.parse(blueprintInput);

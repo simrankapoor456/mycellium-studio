@@ -45,8 +45,9 @@ describe("Phase 6 foundation experience", () => {
     const { rerender } = render(<GenerationWorkspace error="" onRetry={retry} onReturn={back} />);
     expect(screen.getByRole("heading", { name: /Creating a Product Blueprint/ })).toBeVisible();
     expect(screen.getByText("Waiting for a persisted result")).toBeVisible();
-    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Blueprint generation status" })).toHaveTextContent("Preparing foundationSubmittedArchitecting productIn progressSaving blueprintWaiting for a validated resultCompletedConfirmed only after persistence");
     rerender(<GenerationWorkspace error="The blueprint could not be saved." onRetry={retry} onReturn={back} />);
+    expect(screen.getByRole("list", { name: "Blueprint generation status" })).toHaveTextContent("Interrupted / Retry");
     fireEvent.click(screen.getByRole("button", { name: "Retry blueprint generation" }));
     fireEvent.click(screen.getByRole("button", { name: "Return to foundation review" }));
     expect(retry).toHaveBeenCalledOnce(); expect(back).toHaveBeenCalledOnce();

@@ -14,6 +14,7 @@ import { ReviewFactList } from "@/components/discovery/ReviewFactList";
 import { ProjectWorkspaceNav } from "@/components/projects/ProjectWorkspaceNav";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { BlueprintGenerationResponseSchema, type BlueprintGenerationResponse } from "@/lib/domain/blueprint/schemas";
+import { BLUEPRINT_INTERRUPTED_MESSAGE, readJsonResponseSafely, readTypedApiError } from "@/lib/errors/response";
 import {
   DiscoveryReviewResponseSchema,
   FoundationApprovalDetailsSchema,
@@ -41,6 +42,7 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
   const [mutationFeedback, setMutationFeedback] = useState<Readonly<{ targetId: string; status: "success" | "error"; message: string }> | null>(null);
   const blockerElements = useRef(new Map<string, HTMLElement>());
   const generationRequestId = useRef<string | null>(null);
+  const generationInFlight = useRef(false);
 
   const registerBlocker = useCallback((targetId: string, element: HTMLElement | null) => {
     if (element) blockerElements.current.set(targetId, element);
@@ -86,17 +88,36 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
   }
 
   async function handleArchitect() {
+    if (generationInFlight.current) return;
+    generationInFlight.current = true;
     generationRequestId.current ??= crypto.randomUUID();
     setGenerationState("requested"); setError("");
     try {
       const response = await fetch(`/api/projects/${projectId}/blueprint`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId: generationRequestId.current }) });
-      const body: unknown = await response.json();
-      if (!response.ok) throw new Error(readErrorMessage(body, MYCELLIUM_COPY.generation.failure));
-      const result = BlueprintGenerationResponseSchema.parse(body);
+      const parsedResponse = await readJsonResponseSafely(response);
+      if (!parsedResponse.ok) {
+        setError(parsedResponse.error.message);
+        setGenerationState("failed");
+        return;
+      }
+      if (!response.ok) {
+        setError(readTypedApiError(parsedResponse.body).message);
+        setGenerationState("failed");
+        return;
+      }
+      const parsedResult = BlueprintGenerationResponseSchema.safeParse(parsedResponse.body);
+      if (!parsedResult.success) {
+        setError(BLUEPRINT_INTERRUPTED_MESSAGE);
+        setGenerationState("failed");
+        return;
+      }
+      const result = parsedResult.data;
       setGenerationResult(result); setHasBlueprint(true); setGenerationState("revealing");
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : MYCELLIUM_COPY.generation.failure);
+    } catch {
+      setError(BLUEPRINT_INTERRUPTED_MESSAGE);
       setGenerationState("failed");
+    } finally {
+      generationInFlight.current = false;
     }
   }
 

@@ -494,6 +494,21 @@
 .generation-workspace__truth strong { color: var(--text-primary); font-size: 0.85rem; }
 .generation-workspace__truth small { color: var(--text-muted); font-size: 0.7rem; }
 
+.generation-workspace__status {
+  display: grid;
+  width: min(100%, 34rem);
+  margin-top: 1.5rem;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-control);
+  text-align: left;
+}
+.generation-workspace__status li { display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line-default); }
+.generation-workspace__status li:last-child { border-bottom: 0; }
+.generation-workspace__status strong { color: var(--text-primary); font-size: 0.78rem; }
+.generation-workspace__status small { color: var(--text-muted); font-size: 0.68rem; text-align: right; }
+.generation-workspace__status [data-state="complete"] small { color: var(--action-success-background); }
+.generation-workspace__status [data-state="interrupted"] small { color: var(--action-destructive-background); }
+
 .blueprint-export-panel__meta { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; margin-top: 1rem; }
 .blueprint-export-panel__meta div { display: grid; gap: 0.2rem; }
 .blueprint-export-panel__meta dt { color: var(--text-muted); font: 650 0.6rem var(--font-system); text-transform: uppercase; }

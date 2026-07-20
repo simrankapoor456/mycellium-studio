@@ -13,6 +13,7 @@ import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-tes
 import type { Project } from "@/lib/domain/project/schemas";
 import { BLUEPRINT_INSTRUCTIONS, DISCOVERY_INSTRUCTIONS, PRESSURE_TEST_INSTRUCTIONS } from "@/lib/mycel-core/ai/prompts";
 import { createOpenAiProvider, isOpenAiConfigured } from "@/lib/mycel-core/ai/provider";
+import { BLUEPRINT_PROVIDER_TIMEOUT_MS, withProviderTimeout } from "@/lib/mycel-core/ai/timeout";
 
 type ConversationMessage = Readonly<{ role: string; content: string }>;
 
@@ -63,25 +64,32 @@ export async function requestAiBlueprint(
   }
 
   const approvedContext = DiscoveryContextSchema.parse(approvedContextInput);
-  const response = await provider.client.responses.parse({
-    model: provider.model,
-    store: false,
-    instructions: BLUEPRINT_INSTRUCTIONS,
-    input: [{
-      role: "user",
-      content: JSON.stringify({
-        untrustedProject: {
-          id: project.id,
-          name: project.name,
-          projectType: project.project_type,
-          customProjectType: project.custom_project_type,
-          capacity: project.capacity,
-        },
-        approvedContext,
-      }),
-    }],
-    text: { format: zodTextFormat(ProductBlueprintSchema, "mycellium_product_blueprint_proposal") },
-  });
+  const response = await withProviderTimeout(
+    (signal) => provider.client.responses.parse({
+      model: provider.model,
+      store: false,
+      instructions: BLUEPRINT_INSTRUCTIONS,
+      input: [{
+        role: "user",
+        content: JSON.stringify({
+          untrustedProject: {
+            id: project.id,
+            name: project.name,
+            projectType: project.project_type,
+            customProjectType: project.custom_project_type,
+            capacity: project.capacity,
+          },
+          approvedContext,
+        }),
+      }],
+      text: { format: zodTextFormat(ProductBlueprintSchema, "mycellium_product_blueprint_proposal") },
+    }, {
+      maxRetries: 0,
+      signal,
+      timeout: BLUEPRINT_PROVIDER_TIMEOUT_MS - 1_000,
+    }),
+    BLUEPRINT_PROVIDER_TIMEOUT_MS,
+  );
 
   if (!response.output_parsed) {
     throw new Error("AI blueprint output was unavailable.");
