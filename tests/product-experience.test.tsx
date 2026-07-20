@@ -19,11 +19,11 @@ vi.mock("@/app/(auth)/actions", () => ({
 
 describe("Mycellium brand and navigation", () => {
   it("renders the brand mark and home link", () => {
-    const { container } = render(<BrandLogo />);
-    const image = container.querySelector("img");
+    render(<BrandLogo />);
+    const link = screen.getByRole("link", { name: "Mycellium Studio home" });
 
-    expect(screen.getByRole("link", { name: "Mycellium Studio home" })).toHaveAttribute("href", "/");
-    expect(image).toHaveAttribute("src", expect.stringContaining("mycellium-mark.svg"));
+    expect(link).toHaveAttribute("href", "/");
+    expect(link.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("provides every required landing navigation target", () => {
