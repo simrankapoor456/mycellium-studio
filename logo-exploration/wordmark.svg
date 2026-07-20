@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" role="img" aria-labelledby="title desc">
+  <title id="title">Mycellium Studio wordmark</title>
+  <desc id="desc">Mycellium in an editorial serif with Studio tracked beneath between two rules.</desc>
+  <g fill="currentColor" color="#08110E">
+    <text x="210" y="74" text-anchor="middle" font-family="Iowan Old Style, Baskerville, Georgia, serif" font-size="62" font-weight="500" letter-spacing="-1.8">Mycellium</text>
+    <g transform="translate(0 108)">
+      <rect x="34" y="0" width="86" height="2" rx="1"/>
+      <text x="210" y="7" text-anchor="middle" font-family="Inter, Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="600" letter-spacing="9">STUDIO</text>
+      <rect x="300" y="0" width="86" height="2" rx="1"/>
+    </g>
+  </g>
+</svg>

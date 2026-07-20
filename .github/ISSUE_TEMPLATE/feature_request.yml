@@ -1,0 +1,48 @@
+name: Product proposal
+description: Suggest a focused improvement aligned with the product principles.
+title: "proposal: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Product need
+      description: Describe the user need or product decision this would support.
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current experience
+      description: Explain how the need is handled today and where the friction appears.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the result without prescribing a large implementation.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Product area
+      options:
+        - Public experience
+        - Authentication
+        - Dashboard and project shell
+        - Discovery
+        - Foundation Review
+        - Blueprint and export
+        - Profile
+        - Developer experience
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints or alternatives
+      description: Note relevant accessibility, security, compatibility, or workflow considerations.

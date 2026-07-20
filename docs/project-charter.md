@@ -1,85 +1,50 @@
-# mycellium studio Project Charter
+# Mycellium Studio project charter
 
-## Product Statement
+## Product statement
 
-mycellium studio is an AI-powered SDLC planning orchestrator that transforms raw software ideas, feature requests, meeting notes, or product briefs into structured sprint-ready execution plans.
+Mycellium Studio is an AI Product Architect that helps founders and product teams turn rough ideas into grounded product understanding, architecture, scope, requirements, and reviewable execution plans.
 
 ## Problem
 
-Early project planning is often messy. Ideas arrive as loose notes, stakeholder requests, or vague product descriptions. Turning those inputs into epics, stories, tasks, estimates, dependencies, and sprint plans takes time and usually requires repeated manual cleanup.
+Early planning often arrives as loose notes, stakeholder requests, and assumptions. Converting that material into coherent scope, stories, tasks, dependencies, review questions, and sprint allocations takes time and can hide uncertainty.
 
-mycellium studio reduces that planning overhead by using an automated workflow with AI-assisted decomposition, validation, and export-ready formatting.
+mycellium studio creates a structured first pass while keeping facts, assumptions, missing requirements, and human review points visible.
 
-## Target Users
+## Target users
 
-- Solo builders planning software projects
-- Product managers creating first-pass backlogs
-- Engineering leads preparing sprint work
-- Agencies converting client briefs into delivery plans
-- Student or early-career developers learning structured SDLC planning
+- Solo builders planning a first release
+- Product managers shaping an initial backlog
+- Engineering leads preparing delivery work
+- Agencies translating client briefs into plans
+- Student and capstone teams learning structured software planning
 
-## MVP Goal
+## Phase 1 goal
 
-Prove that mycellium studio can reliably turn a rough project description into useful planning artifacts that need only light editing before use.
+Prove the technical contract before introducing service dependencies. Given the same valid input, the local planner must return the same schema-valid plan and export it to portable formats.
 
-The MVP does not need to automate the entire SDLC. It only needs to prove that the core planning workflow is valuable.
+## Phase 1 success criteria
 
-## In Scope
+- The application installs, lints, typechecks, tests, and builds reproducibly.
+- Runtime input and output contracts have one canonical Zod source.
+- Identical input produces identical output.
+- Markdown, JSON, and CSV exports are derived from the canonical plan.
+- The original prototype remains available unchanged under `legacy-static/`.
+- No secrets or unapproved service integrations enter the repository.
 
-- Accept a project description
-- Optionally accept team size, sprint duration, sprint count, deadline, priority, and tech stack
-- Analyze requirements
-- Identify goals, assumptions, risks, constraints, and missing details
-- Generate epics
-- Generate user stories
-- Generate acceptance criteria
-- Generate technical tasks and subtasks
-- Estimate effort using a simple scale
-- Allocate work into sprints
-- Produce readable Markdown output
-- Produce structured JSON output
-- Add a human approval step before external publishing
+## Product principles
 
-## Out of Scope For Version 1
+- Ground plans in supplied context.
+- Separate known facts from assumptions.
+- Make missing information visible.
+- Require human judgment before external publishing.
+- Keep portable data contracts independent of UI and vendors.
+- Add infrastructure only when a validated product need requires it.
 
-- Autonomous code generation
-- Deployment pipelines
-- Full QA automation
-- Multi-agent orchestration
-- Multi-model voting
-- Advanced analytics dashboards
-- Live team collaboration
-- Perfect effort estimation
-- Full RAG or memory system
+## Phase 1 non-goals
 
-## Success Metrics
-
-- A user can submit one rough project idea and receive a usable sprint plan.
-- Generated epics, stories, and tasks are understandable and relevant.
-- Sprint grouping feels logical.
-- At least 70 percent of generated tasks need only light editing.
-- The output saves real planning time compared with starting from a blank page.
-
-## Key Risks
-
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| Vague inputs | Output becomes generic or inaccurate | Add required fields and clarification questions |
-| Hallucinated features | Users lose trust | Separate extracted facts from assumptions |
-| Overbuilt workflow | Debugging becomes slow | Start with one model and one linear workflow |
-| Bad tickets pushed to tools | External systems get polluted | Require human approval before publishing |
-| Scope creep | MVP stalls | Keep version 1 focused on idea-to-sprint-plan |
-
-## First Demo Definition
-
-The first demo should accept a plain project brief and return:
-
-- Project summary
-- Epics
-- User stories
-- Acceptance criteria
-- Technical tasks
-- Sprint plan
-- Optional Jira or Trello-ready payload preview
-
-The demo is successful if the planning output feels immediately usable.
+- Accounts, authentication, or permissions
+- Saved workspaces or database persistence
+- AI-generated output or provider selection
+- Billing, teams, and collaboration
+- Direct publication to third-party tools
+- Autonomous software delivery

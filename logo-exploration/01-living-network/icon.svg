@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Living Network</title>
+  <desc id="desc">A compact central spine branches into five rounded terminals.</desc>
+  <g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 80V48C50 39 44 35 34 28"/>
+    <path d="M50 53C50 43 57 39 68 31"/>
+    <path d="M50 62C41 62 35 58 27 51"/>
+    <path d="M50 70C60 70 66 65 74 57"/>
+    <path d="M50 48V21"/>
+  </g>
+  <g fill="currentColor">
+    <circle cx="50" cy="80" r="5.5"/><circle cx="34" cy="28" r="5"/><circle cx="68" cy="31" r="5"/>
+    <circle cx="27" cy="51" r="5"/><circle cx="74" cy="57" r="5"/><circle cx="50" cy="21" r="5.5"/>
+  </g>
+</svg>

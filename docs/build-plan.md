@@ -1,180 +1,92 @@
-# mycellium studio Build Plan
+# mycellium studio build phases
 
-## Phase 0: Definition
+## Phase 1 - application and domain foundation
 
-Goal: make the MVP clear before building.
+Status: implemented on `feat/fullstack-mvp`.
 
-Deliverables:
+- Preserved the static prototype under `legacy-static/`.
+- Added Next.js App Router, TypeScript, Tailwind CSS, ESLint, and Vitest.
+- Added canonical Zod plan schemas, a deterministic planner, and typed exports.
+- Added the initial server-rendered landing page and architecture documentation.
 
-- Product statement
-- MVP scope
-- Input format
-- Output schema
-- Success metrics
-- First demo scenario
+## Phase 2 - secure personal-user foundation
 
-Acceptance criteria:
+Status: implemented on `feat/fullstack-mvp`.
 
-- The MVP can be explained in one sentence.
-- The first workflow has a fixed input and output contract.
-- Out-of-scope features are documented.
+- Added typed Supabase SSR clients and Next.js Proxy session refresh.
+- Added email/password signup, confirmation, login, logout, and protected routes.
+- Added profiles, projects, and discovery messages with constraints and triggers.
+- Enabled RLS with explicit personal-ownership policies.
+- Added dashboard and project create, read, metadata update, rename, duplicate, and delete flows.
+- Added loading, error, and empty states.
+- Added focused tests for environment, project, ownership, duplication, schemas, and safe errors.
+- Documented database, Auth, redirect, deployment, and two-user RLS setup.
 
-## Phase 1: Basic n8n Pipeline
+Acceptance gates:
 
-Goal: build the first working idea-to-plan workflow.
+```bash
+npm install
+npm test
+npm run lint
+npx tsc --noEmit
+npm run build
+npm audit
+```
 
-Tasks:
+## Deferred beyond Phase 2
 
-- Set up n8n locally or in n8n Cloud
-- Create webhook or form trigger
-- Add input cleanup step
-- Connect one LLM provider
-- Build requirement analyzer step
-- Build epic generator step
-- Build story generator step
-- Generate final Markdown output
+- Conversational discovery and OpenAI/LLM calls
+- Complete plan editor and workspace
+- Billing and subscriptions
+- Teams and collaboration
+- Direct external integrations
 
-Acceptance criteria:
+These are not stubbed with fake output or privileged credentials. A later phase must define its own scope and security review before implementation.
 
-- A user can submit a project brief.
-- mycellium studio returns a project summary, epics, and user stories.
-- The workflow can be run repeatedly with different inputs.
+## Phase 3A - product experience and brand system
 
-## Phase 2: Structured Outputs
+Status: implemented on `feat/fullstack-mvp`.
 
-Goal: make outputs reliable enough for automation.
+- Added the original rooted-M SVG logo, favicon, touch icon, lockup, and social card.
+- Established semantic color, typography, spacing, focus, and motion tokens.
+- Built the complete responsive marketing experience and interactive product-stage example.
+- Polished authentication, dashboard, project cards, forms, loading, error, and empty states.
+- Replaced browser confirmation prompts with an accessible native dialog.
+- Added metadata, canonical URL handling, Open Graph, and Twitter presentation.
+- Added component-level interaction and accessibility-sensitive tests.
+- Documented logo usage, tokens, primitives, motion, accessibility, content, and responsive rules.
 
-Tasks:
+Phase 3A does not add OpenAI calls, adaptive discovery, generated-plan persistence, complete project editing, billing, teams, or integrations.
 
-- Define JSON schema
-- Enforce structured LLM responses
-- Add acceptance criteria to stories
-- Add task and subtask generation
-- Add priority tags
-- Add story point estimates
-- Store output in a simple system such as Google Sheets, Notion, Airtable, or Supabase
+## Phase 3A.5 - signature experience
 
-Acceptance criteria:
+Status: implemented on `feat/fullstack-mvp`.
 
-- Workflow returns valid JSON.
-- Every story has acceptance criteria.
-- Every story has at least one task.
-- Every story has priority and effort.
+- Introduced the Living Architecture Product Graph as a shared hero, narrative, and workflow language.
+- Added a five-stage scroll story with a sticky desktop visualization and complete mobile/static fallback.
+- Rebuilt the fixed-data Discover, Architect, and Execute example with keyboard-operable tabs.
+- Added readiness, scope, dependency, work-hierarchy, and sprint-allocation diagrams.
+- Defined explicit spatial elevation and motion tiers with reduced-motion behavior.
+- Carried calmer versions of the surface language into authentication, dashboard, project, empty, loading, and error states.
+- Preserved the Phase 3A authentication, Supabase, CRUD, RLS, metadata, and responsive behavior.
 
-## Phase 3: Sprint Planning Engine
+Phase 3A.5 remains presentation-only. It makes no external model request and does not add adaptive discovery or new persistence behavior.
 
-Goal: group work into logical sprints.
+## Phase 3B - core product experience
 
-Tasks:
+Status: implemented on `feat/fullstack-mvp`.
 
-- Add dependency extraction
-- Add sprint count and sprint duration handling
-- Add sprint allocation prompt
-- Add sprint goals
-- Add simple capacity assumptions
-- Flag overloaded sprints
+- Added the responsive conversation and Living Product Graph workspace.
+- Added adaptive fact extraction, explicit unknowns, contradiction history, graph changes, and rooted readiness.
+- Added persisted review, assumption decisions, contradiction resolution, acceptable unknowns, and context approval.
+- Added a skippable, reduced-motion-safe architecture reveal.
+- Added a versioned canonical Product Blueprint with visible lineage and controlled editing.
+- Added authenticated discovery, review, blueprint, and persisted export APIs.
+- Added optional server-only OpenAI Responses structured output with bounded retry/timeout and contract-identical deterministic fallback.
+- Added a Phase 3B migration for approval/version metadata and idempotent discovery requests under RLS.
 
-Acceptance criteria:
+Phase 3B does not add billing, subscriptions, teams, collaboration, or external publishing integrations.
 
-- Stories are assigned to sprints.
-- Foundational work appears before dependent work.
-- Each sprint has a clear goal.
-- Sprint load is visible to the user.
+## Preservation policy
 
-## Phase 4: Review And Validation
-
-Goal: improve trust and reduce bad output.
-
-Tasks:
-
-- Add critic/reviewer node
-- Detect missing acceptance criteria
-- Detect duplicate stories
-- Detect oversized stories
-- Detect unsupported assumptions
-- Generate clarification questions when input is vague
-- Add human approval gate
-
-Acceptance criteria:
-
-- The workflow can flag quality issues.
-- Vague project briefs produce clarification questions.
-- External publishing requires approval.
-
-## Phase 5: Tool Integrations
-
-Goal: make mycellium studio usable with real planning tools.
-
-Tasks:
-
-- Create Jira-ready issue payloads
-- Create Trello-ready card payloads
-- Add optional Jira issue creation
-- Add optional Trello card creation
-- Add Notion or Confluence documentation export
-- Add Slack summary notification
-
-Acceptance criteria:
-
-- Approved plans can be exported.
-- Tool payloads preserve epic, story, task, priority, and estimate data.
-- Failed exports are logged clearly.
-
-## Phase 6: Advanced Intelligence
-
-Goal: expand only after the MVP proves value.
-
-Possible additions:
-
-- Risk scoring
-- Capacity planning
-- Project templates
-- Architecture suggestions
-- Test case generation
-- Release planning
-- Historical project retrieval
-- Multi-model critique
-- Backlog grooming
-
-## Week 1 Task List
-
-1. Write the product statement.
-2. Finalize MVP scope.
-3. Choose input fields and defaults.
-4. Choose the first LLM provider.
-5. Set up n8n.
-6. Build webhook or form trigger.
-7. Build requirement analyzer prompt.
-8. Build epic and story generation prompts.
-9. Test with three sample projects.
-10. Document output quality gaps.
-
-## Week 2 Task List
-
-1. Add structured JSON schema.
-2. Add task generation.
-3. Add acceptance criteria.
-4. Add priority and estimate fields.
-5. Add sprint allocation.
-6. Generate Markdown from structured output.
-7. Save outputs to a simple storage layer.
-8. Run five more test briefs.
-
-## Week 3 Task List
-
-1. Add critic/reviewer step.
-2. Add missing info detection.
-3. Add clarification question path.
-4. Add human approval gate.
-5. Add Jira or Trello payload preview.
-6. Polish first demo workflow.
-7. Record demo input and output examples.
-
-## Week 4 Task List
-
-1. Add one real external integration.
-2. Improve prompts using test results.
-3. Add basic error logging.
-4. Create user-facing documentation.
-5. Package the demo.
-6. Decide whether to continue with n8n only or add a backend service.
+`legacy-static/` is the immutable reference snapshot for the pre-Next.js prototype. Modern application work must not silently rewrite that snapshot.

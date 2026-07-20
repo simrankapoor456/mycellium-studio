@@ -342,7 +342,7 @@ function buildReview(epics, missing, risks) {
     clarifying_questions: [
       ...missing.map((item) => `Please confirm: ${item}`),
       "Who is the first target user for the MVP?",
-      "What must be included in Sprint 1 for the demo to feel successful?",
+      "What must be included in Sprint 1 for the first release to feel successful?",
     ].slice(0, 5),
   };
 }
@@ -385,7 +385,7 @@ function inferMissingRequirements(brief) {
   if (!lower.includes("export") && !lower.includes("download") && !lower.includes("share")) {
     missing.push("handoff or export format");
   }
-  if (!lower.includes("deadline") && !lower.includes("sprint") && !lower.includes("week")) {
+  if (!lower.includes("target date") && !lower.includes("sprint") && !lower.includes("week")) {
     missing.push("timeline or delivery target");
   }
   if (!lower.includes("success") && !lower.includes("goal") && !lower.includes("useful")) {

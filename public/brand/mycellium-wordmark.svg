@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 118" role="img" aria-labelledby="title">
+  <title id="title">Mycellium Studio</title>
+  <text x="270" y="62" fill="#f1f0e7" font-family="Georgia, Times New Roman, serif" font-size="66" text-anchor="middle">Mycellium</text>
+  <path d="M133 91H207M333 91H407" stroke="#b9ed66" stroke-width="1.5"/>
+  <text x="270" y="98" fill="#b9ed66" font-family="Aptos, Segoe UI, sans-serif" font-size="15" letter-spacing="10" text-anchor="middle">STUDIO</text>
+</svg>

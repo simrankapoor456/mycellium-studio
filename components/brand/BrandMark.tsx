@@ -1,0 +1,44 @@
+import { cn } from "@/lib/class-names";
+
+type BrandMarkProps = Readonly<{
+  animated?: boolean;
+  className?: string;
+  label?: string;
+}>;
+
+export function BrandMark({ animated = false, className, label }: BrandMarkProps) {
+  const accessibility = label
+    ? { role: "img", "aria-label": label }
+    : { "aria-hidden": true as const };
+
+  return (
+    <svg
+      {...accessibility}
+      className={cn("brand-mark", animated && "brand-mark--animated", className)}
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g className="brand-mark__connect" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M50 43V15M50 30C44 27 40 22 40 15M50 31C57 28 60 23 60 17" />
+        <path d="M50 57V85M50 70C43 73 40 78 40 85M50 69C57 72 60 77 60 83" />
+        <path d="M44 48C35 47 31 40 24 35M33 43C27 43 23 40 19 36M28 38C29 32 27 28 23 25" />
+        <path d="M56 48C65 47 69 40 76 35M67 43C73 43 77 40 81 36M72 38C71 32 73 28 77 25" />
+        <path d="M45 54C37 58 33 65 26 69M34 62C28 60 23 62 19 66M29 67C29 73 26 77 22 80" />
+        <path d="M55 54C63 58 67 65 74 69M66 62C72 60 77 62 81 66M71 67C71 73 74 77 78 80" />
+      </g>
+      <path className="brand-mark__form" d="M50 40C55 44 58 49 56 53C54 57 51 59 50 62C49 59 46 57 44 53C42 49 45 44 50 40Z" fill="currentColor" />
+      <g className="brand-mark__grow" fill="currentColor">
+        <circle cx="50" cy="13" r="3.7" /><circle cx="50" cy="87" r="3.7" />
+        <circle cx="17" cy="35" r="3.2" /><circle cx="83" cy="35" r="3.2" />
+        <circle cx="17" cy="67" r="3.2" /><circle cx="83" cy="67" r="3.2" />
+      </g>
+      <g className="brand-mark__settle" fill="currentColor">
+        <circle cx="40" cy="13" r="2.6" /><circle cx="60" cy="15" r="2.5" />
+        <circle cx="40" cy="87" r="2.6" /><circle cx="60" cy="85" r="2.5" />
+        <circle cx="21" cy="23" r="2.5" /><circle cx="79" cy="23" r="2.5" />
+        <circle cx="20" cy="82" r="2.5" /><circle cx="80" cy="82" r="2.5" />
+      </g>
+      <circle className="brand-mark__spark" cx="50" cy="50" fill="currentColor" r="2.4" />
+    </svg>
+  );
+}
