@@ -73,6 +73,10 @@ Spacing follows a compact base rhythm with larger editorial jumps between narrat
 | `BrandLogo` | Home or dashboard link with canonical mark and typographic wordmark |
 | `Button` / `ButtonLink` | Intelligence-primary, neutral-secondary, quiet, destructive, compact, disabled, active, and focus states |
 | `FormField` | Visible label, hint/error association, stable input surface, and explicit validation state |
+| `TextField` / `TextareaField` / `SelectField` | Shared label, requirement, hint, inline error, focus, and disabled behavior |
+| `ComboboxField` | Searchable, keyboard-operable listbox for structured string values |
+| `FormActionMessage` | Live-region success and classified failure with bounded recovery |
+| `FormSubmitButton` / `DirtyIndicator` | Idle, pending, saved, retry, and unsaved-state vocabulary |
 | `Card` | One semantic content boundary using the content-surface tier |
 | `Badge` | Text-backed neutral, success, warning, danger, and accent states |
 | `ConfirmDialog` | Native dialog behavior with focused overlay treatment |
@@ -82,6 +86,17 @@ Spacing follows a compact base rhythm with larger editorial jumps between narrat
 | `ProjectWorkspaceNav` | Data-backed journey state, current project context, locked-stage explanation, and export access |
 
 Phase 7.1 applies these foundations across existing routes without replacing the internal workspace structures reserved for Phase 7.2.
+
+### Form trust
+
+- Labels always sit above controls. Required and optional status is explicit in text and native semantics.
+- Invalid controls use the danger token for the border and a low-opacity danger focus halo. Error meaning is also expressed in text.
+- Save actions use one vocabulary: idle, pending, saved, retry, and failed. Buttons disable while pending.
+- Dirty state sits beside the action. Navigation warnings appear only while current values differ from the last confirmed save.
+- Success toasts are supplemental. Inline live-region status remains available in document flow.
+- Project-entry atmosphere uses static radial gradients and existing forest, intelligence, gold, surface, radius, and shadow tokens.
+
+See [Form guidelines](./form-guidelines.md), [Validation strategy](./validation-strategy.md), [Error handling](./error-handling.md), and [Form trust layer](./form-trust-layer.md).
 
 ## Motion
 

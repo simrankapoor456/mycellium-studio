@@ -30,6 +30,7 @@ Current capabilities include:
 - optional structured OpenAI generation behind a server-only boundary
 - deterministic Reliable mode using the same canonical Zod contracts
 - private Supabase-backed projects protected by ownership checks and row-level security
+- client-and-server form validation, user-scoped project drafts, dirty-state warnings, and actionable recovery states
 
 ## Current visuals
 
@@ -164,6 +165,10 @@ legacy-static/               Preserved pre-Next.js prototype
 - [Phase 7.1 review](docs/phase-7-1-review.md)
 - [Phase 7.2 review](docs/phase-7-2-review.md)
 - [Living Product Experience](docs/living-product-experience.md)
+- [Form guidelines](docs/form-guidelines.md)
+- [Validation strategy](docs/validation-strategy.md)
+- [Error handling](docs/error-handling.md)
+- [Form trust layer](docs/form-trust-layer.md)
 - [Phase 7.3 scroll-story concept](docs/phase-7-3-scroll-story-concept.md)
 - [MVP architecture](docs/mvp-architecture.md)
 - [Supabase and authentication setup](docs/supabase-setup.md)
@@ -182,7 +187,7 @@ legacy-static/               Preserved pre-Next.js prototype
 
 ## Project status
 
-Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; route and trust refinements; and the Living Product Experience across public storytelling, Foundation, architecture, Blueprint, and dashboard surfaces.
+Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; resilient form validation and draft recovery; and the Living Product Experience across public storytelling, Foundation, architecture, Blueprint, and dashboard surfaces.
 
 Active development: advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
 
