@@ -25,7 +25,10 @@ export default async function DiscoverPage({ params }: { params: Promise<{ id: s
   const blueprint = project.plan ? ProductBlueprintSchema.safeParse(project.plan) : null;
   const downstreamItems = blueprint?.success ? buildDownstreamItems(blueprint.data) : {};
 
-  return <DiscoveryWorkspace blueprintAvailable={project.plan_schema_version === "2.0" && Boolean(project.plan)} downstreamItems={downstreamItems} foundationApproved={Boolean(project.discovery_approved_at)} initialContext={context} initialEngineState={lastTurn?.engineState ?? "reliable"} initialMessages={messages.map((message) => ({ id: message.id, role: message.role, content: message.content }))} initialReadiness={readiness} projectId={project.id} projectName={project.name} />;
+  return <DiscoveryWorkspace blueprintAvailable={project.plan_schema_version === "2.0" && Boolean(project.plan)} downstreamItems={downstreamItems} foundationApproved={Boolean(project.discovery_approved_at)} initialContext={context} initialEngineState={lastTurn?.engineState ?? "reliable"} initialMessages={messages.map((message) => {
+    const turn = DiscoveryTurnResponseSchema.safeParse(message.structured_facts);
+    return { id: message.id, role: message.role, content: turn.success ? turn.data.assistantMessage : message.content };
+  })} initialReadiness={readiness} projectId={project.id} projectName={project.name} />;
 }
 
 function buildDownstreamItems(blueprint: ProductBlueprint): Record<string, string[]> {

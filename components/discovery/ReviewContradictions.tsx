@@ -1,5 +1,6 @@
 import { FormEvent } from "react";
 
+import { Button } from "@/components/ui/Button";
 import type { DiscoveryContext, DiscoveryReviewInput } from "@/lib/domain/discovery/schemas";
 
 type Props = Readonly<{ context: DiscoveryContext; pending: boolean; blockingTargetIds?: ReadonlySet<string>; onBlockerRef?: (targetId: string, element: HTMLElement | null) => void; onMutate: (input: DiscoveryReviewInput) => void }>;
@@ -12,6 +13,6 @@ export function ReviewContradictions({ context, pending, blockingTargetIds = new
     return <form data-blocking={blockingTargetIds.has(targetId)} id={targetId} key={item.id} ref={(element) => onBlockerRef?.(targetId, element)} tabIndex={-1} onSubmit={(event: FormEvent<HTMLFormElement>) => {
       event.preventDefault(); const data = new FormData(event.currentTarget);
       onMutate({ action: "resolve_contradiction", contradictionId: item.id, resolution: String(data.get("resolution")), confirmedFactId: String(data.get("confirmedFactId")) });
-    }}><strong>{item.description}</strong><label>Direction to keep<select name="confirmedFactId">{item.factIds.map((id) => { const fact = context.facts.find((candidate) => candidate.id === id); return <option key={id} value={id}>{fact?.value ?? "Available direction"}</option>; })}</select></label><label>Reason<input name="resolution" placeholder="Why this direction fits the product" required /></label><button disabled={pending} type="submit">Keep this direction</button></form>;
+    }}><strong>{item.description}</strong><label>Direction to keep<select name="confirmedFactId">{item.factIds.map((id) => { const fact = context.facts.find((candidate) => candidate.id === id); return <option key={id} value={id}>{fact?.value ?? "Available direction"}</option>; })}</select></label><label>Reason<input name="resolution" placeholder="Why this direction fits the product" required /></label><Button disabled={pending} type="submit">Keep this direction</Button></form>;
   })}</section>;
 }

@@ -138,14 +138,24 @@ export const DiscoveryContextSchema = z.object({
   updatedAt: z.string().datetime({ offset: true }),
 });
 
-export const DiscoveryTurnInputSchema = z.object({
+export const DiscoveryTurnInputSchema = z.discriminatedUnion("action", [
+  z.object({
+    requestId: z.string().uuid(),
+    action: z.literal("answer"),
+    message: z.string().trim().min(1, "Share a little more context.").max(4_000),
+  }),
+  z.object({ requestId: z.string().uuid(), action: z.literal("mark_unknown") }),
+  z.object({ requestId: z.string().uuid(), action: z.literal("ask_later") }),
+]).or(z.object({
   requestId: z.string().uuid(),
   message: z.string().trim().min(1, "Share a little more context.").max(4_000),
-});
+}).transform((value) => ({ ...value, action: "answer" as const })));
 
 export const DiscoveryTurnResponseSchema = z.object({
   assistantMessage: z.string().trim().min(1).max(2_000),
   assistantQuestion: z.string().trim().min(1).max(500),
+  questionId: z.string().trim().min(1).max(120).default("review"),
+  questionCategory: FactCategorySchema.default("unknowns"),
   questionReason: z.string().trim().min(1).max(500),
   extractedFacts: z.array(DiscoveryFactSchema).max(20),
   updatedFacts: z.array(DiscoveryFactSchema).max(20),
