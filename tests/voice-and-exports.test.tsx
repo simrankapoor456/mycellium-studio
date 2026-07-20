@@ -16,13 +16,14 @@ afterEach(() => {
 });
 
 describe("Mycellium voice", () => {
-  it("varies deterministic acknowledgements without using formal system copy", () => {
+  it("keeps equivalent state transitions deterministic and specific", () => {
     const messages = Array.from({ length: 8 }, (_, index) => {
       const context = createInitialDiscoveryContext({ id: projectId, description: null, targetUsers: null, constraints: null }, now);
       return advanceDiscovery({ context, messageId: `30000000-0000-4000-8000-${String(index).padStart(12, "0")}`, message: "Independent designers are the first users.", mode: "fallback", now }).assistantMessage;
     });
 
-    expect(new Set(messages).size).toBeGreaterThan(1);
+    expect(new Set(messages).size).toBe(1);
+    expect(messages[0]).toContain("Business objective is now grounded");
     expect(messages.every((message) => !/input received|critical gaps|readiness assessment|that adds target users/i.test(message))).toBe(true);
   });
 
@@ -33,7 +34,7 @@ describe("Mycellium voice", () => {
     const presentation = getReadinessPresentation(readiness);
 
     render(<ReadinessRoots readiness={readiness} />);
-    expect(presentation.title).toMatch(/^Foundation strength: \d+%$/);
+    expect(presentation.title).toBe("Foundation readiness");
     expect(screen.getByText(presentation.title)).toBeInTheDocument();
     expect(screen.getByText(/rooted/i)).toBeInTheDocument();
     expect(screen.queryByText(/\/100/)).not.toBeInTheDocument();
@@ -44,28 +45,28 @@ describe("Mycellium voice", () => {
     const first = advanceDiscovery({ context: empty, messageId: "30000000-0000-4000-8000-000000000011", message: "The business goal is reducing unpaid invoices.", mode: "fallback", now });
     const second = advanceDiscovery({ context: first.context, messageId: "30000000-0000-4000-8000-000000000012", message: "The business goal is selling accounting subscriptions instead.", mode: "fallback", now });
 
-    expect(second.assistantMessage).toContain("I'm seeing a possible contradiction");
-    expect(second.contradictions[0]?.description).toContain("I'm seeing two different answers");
+    expect(second.assistantMessage).toContain("conflicts with an earlier direction");
+    expect(second.contradictions[0]?.description).toContain("Two different answers exist");
   });
 });
 
 describe("blueprint export access", () => {
   it("keeps Export visible in project navigation before a blueprint exists", () => {
     render(<ProjectWorkspaceNav active="overview" blueprintAvailable={false} projectId={projectId} />);
-    const exportLink = screen.getByRole("link", { name: /Export/ });
+    const exportLinks = screen.getAllByRole("link", { name: /Export/ });
 
-    expect(exportLink).toBeVisible();
-    expect(exportLink).toHaveAttribute("href", `/projects/${projectId}/export`);
-    expect(exportLink).toHaveTextContent("After blueprint");
+    expect(exportLinks.some((link) => link.getAttribute("href") === `/projects/${projectId}/export`)).toBe(true);
+    expect(exportLinks.every((link) => link.textContent?.includes("Blueprint required"))).toBe(true);
   });
 
-  it("explains the locked state and disables every format", () => {
+  it("explains the locked state without presenting dead controls", () => {
     render(<BlueprintExportPanel available={false} projectId={projectId} projectName="Invoice roots" />);
     expect(screen.getByRole("heading", { name: MYCELLIUM_COPY.export.lockedTitle })).toBeInTheDocument();
     expect(screen.getByText(MYCELLIUM_COPY.export.lockedDescription)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Markdown/ })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /JSON/ })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /CSV/ })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: /Markdown/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /JSON/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /CSV/ })).not.toBeInTheDocument();
+    expect(screen.getAllByText("Available after blueprint")).toHaveLength(3);
   });
 
   it("downloads every format and confirms success from the current saved routes", async () => {

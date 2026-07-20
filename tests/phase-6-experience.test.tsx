@@ -37,14 +37,15 @@ describe("Phase 6 foundation experience", () => {
     const context = createInitialDiscoveryContext({ id: projectId, description: "A configurable product system", targetUsers: "Workspace owners", constraints: null }, now);
     render(<FoundationMap context={context} readiness={calculateReadiness(context)} />);
     expect(screen.getByRole("button", { name: /Users/ })).toHaveAttribute("data-state", "emerging");
-    expect(screen.getByText("See where the product is rooted.")).toBeVisible();
+    expect(screen.getByText("Trace every branch back to intent.")).toBeVisible();
   });
 
   it("keeps generation status prominent and recoverable", () => {
     const retry = vi.fn(); const back = vi.fn();
     const { rerender } = render(<GenerationWorkspace error="" onRetry={retry} onReturn={back} />);
-    expect(screen.getByRole("heading", { name: /becoming a blueprint/ })).toBeVisible();
-    expect(screen.getByText("Grounding the product understanding").closest("li")).toHaveAttribute("data-state", "active");
+    expect(screen.getByRole("heading", { name: /Creating a Product Blueprint/ })).toBeVisible();
+    expect(screen.getByText("Waiting for a persisted result")).toBeVisible();
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
     rerender(<GenerationWorkspace error="The blueprint could not be saved." onRetry={retry} onReturn={back} />);
     fireEvent.click(screen.getByRole("button", { name: "Retry blueprint generation" }));
     fireEvent.click(screen.getByRole("button", { name: "Return to foundation review" }));
@@ -61,8 +62,8 @@ describe("Phase 6 inputs and navigation", () => {
 
   it("keeps unavailable journey stages descriptive and Export reachable", () => {
     render(<ProjectWorkspaceNav active="overview" blueprintAvailable={false} projectId={projectId} />);
-    expect(screen.getByText("Approve the foundation first").closest("span")).toHaveAttribute("aria-disabled", "true");
-    expect(screen.getByRole("link", { name: /Export/ })).toHaveAttribute("href", `/projects/${projectId}/export`);
+    expect(screen.getAllByText("Approve the foundation first").every((text) => text.closest("span")?.getAttribute("aria-disabled") === "true")).toBe(true);
+    expect(screen.getAllByRole("link", { name: /Export/ }).every((link) => link.getAttribute("href") === `/projects/${projectId}/export`)).toBe(true);
   });
 
   it("validates profile fields without privileged account access", () => {

@@ -5,6 +5,11 @@ const widths = [375, 768, 1024, 1440] as const;
 test("keeps the public experience responsive and keyboard reachable", async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
+  const browserProblems: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error" || /hydration/i.test(message.text())) browserProblems.push(message.text());
+  });
+  page.on("pageerror", (error) => browserProblems.push(error.message));
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
@@ -22,6 +27,49 @@ test("keeps the public experience responsive and keyboard reachable", async ({ p
     await expect(page.locator(":focus")).toBeVisible();
     await page.screenshot({ fullPage: true, path: testInfo.outputPath(`landing-${width}.png`) });
   }
+
+  expect(browserProblems).toEqual([]);
+});
+
+test("moves the signature story forward and backward without trapping the page", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  const first = page.getByRole("button", { name: /Fragmented input/ });
+  const architecture = page.getByRole("button", { name: /Architecture emergence/ });
+  const finalBeat = page.getByRole("button", { name: /New seed/ });
+  await architecture.scrollIntoViewIfNeeded();
+  await expect(architecture).toHaveAttribute("aria-pressed", "true");
+  await finalBeat.scrollIntoViewIfNeeded();
+  await expect(finalBeat).toHaveAttribute("aria-pressed", "true");
+  await first.scrollIntoViewIfNeeded();
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+
+  await architecture.scrollIntoViewIfNeeded();
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.locator("#how-it-works")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "From first signal to useful product value." })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("presents the complete signature composition without spatial motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  await page.locator("#how-it-works").scrollIntoViewIfNeeded();
+
+  await expect(page.getByRole("button", { name: /New seed/ })).toHaveAttribute("aria-pressed", "true");
+  const levels = page.locator(".signature-growth [data-level]");
+  await expect(levels).toHaveCount(12);
+  expect(await levels.evaluateAll((nodes) => nodes.every((node) => node.getAttribute("data-visible") === "true"))).toBe(true);
+  await expect(page.locator(".scroll-story__visual")).toHaveCSS("position", "relative");
+});
+
+test("redirects signed-out protected access to the login route", async ({ page }) => {
+  await page.goto("/dashboard", { waitUntil: "domcontentloaded" });
+  await expect(page).toHaveURL(/\/login$/);
 });
 
 test("keeps public navigation and calls to action functional", async ({ page }) => {

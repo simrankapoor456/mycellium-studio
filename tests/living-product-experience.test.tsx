@@ -14,8 +14,8 @@ describe("Living Product Experience", () => {
 
     expect(signatureStoryStages).toHaveLength(12);
     expect(signatureStoryStages.map((stage) => stage.label)).toEqual([
-      "A rough idea", "Signal", "Roots", "Connections", "Evidence", "Structured understanding",
-      "Foundation", "Product architecture", "Blueprint", "Execution plan", "Value", "New seed",
+      "Fragmented input", "Seed of intent", "First root", "Evidence branching", "Questions and constraints", "Mycelium connections",
+      "Foundation stabilization", "Architecture emergence", "Blueprint formation", "Execution branches", "Visible product value", "New seed",
     ]);
     expect(screen.getByRole("list", { name: "Living product story" })).toBeVisible();
     expect(screen.getByRole("button", { name: /New seed/ })).toBeVisible();
@@ -51,7 +51,7 @@ describe("Living Product Experience", () => {
     fireEvent.keyDown(users, { key: "ArrowRight" });
     expect(problem).toHaveFocus();
     expect(problem).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("Still unresolved")).toBeVisible();
+    expect(screen.getByText("Unresolved branch")).toBeVisible();
   });
 
   it("keeps architecture and editorial workspace changes presentational", () => {
