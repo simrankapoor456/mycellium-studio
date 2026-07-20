@@ -25,7 +25,7 @@ Run `npm run brand:generate` after changing the social source or icon geometry. 
 
 ## Token architecture
 
-Phase 7.1 tokens are centralized in `app/phase-7-1.css` and imported after the established compatibility styles in `app/globals.css`. New surfaces and components should use semantic custom properties instead of route-local visual values.
+Foundation tokens are centralized in `app/phase-7-1.css` and imported after the established compatibility styles in `app/globals.css`. Phase 8 semantic action and motion roles live in `app/phase-8.css`, which is imported last. New surfaces and components should use semantic custom properties instead of route-local visual values.
 
 ### Color roles
 
@@ -42,6 +42,19 @@ Phase 7.1 tokens are centralized in `app/phase-7-1.css` and imported after the e
 | `--line-*` | Quiet structural separation and active boundaries |
 
 Lime is not ambient decoration. Use its strongest value for primary action, selected graph nodes, active Mycel Core state, and meaningful completion. State always includes text or shape, never color alone.
+
+### Semantic action contrast
+
+Bright actions use an explicit dark foreground rather than inherited cream or white text.
+
+| Role | Background | Foreground | Contrast |
+| --- | --- | --- | ---: |
+| Primary | `#b9ed66` | `#07110d` | 14.03:1 |
+| Success | `#a9dc62` | `#07110d` | 11.96:1 |
+| Destructive | `#e17c72` | `#160706` | 6.87:1 |
+| Disabled | `#213128` | `#91a497` | 5.19:1 |
+
+Icons inherit the semantic foreground. Hover, pressed, focus, loading, and disabled states keep readable foregrounds and never depend on glow.
 
 ### Typography
 
@@ -71,7 +84,7 @@ Spacing follows a compact base rhythm with larger editorial jumps between narrat
 | --- | --- |
 | `BrandMark` | Inline radial mark, accessible label when meaningful, decorative otherwise, optional one-time formation |
 | `BrandLogo` | Home or dashboard link with canonical mark and typographic wordmark |
-| `Button` / `ButtonLink` | Intelligence-primary, neutral-secondary, quiet, destructive, compact, disabled, active, and focus states |
+| `Button` / `ButtonLink` | Primary, secondary, quiet, outline, destructive, success, loading, disabled, icon-only, pressed, and focus states |
 | `FormField` | Visible label, hint/error association, stable input surface, and explicit validation state |
 | `TextField` / `TextareaField` / `SelectField` | Shared label, requirement, hint, inline error, focus, and disabled behavior |
 | `ComboboxField` | Searchable, keyboard-operable listbox for structured string values |
@@ -84,6 +97,8 @@ Spacing follows a compact base rhythm with larger editorial jumps between narrat
 | `LoadingState` | Layout-mirroring skeleton with live-region text and no motion requirement |
 | `WorkspaceNavigation` | Anchored global product navigation with current route, profile access, identity context, and mobile mode |
 | `ProjectWorkspaceNav` | Data-backed journey state, current project context, locked-stage explanation, and export access |
+| `FoundationDecisionGroups` | Blocking, recommended, deferred, contradiction, and challenge groupings with direct resolution links |
+| `FoundationMap` | Deterministic evidence topology, keyboard branch selection, selected lineage, and ordered text alternative |
 
 Phase 7.1 applies these foundations across existing routes without replacing the internal workspace structures reserved for Phase 7.2.
 
@@ -111,11 +126,11 @@ Motion communicates connection and state; it does not make the user wait.
 | Deliberate, 640 ms | One-time narrative entrance |
 | Formation, up to 2.4 s | Spark, Connect, Grow, Form, Settle identity sequence |
 
-The spatial easing curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product surfaces use only the first three tiers. Environmental effects use opacity and transforms and never hijack scrolling.
+Phase 8 resolves the shared product meanings to 110 ms immediate feedback, 180 ms small state transition, 260 ms panel transition, and 620 ms environmental reveal. Scroll-linked work remains progress-driven. The spatial easing curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product surfaces use only the first three tiers. Environmental effects use opacity and transforms and never hijack scrolling.
 
 The animated mark forms once through Spark, Connect, Grow, Form, and Settle. It is complete from the start in the document, does not delay content, and becomes immediately static under `prefers-reduced-motion: reduce`.
 
-The Living Product Experience uses GSAP only in isolated Client Components. `useGSAP`, a local scope, `gsap.matchMedia()`, ScrollTrigger cleanup, and explicit revert cleanup are required. SplitText remains limited to one major transition and its semantic text exists before enhancement. Authenticated work keeps CSS feedback and native scrolling.
+The Living Product Experience uses GSAP only in isolated Client Components. `useGSAP`, a local scope, `gsap.matchMedia()`, ScrollTrigger cleanup, and explicit revert cleanup are required. The public signature story and Living Foundation Map are the only Phase 8 owners. SplitText remains limited to one major transition and its semantic text exists before enhancement. Other authenticated work keeps CSS feedback and native scrolling.
 
 Lenis is lazy-loaded by `MarketingMotionProvider` on the public landing route only. Touch remains native, form and nested-scroll surfaces are excluded, anchors retain their destinations, and reduced motion prevents the instance from starting. It never wraps authentication, product workspaces, dialogs, profile, or settings.
 
@@ -131,6 +146,8 @@ Lenis is lazy-loaded by `MarketingMotionProvider` on the public landing route on
 - Reduced motion removes formation, reveals, smooth scrolling, and environmental drift.
 - Higher contrast preferences strengthen surface lines and text separation.
 - Product status always combines wording with visual treatment.
+- The Living Foundation Map has arrow-key traversal, selected lineage, and an ordered text alternative.
+- The Project Journey becomes a native details disclosure on small screens and names every blocked prerequisite.
 
 Automated checks protect semantics and interactions but do not establish complete accessibility conformance. Keyboard, zoom, contrast, screen-reader, and real-device checks remain release work.
 
@@ -144,6 +161,8 @@ Review widths are 375, 768, 1024, and 1440 pixels.
 - At 1440 pixels, full floating navigation and asymmetric editorial composition are available.
 - No route may create page-level horizontal overflow or hide a critical action.
 - Product navigation wraps or changes mode instead of shrinking labels below legibility.
+- The signature story uses native vertical flow below 640 pixels, with no pinned range or snap carousel.
+- The Living Foundation Map becomes a vertical evidence lineage below 640 pixels.
 
 ## Performance boundaries
 
@@ -154,6 +173,8 @@ Review widths are 375, 768, 1024, and 1440 pixels.
 - Layout dimensions are reserved before animation.
 - Static meaning exists before JavaScript enhancement.
 - Large blur is restricted to bounded floating surfaces.
+- The signature story is dynamically composed from the public route and remains server-rendered for semantic completeness.
+- Lenis stays in its unchanged separate public-only chunk and is absent from protected route manifests.
 
 See [`docs/premium-interaction-foundation.md`](./premium-interaction-foundation.md) for client-only integration, cleanup, reduced-motion, and public-only scrolling rules.
 

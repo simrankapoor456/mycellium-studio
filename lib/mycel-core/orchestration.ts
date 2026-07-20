@@ -47,6 +47,7 @@ import {
   persistDiscoveryState,
   toJson,
 } from "@/lib/mycel-core/execution/discovery";
+import { getNextDiscoveryPrompt } from "@/lib/discovery/questions";
 import { blueprintToCsv, blueprintToJson, blueprintToMarkdown } from "@/lib/mycel-core/execution/exports";
 import {
   beginWorkflowRequest,
@@ -118,13 +119,25 @@ export async function orchestrateDiscoveryTurn(
           access.data.project.custom_project_type,
         ),
       }, now);
+    const action = requestDecision.value.action;
+    const prompt = getNextDiscoveryPrompt(context);
+    if (action !== "answer" && !prompt) {
+      await failDiscoveryRequest(access.data.project.id, access.data.userId, requestDecision.value.requestId);
+      return failure(409, "No materially different discovery question remains. Review the current foundation.", "requires_review");
+    }
+
+    const message = action === "answer"
+      ? requestDecision.value.message
+      : action === "mark_unknown"
+        ? "Marked the current decision as unknown."
+        : "Deferred the current decision for Foundation Review.";
     const messages = await listDiscoveryMessages(access.data.project.id, access.data.userId);
     const sequence = messages.length + 1;
     await createDiscoveryMessage({
       projectId: access.data.project.id,
       role: "user",
-      content: requestDecision.value.message,
-      structuredFacts: null,
+      content: message,
+      structuredFacts: action === "answer" ? null : toJson({ action, questionId: prompt?.id ?? "review" }),
       sequenceNumber: sequence,
     }, access.data.userId, requestDecision.value.requestId);
 
@@ -136,9 +149,9 @@ export async function orchestrateDiscoveryTurn(
     const providerConfigured = isOpenAiConfigured();
     let providerProposal: unknown = null;
 
-    if (providerConfigured) {
+    if (providerConfigured && action === "answer") {
       try {
-        providerProposal = await requestAiDiscovery(context, boundedMessages, requestDecision.value.message);
+        providerProposal = await requestAiDiscovery(context, boundedMessages, message);
       } catch {
         providerProposal = null;
       }
@@ -153,17 +166,18 @@ export async function orchestrateDiscoveryTurn(
     const response = advanceDiscovery({
       context,
       messageId: requestDecision.value.requestId,
-      message: requestDecision.value.message,
+      message,
       mode: useAi ? "ai" : "fallback",
       engineState,
       now,
+      ...(action === "answer" ? {} : { controlAction: action }),
       ...(useAi ? { aiResponse: proposalDecision.value } : {}),
     });
 
     await createDiscoveryMessage({
       projectId: access.data.project.id,
       role: "assistant",
-      content: `${response.assistantMessage}\n\n${response.assistantQuestion}\n\nWhy this matters: ${response.questionReason}`,
+      content: response.assistantMessage,
       structuredFacts: toJson(response),
       sequenceNumber: sequence + 1,
     }, access.data.userId);

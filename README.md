@@ -23,9 +23,9 @@ Mycellium Studio keeps product intent connected from the first source material t
 
 Current capabilities include:
 
-- adaptive discovery with explicit facts, unknowns, contradictions, readiness, and graph changes
-- a persistent Living Product Graph and seven-area Foundation Map
-- human approval with visible lineage and focused blocker recovery
+- adaptive discovery with stable question identities, explicit answer, unknown, defer, and review controls
+- a persistent Living Product Graph and deterministic seven-branch Living Foundation Map
+- human approval grouped by blockers, refinements, deferred unknowns, contradictions, and challenges
 - editable, versioned Product Blueprints with Markdown, JSON, and CSV exports
 - optional structured OpenAI generation behind a server-only boundary
 - deterministic Reliable mode using the same canonical Zod contracts
@@ -40,18 +40,21 @@ Current capabilities include:
 
 ![Mycellium Studio authentication experience](docs/assets/authentication.png)
 
-Authenticated screenshots are intentionally absent because no reusable test account was available for this visual pass. The exact capture steps are recorded in [the Phase 7.1 review](docs/phase-7-1-review.md).
+Authenticated screenshots are intentionally absent because no reusable local account was available for this visual pass. The remaining capture steps are recorded in [the Phase 8 experience](docs/phase-8-mycelium-experience.md).
 
 ## Product journey
 
 ```mermaid
 flowchart LR
   A[Messy context] --> B[Discovery]
-  B --> C[Living Product Graph]
-  C --> D[Foundation Review]
-  D --> E[Architecture]
-  E --> F[Product Blueprint]
-  F --> G[Export]
+  B --> C{Answer or keep open}
+  C --> D[Living Product Graph]
+  C --> E[Deferred unknown]
+  D --> F[Foundation Review]
+  E --> F
+  F --> G[Architecture]
+  G --> H[Product Blueprint]
+  H --> I[Export]
 ```
 
 Every transition is grounded in persisted state. Approval remains human-controlled, and exported artifacts stay linked to the facts and decisions that shaped them.
@@ -75,7 +78,9 @@ The proposal layer cannot write application data. The Decision Layer owns authen
 ## Signature capabilities
 
 - **Living Product Graph:** facts, uncertainties, dependencies, and lineage remain visible as understanding grows.
-- **Foundation Review:** approval is blocked only by explicit, recoverable conditions.
+- **Discovery control:** every question can be answered, marked unknown, deferred, explained, or carried to review without a wording loop.
+- **Living Foundation Map:** stable evidence topology exposes state, lineage, dependencies, gaps, challenges, and a complete text alternative.
+- **Foundation Review:** blockers, refinements, deferred unknowns, contradictions, and challenges remain separate and directly resolvable.
 - **Mycel Core:** AI proposals, product decisions, and deterministic execution have separate authority.
 - **Reliable mode:** missing or invalid provider output falls back safely without changing the product contract.
 - **Product Blueprint:** architecture, requirements, work structure, and exports remain editable and versioned.
@@ -164,6 +169,10 @@ legacy-static/               Preserved pre-Next.js prototype
 - [Design system](docs/design-system.md)
 - [Phase 7.1 review](docs/phase-7-1-review.md)
 - [Phase 7.2 review](docs/phase-7-2-review.md)
+- [Phase 8 Mycelium Experience](docs/phase-8-mycelium-experience.md)
+- [Discovery control model](docs/discovery-control-model.md)
+- [Living Foundation Map](docs/living-foundation-map.md)
+- [Signature Growth Story](docs/signature-growth-story.md)
 - [Living Product Experience](docs/living-product-experience.md)
 - [Form guidelines](docs/form-guidelines.md)
 - [Validation strategy](docs/validation-strategy.md)
@@ -187,7 +196,7 @@ legacy-static/               Preserved pre-Next.js prototype
 
 ## Project status
 
-Implemented: the complete personal-user journey from authentication through discovery, foundation approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; resilient form validation and draft recovery; and the Living Product Experience across public storytelling, Foundation, architecture, Blueprint, and dashboard surfaces.
+Implemented: the complete personal-user journey from authentication through controlled discovery, grouped foundation review, approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; resilient form validation and draft recovery; and the Mycelium Experience across public storytelling, the Living Foundation Map, architecture, Blueprint, and dashboard surfaces.
 
 Active development: advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Button } from "@/components/ui/Button";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
 
 type PressureTestPanelProps = Readonly<{
@@ -35,7 +36,7 @@ export function PressureTestPanel({ initialPressureTest, projectId, onUpdated }:
 
   return (
     <section className="pressure-test" id="pressure-test">
-      <header><div><span className="eyebrow">Pressure Test</span><h2>Where could this blueprint break?</h2><p>Findings stay separate until you choose to edit the blueprint.</p></div><button disabled={pending} onClick={() => void handleRun()} type="button">{pending ? "Testing the blueprint" : pressureTest ? "Run again" : "Run Pressure Test"}</button></header>
+      <header><div><span className="eyebrow">Pressure Test</span><h2>Where could this blueprint break?</h2><p>Findings stay separate until you choose to edit the blueprint.</p></div><Button loading={pending} onClick={() => void handleRun()} type="button">{pending ? "Testing the blueprint" : pressureTest ? "Run again" : "Run Pressure Test"}</Button></header>
       {error ? <p role="alert">{error}</p> : null}
       {pressureTest ? <div className="pressure-test__results"><strong>{pressureTest.overallAssessment}</strong><span>{pressureTest.pressureTestMode === "ai" ? "Mycel Core · AI enhanced" : "Mycel Core · Reliable mode"}</span><PressureList items={pressureTest.criticalFindings} title="Critical findings" /><PressureList items={pressureTest.scopeCuts} title="Scope cuts" /><PressureList items={pressureTest.risks} title="Risks" /><PressureList items={pressureTest.questions} title="Questions" /><PressureList items={pressureTest.recommendedNextActions} title="Recommended next actions" /></div> : <p>No Pressure Test has been saved for this blueprint version.</p>}
     </section>

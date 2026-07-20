@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import type { DiscoveryContext, DiscoveryReviewInput, ProductChallenge } from "@/lib/domain/discovery/schemas";
 
 type ReviewChallengesProps = Readonly<{
@@ -21,7 +22,7 @@ export function ReviewChallenges({ context, pending, blockingTargetIds = new Set
           <p><b>Why it matters:</b> {challenge.description}</p>
           <p><b>Affected areas:</b> {challenge.category.replaceAll("_", " ")}</p>
           <p><b>Recommended action:</b> Clarify the boundary, accept the risk, or resolve the underlying choice.</p>
-          {challenge.status === "open" ? <div><button disabled={pending} onClick={() => onMutate({ action: "resolve_challenge", challengeId: challenge.id })} type="button">Resolve</button><button disabled={pending} onClick={() => onMutate({ action: "acknowledge_challenge", challengeId: challenge.id })} type="button">Acknowledge</button><button disabled={pending} onClick={() => onMutate({ action: "accept_challenge_risk", challengeId: challenge.id })} type="button">Accept risk</button></div> : null}
+          {challenge.status === "open" ? <div><Button disabled={pending} onClick={() => onMutate({ action: "resolve_challenge", challengeId: challenge.id })} type="button">Resolve challenge</Button><Button disabled={pending} onClick={() => onMutate({ action: "acknowledge_challenge", challengeId: challenge.id })} type="button" variant="secondary">Acknowledge</Button><Button disabled={pending} onClick={() => onMutate({ action: "accept_challenge_risk", challengeId: challenge.id })} type="button" variant="outline">Accept risk</Button></div> : null}
         </article>;
       })}
     </section>

@@ -6,7 +6,7 @@ export const DISCOVERY_CATEGORY_COPY: Record<FactCategory, { label: string; ques
   problem: { label: "Problem", question: "Where does the current approach break down for the person using it?" },
   target_users: { label: "Target users", question: "Who should feel that the first version was made specifically for them?" },
   use_cases: { label: "Primary outcome", question: "What is the one outcome the first version must help the user accomplish?" },
-  success_metrics: { label: "Success measure", question: "What observable result would convince you the first release is working?" },
+  success_metrics: { label: "Success measure", question: "What observable result would show that the first release is working?" },
   functional_requirements: { label: "Core capability", question: "Which capability is essential to make that outcome possible?" },
   non_functional_requirements: { label: "Quality expectation", question: "Which security, accessibility, reliability, or performance expectation cannot be compromised?" },
   constraints: { label: "Constraint", question: "Which budget, platform, policy, or delivery boundary will shape the design most?" },
@@ -32,40 +32,39 @@ export const MYCELLIUM_COPY = {
     fallbackDetail: "Using Mycellium's built-in planning engine",
   },
   emptyStates: {
-    discovery: "Start wherever the idea feels clearest. I'll help find the next useful question.",
-    blueprint: "The idea has a starting point. Discovery will give it a shape we can architect.",
+    discovery: "Start with what is clearest. Mycel Core will choose the next essential decision.",
+    blueprint: "The idea has a starting point. Discovery will make its foundation explicit.",
   },
   transitions: {
-    ideaHasShape: "The idea has a shape now.",
-    foundationGrowing: "The foundation is getting stronger.",
-    reviewReady: "I think I understand the product. Let's review the foundation.",
-    architectReady: "Your product is ready to be architected.",
+    foundationChanged: "A product decision is now grounded in the foundation.",
+    reviewReady: "This is enough to review a provisional foundation.",
+    architectReady: "The foundation is ready to architect.",
   },
   review: {
     eyebrow: "Foundation review",
-    title: "Let's make sure I have the product right.",
+    title: "Review the product foundation.",
     description: "Keep what is true, correct what is not, and make the remaining unknowns intentional.",
-    pendingTitle: "A few decisions still need your judgment",
-    pendingDetail: "Your approval locks the exact foundation used to create the blueprint.",
-    approvedTitle: "Your product is ready to be architected",
-    approvedDetail: "The foundation is approved. Mycellium can now turn it into a traceable plan.",
+    pendingTitle: "The foundation is ready for your judgment",
+    pendingDetail: "Confirm essential decisions and explicitly carry any remaining uncertainty forward.",
+    approvedTitle: "The foundation is ready to architect",
+    approvedDetail: "Mycellium can now turn the approved foundation into a traceable Product Blueprint.",
   },
   generation: {
     idle: "Architect my product",
-    active: "Shaping the blueprint",
-    reveal: "The blueprint is taking form.",
+    active: "Creating the blueprint",
+    reveal: "The saved architecture is ready.",
     complete: "Your Product Blueprint is ready.",
     failure: "The blueprint could not be created yet. Your approved foundation is safe, and exports will unlock after generation succeeds.",
   },
   export: {
     title: "Take the blueprint with you",
     description: "Every format is built from the latest saved version, including your edits.",
-    lockedTitle: "Exports unlock with your first Product Blueprint",
-    lockedDescription: "Exports become available after your first Product Blueprint is created.",
+    lockedTitle: "Blueprint required",
+    lockedDescription: "Create a persisted Product Blueprint before exporting.",
     unavailableAfterFailure: "Exports are still locked because blueprint generation did not finish.",
     preparing: "Preparing export",
     success: "Download ready",
-    failure: "That export could not be prepared. Try again in a moment.",
+    failure: "That export could not be prepared. Your blueprint is unchanged. Try again.",
   },
 } as const;
 
@@ -83,124 +82,97 @@ export function getReadinessPresentation(readiness: ReadinessAssessment): Readin
 
   if (contradictionCount > 0) {
     return {
-      title: `Foundation strength: ${readiness.score}%`,
+      title: "Foundation readiness",
       statusLabel: "Decision needed",
-      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${contradictionCount} ${pluralize("contradiction", contradictionCount)} still ${contradictionCount === 1 ? "needs" : "need"} a clear answer.`,
-      momentum: contradictionCount === 1 ? "One contradiction is holding the plan back." : "A few contradictions are holding the plan back.",
+      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${contradictionCount} conflicting ${pluralize("direction", contradictionCount)} must be resolved.`,
+      momentum: "Resolve the conflicting direction before architecture is created.",
     };
   }
 
   if (readiness.status === "ready") {
     return {
-      title: `Foundation strength: ${readiness.score}%`,
+      title: "Foundation readiness",
       statusLabel: "Ready to architect",
-      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. The remaining unknowns will not change the core architecture.`,
+      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. Remaining unknowns can stay documented without changing the core architecture.`,
       momentum: MYCELLIUM_COPY.transitions.architectReady,
     };
   }
 
   if (readiness.status === "needs_review") {
     return {
-      title: `Foundation strength: ${readiness.score}%`,
+      title: "Foundation readiness",
       statusLabel: "Ready for review",
-      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${clarityCount} ${pluralize("decision", clarityCount)} still ${clarityCount === 1 ? "needs" : "need"} clarity.`,
-      momentum: MYCELLIUM_COPY.transitions.foundationGrowing,
+      summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${clarityCount} recommended ${pluralize("refinement", clarityCount)} remain.`,
+      momentum: "Review now or continue with the next useful decision.",
     };
   }
 
   return {
-    title: `Foundation strength: ${readiness.score}%`,
-    statusLabel: "Taking shape",
-    summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${clarityCount} ${pluralize("area", clarityCount)} still ${clarityCount === 1 ? "needs" : "need"} clarity.`,
-    momentum: rootedCount >= 3 ? MYCELLIUM_COPY.transitions.ideaHasShape : "We're finding the product's strongest roots.",
+    title: "Foundation readiness",
+    statusLabel: "Building context",
+    summary: `${rootedCount} ${pluralize("area", rootedCount)} rooted. ${readiness.criticalGaps.length} essential ${pluralize("decision", readiness.criticalGaps.length)} remain open.`,
+    momentum: rootedCount >= 3 ? "The next essential decision will improve the provisional foundation." : "Start with the product outcome, user, and problem.",
   };
 }
 
-export function buildDiscoveryAcknowledgement(facts: readonly DiscoveryFact[], seed: string): string {
+export function buildDiscoveryTransitionMessage(
+  before: ReadinessAssessment,
+  after: ReadinessAssessment,
+  facts: readonly DiscoveryFact[],
+): string {
+  if (after.contradictions.length > before.contradictions.length) {
+    return "This answer conflicts with an earlier direction. The choice stays open until it is resolved in Foundation Review.";
+  }
+
   if (facts.length === 0) {
-    return selectStableCopy([
-      "I hear the direction, but it has not changed the product foundation yet.",
-      "That helps me follow your thinking. I still need one concrete product decision to root it.",
-    ], seed);
+    return "This answer did not change a product decision yet. Add a concrete outcome, boundary, or user need when it becomes clear.";
   }
 
   if (facts.every((fact) => fact.status === "unknown")) {
-    return selectStableCopy([
-      "That's a useful unknown. I'll keep it visible instead of filling in the blank.",
-      "Fair. That decision is still open. We can design around the uncertainty for now.",
-      "Good to name what is not decided yet. I won't pretend we know more than we do.",
-    ], seed);
+    return "The decision is recorded as unknown. It stays visible and is not treated as a confirmed fact.";
   }
 
-  const categories = new Set(facts.map((fact) => fact.category));
-
-  if (categories.has("target_users")) {
-    return selectStableCopy([
-      "That gives us a clearer picture of who this is for.",
-      "Good. The first user is coming into focus.",
-      "Now we have someone specific to design for.",
-    ], seed);
-  }
-
-  if (categories.has("problem")) {
-    return selectStableCopy([
-      "That makes the pain much more concrete.",
-      "Good. Now we can see where the current workflow breaks down.",
-      "That gives the product a problem worth organizing around.",
-    ], seed);
-  }
-
-  if (categories.has("business_objective")) {
-    return selectStableCopy([
-      "That gives the product a sharper reason to exist.",
-      "Good. The outcome behind the idea is clearer now.",
-      "Now we know what this product needs to change.",
-    ], seed);
-  }
-
-  const labels = [...new Set(facts.map((fact) => DISCOVERY_CATEGORY_COPY[fact.category].label.toLowerCase()))].slice(0, 2);
-
-  return selectStableCopy([
-    `That adds real shape around ${joinNaturally(labels)}.`,
-    `Useful. ${joinNaturally(labels)} ${labels.length === 1 ? "is" : "are"} clearer now.`,
-    `I can place ${joinNaturally(labels)} more confidently in the product foundation.`,
-  ], seed);
-}
-
-export function buildDiscoveryInsight(readiness: ReadinessAssessment): string {
-  const presentation = getReadinessPresentation(readiness);
-
-  if (readiness.contradictions.length > 0) {
-    return "I'm seeing a possible contradiction here. We should settle it before it shapes the architecture.";
-  }
-
-  if (readiness.status === "ready") {
+  if (after.status === "ready" && before.status !== "ready") {
     return MYCELLIUM_COPY.transitions.reviewReady;
   }
 
-  return presentation.momentum;
+  const criticalImprovement = before.criticalGaps.length - after.criticalGaps.length;
+  const labels = [...new Set(facts.map((fact) => DISCOVERY_CATEGORY_COPY[fact.category].label))].slice(0, 2);
+  const subject = joinNaturally(labels);
+
+  if (criticalImprovement > 0) {
+    return `${subject} is now grounded. ${after.criticalGaps.length} essential ${pluralize("decision", after.criticalGaps.length)} remain open.`;
+  }
+
+  if (facts.some((fact) => ["included_scope", "excluded_scope", "constraints"].includes(fact.category))) {
+    return `${subject} now defines a clearer product boundary. Open items remain separate from confirmed scope.`;
+  }
+
+  return `${subject} is now part of the product foundation. ${after.areasNeedingClarification.length} recommended ${pluralize("refinement", after.areasNeedingClarification.length)} remain.`;
+}
+
+export function buildDiscoveryControlMessage(
+  action: "mark_unknown" | "ask_later",
+  category: FactCategory,
+  readiness: ReadinessAssessment,
+): string {
+  const label = DISCOVERY_CATEGORY_COPY[category].label;
+  const state = action === "ask_later"
+    ? `${label} is deferred and will remain visible in Foundation Review.`
+    : `${label} is recorded as unknown and will not be treated as a confirmed fact.`;
+  const next = readiness.status === "ready"
+    ? " The current foundation is ready to review."
+    : ` ${readiness.criticalGaps.length} essential ${pluralize("decision", readiness.criticalGaps.length)} remain open.`;
+  return `${state}${next}`;
 }
 
 export function buildContradictionDescription(category: FactCategory): string {
   const label = DISCOVERY_CATEGORY_COPY[category].label.toLowerCase();
-  return `I'm seeing two different answers for ${label}. One decision needs to win before the plan can settle.`;
-}
-
-export function selectStableCopy(options: readonly string[], seed: string): string {
-  let hash = 0;
-
-  for (let index = 0; index < seed.length; index += 1) {
-    hash = Math.imul(hash, 31) + seed.charCodeAt(index);
-  }
-
-  return options[Math.abs(hash) % options.length] ?? options[0] ?? "";
+  return `Two different answers exist for ${label}. Choose one direction before architecture is created.`;
 }
 
 function joinNaturally(items: readonly string[]): string {
-  if (items.length < 2) {
-    return items[0] ?? "the product";
-  }
-
+  if (items.length < 2) return items[0] ?? "The product direction";
   return `${items[0]} and ${items[1]}`;
 }
 

@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { ProductGraph } from "@/components/marketing/diagrams/ProductGraph";
+import { SignatureGrowthVisual } from "@/components/marketing/SignatureGrowthVisual";
 import { Container } from "@/components/ui/Container";
-import { signatureStoryStages } from "@/lib/marketing/signature-experience";
+import { signatureStoryConfig, signatureStoryStages } from "@/lib/marketing/signature-experience";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/motion/gsap-client";
 
 export function ScrollProductNarrative() {
@@ -14,6 +14,10 @@ export function ScrollProductNarrative() {
   const activeStage = signatureStoryStages[activeIndex] ?? signatureStoryStages[0];
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const frame = window.requestAnimationFrame(() => setActiveIndex(signatureStoryStages.length - 1));
+      return () => window.cancelAnimationFrame(frame);
+    }
     if (!("IntersectionObserver" in window)) return;
 
     const observer = new IntersectionObserver(
@@ -59,7 +63,7 @@ export function ScrollProductNarrative() {
           trigger: section,
           start: "top 78%",
           end: "bottom 22%",
-          scrub: 0.7,
+          scrub: signatureStoryConfig.scrollScrub,
         },
       });
 
@@ -94,8 +98,8 @@ export function ScrollProductNarrative() {
       <a className="living-story__skip" href="#living-story-end">Skip the product story</a>
       <Container>
         <header className="living-story__header">
-          <h2>Ideas take root. Products grow.</h2>
-          <p>Watch one signal gather evidence, become architecture, and return as stronger product understanding.</p>
+          <h2>From first signal to useful product value.</h2>
+          <p>Follow one intent through evidence, judgment, architecture, a Product Blueprint, and the learning that begins the next cycle.</p>
         </header>
 
         <div className="living-story__layout">
@@ -105,7 +109,7 @@ export function ScrollProductNarrative() {
               <span>{activeStage.label}</span>
               <span>{String(activeIndex + 1).padStart(2, "0")} / {signatureStoryStages.length}</span>
             </div>
-            <ProductGraph activeLevel={activeStage.level} ariaLabel={`Product graph at the ${activeStage.label.toLowerCase()} stage`} />
+            <SignatureGrowthVisual activeIndex={activeIndex} label={activeStage.label} />
             <figcaption className="scroll-story__caption">
               <small>{activeStage.artifact}</small>
               <strong>{activeStage.title}</strong>

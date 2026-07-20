@@ -15,32 +15,16 @@ import {
   type ReadinessAssessment,
 } from "@/lib/domain/discovery/schemas";
 import { hasBlockingChallenges, mergeProductChallenges } from "@/lib/mycel-core/decision/challenges";
+import { DISCOVERY_CATEGORY_ORDER, getNextDiscoveryPrompt } from "@/lib/discovery/questions";
 import {
   buildContradictionDescription,
-  buildDiscoveryAcknowledgement,
-  buildDiscoveryInsight,
+  buildDiscoveryControlMessage,
+  buildDiscoveryTransitionMessage,
   DISCOVERY_CATEGORY_COPY,
   getReadinessPresentation,
 } from "@/lib/voice/mycellium";
 
-const CATEGORY_ORDER = [
-  "business_objective",
-  "product_type",
-  "target_users",
-  "use_cases",
-  "problem",
-  "success_metrics",
-  "functional_requirements",
-  "constraints",
-  "risks",
-  "non_functional_requirements",
-  "assumptions",
-  "architecture_decisions",
-  "included_scope",
-  "excluded_scope",
-  "technical_preferences",
-  "dependencies",
-] as const satisfies readonly FactCategory[];
+const CATEGORY_ORDER = DISCOVERY_CATEGORY_ORDER;
 
 const CATEGORY_CONFIG: Record<FactCategory, { label: string; question: string; weight: number; critical: boolean; single: boolean }> = {
   business_objective: { ...DISCOVERY_CATEGORY_COPY.business_objective, weight: 14, critical: true, single: true },
@@ -74,6 +58,7 @@ type AdvanceDiscoveryInput = Readonly<{
   context: DiscoveryContext;
   messageId: string;
   message: string;
+  controlAction?: "mark_unknown" | "ask_later";
   mode: "ai" | "fallback";
   now: string;
   aiResponse?: AiDiscoveryResponse;
@@ -125,9 +110,19 @@ export function createInitialDiscoveryContext(project: ProjectSeed, now: string)
 export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnResponse {
   const previous = DiscoveryContextSchema.parse(input.context);
   const aiResponse = input.aiResponse ? AiDiscoveryResponseSchema.parse(input.aiResponse) : null;
-  const rawFacts = aiResponse
+  const currentPrompt = getNextDiscoveryPrompt(previous);
+  const controlCategory = currentPrompt?.category ?? "unknowns";
+  const rawFacts = input.controlAction
+    ? [{
+      category: controlCategory,
+      label: CATEGORY_CONFIG[controlCategory].label,
+      value: input.controlAction === "ask_later" ? "Deferred for foundation review" : "Intentionally left unknown",
+      status: "unknown" as const,
+      confidence: 1,
+    }]
+    : aiResponse
     ? [...aiResponse.extractedFacts, ...aiResponse.updatedFacts]
-    : extractDeterministicFacts(input.message, chooseNextCategory(previous));
+    : extractDeterministicFacts(input.message, controlCategory);
   const extractedFacts = rawFacts.map((fact) =>
     createFact(fact.category, fact.label, fact.value, fact.status, [input.messageId], input.now, fact.confidence),
   );
@@ -140,6 +135,9 @@ export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnRes
     facts,
     contradictions,
     graph,
+    acceptedUnknownFactIds: input.controlAction === "ask_later"
+      ? [...new Set([...previous.acceptedUnknownFactIds, ...extractedFacts.map((fact) => fact.id)])]
+      : previous.acceptedUnknownFactIds,
     approvalState: previous.approvalState === "approved" ? "stale" : "pending",
     updatedAt: input.now,
   });
@@ -147,15 +145,18 @@ export function advanceDiscovery(input: AdvanceDiscoveryInput): DiscoveryTurnRes
   const unresolvedDecisionIds = calculateUnresolvedDecisionIds(provisionalContext, challenges);
   const context = DiscoveryContextSchema.parse({ ...provisionalContext, challenges, unresolvedDecisionIds });
   const readinessAssessment = calculateReadiness(context);
-  const nextQuestion = aiResponse?.assistantQuestion || readinessAssessment.recommendedNextQuestion;
-  const acknowledgement = buildDiscoveryAcknowledgement(extractedFacts, input.messageId);
-  const insight = buildDiscoveryInsight(readinessAssessment);
-  const assistantMessage = aiResponse?.assistantMessage || `${acknowledgement}\n\n${insight}`;
+  const nextPrompt = getNextDiscoveryPrompt(context);
+  const nextQuestion = nextPrompt?.question ?? "The current foundation is ready for review.";
+  const assistantMessage = input.controlAction
+    ? buildDiscoveryControlMessage(input.controlAction, controlCategory, readinessAssessment)
+    : buildDiscoveryTransitionMessage(calculateReadiness(previous), readinessAssessment, extractedFacts);
 
   return DiscoveryTurnResponseSchema.parse({
     assistantMessage,
     assistantQuestion: nextQuestion,
-    questionReason: aiResponse?.questionReason ?? questionReasonFor(chooseNextCategory(context)),
+    questionId: nextPrompt?.id ?? "review",
+    questionCategory: nextPrompt?.category ?? "unknowns",
+    questionReason: nextPrompt?.reason ?? "Review now to confirm what is grounded and keep remaining uncertainty explicit.",
     extractedFacts,
     updatedFacts,
     unresolvedItems: readinessAssessment.areasNeedingClarification.map((category) => CATEGORY_CONFIG[category].label),
@@ -195,7 +196,7 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
     : score >= 45 || criticalGaps.length <= 2
       ? "needs_review"
       : "discovering";
-  const nextCategory = chooseNextCategory(context);
+  const nextPrompt = getNextDiscoveryPrompt(context);
 
   const readiness = ReadinessAssessmentSchema.parse({
     score: Math.max(0, score - openContradictions.length * 10 - blockingChallenges.length * 4),
@@ -205,7 +206,9 @@ export function calculateReadiness(contextInput: DiscoveryContext): ReadinessAss
     criticalGaps,
     contradictions: openContradictions.map((item) => item.description),
     openChallenges: openChallenges.map((challenge) => challenge.id),
-    recommendedNextQuestion: status === "ready" ? "Review the structured understanding, then approve it when it reflects your intent." : CATEGORY_CONFIG[nextCategory].question,
+    recommendedNextQuestion: status === "ready" || !nextPrompt
+      ? "Review the structured understanding, then approve it when it reflects your intent."
+      : nextPrompt.question,
     explanation: "Foundation progress calculated.",
     rootedAreas: CATEGORY_ORDER.filter((category) => rooted.has(category)),
     areasNeedingClarification: CATEGORY_ORDER.filter((category) => !rooted.has(category) && !resolvedByUnknown.has(category)),
@@ -376,11 +379,6 @@ function detectContradictions(facts: readonly DiscoveryFact[], previous: Discove
   return contradictions;
 }
 
-function chooseNextCategory(context: DiscoveryContext): FactCategory {
-  const accepted = new Set(context.acceptedUnknownFactIds);
-  const covered = new Set(context.facts.filter((fact) => fact.deletedAt === null && fact.status !== "rejected" && (fact.status !== "unknown" || accepted.has(fact.id))).map((fact) => fact.category));
-  return CATEGORY_ORDER.find((category) => !covered.has(category)) ?? "unknowns";
-}
 
 function createFact(category: FactCategory, label: string, value: string, status: DiscoveryFact["status"], sourceMessageIds: string[], now: string, confidence = status === "confirmed" ? 0.85 : 0.6): DiscoveryFact {
   return { id: stableId("fact", [category, normalize(value)]), category, label, value: value.trim(), status, confidence, sourceMessageIds, createdAt: now, updatedAt: now, manuallyEdited: false, deletedAt: null };
@@ -431,16 +429,4 @@ function calculateUnresolvedDecisionIds(
   const contradictionIds = context.contradictions.filter((item) => item.status === "open").map((item) => item.id);
   const challengeIds = challenges.filter((item) => item.status === "open").map((item) => item.id);
   return [...new Set([...unknownIds, ...contradictionIds, ...challengeIds])];
-}
-
-function questionReasonFor(category: FactCategory): string {
-  if (category === "use_cases") {
-    return "This helps Mycel Core separate the essential experience from features that can wait.";
-  }
-
-  if (CATEGORY_CONFIG[category].critical) {
-    return "This decision shapes the core product outcome and the scope built around it.";
-  }
-
-  return "This will make the next architecture and delivery trade-off more grounded.";
 }

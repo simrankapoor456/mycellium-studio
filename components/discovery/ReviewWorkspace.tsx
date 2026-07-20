@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 
 import { ArchitectureReveal } from "@/components/discovery/ArchitectureReveal";
+import { FoundationDecisionGroups } from "@/components/discovery/FoundationDecisionGroups";
 import { FoundationMap } from "@/components/discovery/FoundationMap";
 import { GenerationWorkspace } from "@/components/discovery/GenerationWorkspace";
 import { ReviewChallenges } from "@/components/discovery/ReviewChallenges";
 import { ReviewContradictions } from "@/components/discovery/ReviewContradictions";
 import { ReviewFactList } from "@/components/discovery/ReviewFactList";
 import { ProjectWorkspaceNav } from "@/components/projects/ProjectWorkspaceNav";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { BlueprintGenerationResponseSchema, type BlueprintGenerationResponse } from "@/lib/domain/blueprint/schemas";
 import {
   DiscoveryReviewResponseSchema,
@@ -36,6 +38,7 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
   const [generationResult, setGenerationResult] = useState<BlueprintGenerationResponse | null>(null);
   const [error, setError] = useState("");
   const [approvalDetails, setApprovalDetails] = useState<FoundationApprovalDetails | null>(null);
+  const [mutationFeedback, setMutationFeedback] = useState<Readonly<{ targetId: string; status: "success" | "error"; message: string }> | null>(null);
   const blockerElements = useRef(new Map<string, HTMLElement>());
   const generationRequestId = useRef<string | null>(null);
 
@@ -54,26 +57,31 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
   }
 
   async function handleMutation(payload: DiscoveryReviewInput) {
-    setPending(true); setError(""); setApprovalDetails(null);
+    const targetId = mutationTargetId(payload);
+    setPending(true); setError(""); setApprovalDetails(null); setMutationFeedback(null);
     let requestFailure = "";
     try {
       const response = await fetch(`/api/projects/${projectId}/review`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const body: unknown = await response.json();
       if (!response.ok) {
-        if (response.status === 401) { setError("Your session expired. Sign in again, then retry. Your review edit is still here."); return; }
-        if (response.status === 403) { setError("You do not have permission to change this foundation."); return; }
+        if (response.status === 401) { const message = "Your session expired. Sign in again, then retry. Your review edit is still here."; setError(message); setMutationFeedback(targetId ? { targetId, status: "error", message } : null); return; }
+        if (response.status === 403) { const message = "You do not have permission to change this foundation."; setError(message); setMutationFeedback(targetId ? { targetId, status: "error", message } : null); return; }
         const failure = readReviewFailure(body);
         setError(failure.error);
+        setMutationFeedback(targetId ? { targetId, status: "error", message: failure.error } : null);
         if (failure.details) { setApprovalDetails(failure.details); focusFirstBlocker(failure.details); }
         return;
       }
       const result = DiscoveryReviewResponseSchema.parse(body);
       setContext(result.context); setReadiness(result.readiness); setApproved(result.approved);
+      setMutationFeedback(targetId ? { targetId, status: "success", message: mutationSuccessMessage(payload) } : null);
+      if (targetId) window.requestAnimationFrame(() => blockerElements.current.get(targetId)?.focus({ preventScroll: true }));
     } catch (caught) {
       requestFailure = caught instanceof TypeError
         ? "Could not reach the server. Your review edit is still here. Check your connection and retry."
         : "That review change could not be saved. Your edit is still here. Retry.";
       setError(requestFailure);
+      setMutationFeedback(targetId ? { targetId, status: "error", message: requestFailure } : null);
     } finally { setPending(false); }
   }
 
@@ -102,17 +110,39 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
   const blockingIds = new Set(approvalDetails?.blockers.map((blocker) => blocker.targetId) ?? []);
   return (
     <main className="review-workspace">
-      <header className="review-workspace__hero"><Link href={`/projects/${projectId}/discover`}>← {projectName} discovery</Link><span className="eyebrow">Foundation review</span><h1>Mycel Core has been listening.</h1><p>Here is the product foundation it understands. Keep what is true, reshape what is not, and make uncertainty intentional.</p></header>
+      <header className="review-workspace__hero"><Link href={`/projects/${projectId}/discover`}>← {projectName} discovery</Link><span className="eyebrow">Foundation review</span><h1>Review the product foundation.</h1><p>Keep what is true, reshape what is not, and make every remaining uncertainty intentional.</p></header>
       <ProjectWorkspaceNav active="review" blueprintAvailable={hasBlueprint} discoveryStarted foundationApproved={approved} projectId={projectId} />
       {error ? <ApprovalNotice details={approvalDetails} error={error} /> : null}
+      <FoundationDecisionGroups context={context} readiness={readiness} />
       <FoundationMap blockingTargetIds={blockingIds} context={context} onBlockerRef={registerBlocker} readiness={readiness} />
-      <ReviewFactList blockingTargetIds={blockingIds} context={context} onBlockerRef={registerBlocker} onMutate={(input) => void handleMutation(input)} pending={pending} />
+      <ReviewFactList blockingTargetIds={blockingIds} context={context} feedback={mutationFeedback} onBlockerRef={registerBlocker} onMutate={(input) => void handleMutation(input)} pending={pending} />
       <ReviewContradictions blockingTargetIds={blockingIds} context={context} onBlockerRef={registerBlocker} onMutate={(input) => void handleMutation(input)} pending={pending} />
       <ReviewChallenges blockingTargetIds={blockingIds} context={context} onBlockerRef={registerBlocker} onMutate={(input) => void handleMutation(input)} pending={pending} />
-      <footer className="review-approval"><div><span className="eyebrow">Foundation readiness</span><strong>{approved ? MYCELLIUM_COPY.review.approvedTitle : MYCELLIUM_COPY.review.pendingTitle}</strong><p>{approved ? MYCELLIUM_COPY.review.approvedDetail : MYCELLIUM_COPY.review.pendingDetail}</p></div>{approved ? <button onClick={() => void handleArchitect()} type="button">Architect my product</button> : <button disabled={pending} onClick={() => void handleMutation({ action: "approve" })} type="button">Approve this foundation</button>}</footer>
-      {hasBlueprint ? <Link className="review-export-link" href={`/projects/${projectId}/export`}>Export the current Product Blueprint →</Link> : <p className="review-export-locked">{MYCELLIUM_COPY.export.lockedDescription}</p>}
+      <footer className="review-approval"><div><span className="eyebrow">Foundation readiness</span><strong>{approved ? MYCELLIUM_COPY.review.approvedTitle : MYCELLIUM_COPY.review.pendingTitle}</strong><p>{approved ? MYCELLIUM_COPY.review.approvedDetail : MYCELLIUM_COPY.review.pendingDetail}</p></div>{approved ? <Button onClick={() => void handleArchitect()} type="button">Architect my product</Button> : <Button disabled={pending} loading={pending} onClick={() => void handleMutation({ action: "approve" })} type="button">Approve this foundation</Button>}</footer>
+      {hasBlueprint ? <ButtonLink className="review-export-link" href={`/projects/${projectId}/export`} variant="secondary">Export the current Product Blueprint <span aria-hidden="true">→</span></ButtonLink> : <p className="review-export-locked">{MYCELLIUM_COPY.export.lockedDescription}</p>}
     </main>
   );
+}
+
+function mutationTargetId(input: DiscoveryReviewInput): string | null {
+  if ("factId" in input) return `review-fact-${input.factId}`;
+  if ("contradictionId" in input) return `review-contradiction-${input.contradictionId}`;
+  if ("challengeId" in input) return `review-challenge-${input.challengeId}`;
+  return null;
+}
+
+function mutationSuccessMessage(input: DiscoveryReviewInput): string {
+  if (input.action === "edit_fact") return "Fact changes saved.";
+  if (input.action === "confirm_fact") return "Fact confirmed.";
+  if (input.action === "mark_unknown") return "Fact kept as an explicit unknown.";
+  if (input.action === "accept_unknown") return "Unknown accepted as a documented assumption.";
+  if (input.action === "reject_assumption") return "Fact rejected from the foundation.";
+  if (input.action === "delete_fact") return "Fact removed.";
+  if (input.action === "resolve_contradiction") return "Contradiction resolved.";
+  if (input.action === "accept_challenge_risk") return "Challenge accepted with its risk visible.";
+  if (input.action === "acknowledge_challenge") return "Challenge acknowledged.";
+  if (input.action === "resolve_challenge") return "Challenge resolved.";
+  return "Foundation updated.";
 }
 
 function ApprovalNotice({ details, error }: Readonly<{ details: FoundationApprovalDetails | null; error: string }>) {

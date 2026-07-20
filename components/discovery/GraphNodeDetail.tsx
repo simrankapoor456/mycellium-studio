@@ -1,5 +1,8 @@
-import { FormEvent } from "react";
+"use client";
 
+import { FormEvent, useId, useRef } from "react";
+
+import { Button } from "@/components/ui/Button";
 import type { DiscoveryContext, DiscoveryReviewInput, ProductGraph } from "@/lib/domain/discovery/schemas";
 
 type GraphNodeDetailProps = Readonly<{
@@ -13,6 +16,9 @@ type GraphNodeDetailProps = Readonly<{
 
 export function GraphNodeDetail({ context, downstreamItems, messages, node, pending, onMutate }: GraphNodeDetailProps) {
   const fact = context.facts.find((item) => item.id === node.id);
+  const deleteDialog = useRef<HTMLDialogElement>(null);
+  const deleteTitleId = useId();
+  const deleteDescriptionId = useId();
 
   if (!fact) {
     return null;
@@ -47,12 +53,12 @@ export function GraphNodeDetail({ context, downstreamItems, messages, node, pend
         <div><dt>Downstream blueprint items</dt><dd>{downstreamItems.join(", ") || "None yet"}</dd></div>
       </dl>
       {sourceMessages.map((message) => <a href={`#message-${message.id}`} key={message.id}>Jump to source: {message.content.slice(0, 80)}</a>)}
-      <form className="living-graph__edit" onSubmit={handleEdit}><label htmlFor={`graph-value-${fact.id}`}>Edit this fact</label><textarea defaultValue={fact.value} id={`graph-value-${fact.id}`} name="value" required rows={3} /><button disabled={pending} type="submit">Save fact</button></form>
+      <form className="living-graph__edit" onSubmit={handleEdit}><label htmlFor={`graph-value-${fact.id}`}>Edit this fact</label><textarea defaultValue={fact.value} id={`graph-value-${fact.id}`} name="value" required rows={3} /><Button disabled={pending} type="submit">Save fact</Button></form>
       <div className="living-graph__actions">
-        <button disabled={pending} onClick={() => onMutate({ action: "confirm_fact", factId: fact.id })} type="button">Confirm</button>
-        <button disabled={pending} onClick={() => onMutate({ action: "reject_assumption", factId: fact.id })} type="button">Reject</button>
-        <button disabled={pending} onClick={() => onMutate({ action: "mark_unknown", factId: fact.id })} type="button">Mark unknown</button>
-        <button disabled={pending} onClick={() => onMutate({ action: "delete_fact", factId: fact.id })} type="button">Delete</button>
+        <Button disabled={pending} onClick={() => onMutate({ action: "confirm_fact", factId: fact.id })} type="button">Confirm</Button>
+        <Button disabled={pending} onClick={() => onMutate({ action: "mark_unknown", factId: fact.id })} type="button" variant="outline">Mark unknown</Button>
+        <Button disabled={pending} onClick={() => onMutate({ action: "reject_assumption", factId: fact.id })} type="button" variant="quiet">Reject</Button>
+        <Button disabled={pending} onClick={() => deleteDialog.current?.showModal()} type="button" variant="destructive">Delete</Button>
       </div>
       {contradictions.map((contradiction) => (
         <form className="living-graph__resolution" key={contradiction.id} onSubmit={(event) => {
@@ -62,15 +68,22 @@ export function GraphNodeDetail({ context, downstreamItems, messages, node, pend
         }}>
           <strong>{contradiction.description}</strong>
           <select aria-label="Direction to keep" name="confirmedFactId">{contradiction.factIds.map((id) => <option key={id} value={id}>{context.facts.find((item) => item.id === id)?.value ?? id}</option>)}</select>
-          <input name="resolution" placeholder="Why this direction wins" required /><button disabled={pending} type="submit">Resolve</button>
+          <input name="resolution" placeholder="Why this direction wins" required /><Button disabled={pending} type="submit">Resolve</Button>
         </form>
       ))}
       {challenges.map((challenge) => (
         <section className="living-graph__challenge" key={challenge.id}>
           <strong>{challenge.title}</strong><p>{challenge.description}</p><small>{challenge.severity} · {challenge.status.replaceAll("_", " ")}</small>
-          {challenge.status === "open" ? <div><button disabled={pending} onClick={() => onMutate({ action: "acknowledge_challenge", challengeId: challenge.id })} type="button">Acknowledge</button><button disabled={pending} onClick={() => onMutate({ action: "accept_challenge_risk", challengeId: challenge.id })} type="button">Accept risk</button></div> : null}
+          {challenge.status === "open" ? <div><Button disabled={pending} onClick={() => onMutate({ action: "acknowledge_challenge", challengeId: challenge.id })} type="button" variant="secondary">Acknowledge</Button><Button disabled={pending} onClick={() => onMutate({ action: "accept_challenge_risk", challengeId: challenge.id })} type="button" variant="outline">Accept risk</Button></div> : null}
         </section>
       ))}
+      <dialog aria-describedby={deleteDescriptionId} aria-labelledby={deleteTitleId} className="dialog-backdrop ui-dialog" ref={deleteDialog}>
+        <div className="ui-dialog__content">
+          <h2 id={deleteTitleId}>Delete this fact?</h2>
+          <p id={deleteDescriptionId}>This removes the fact from the active foundation after you confirm.</p>
+          <div><Button onClick={() => deleteDialog.current?.close()} type="button" variant="secondary">Cancel</Button><Button onClick={() => { deleteDialog.current?.close(); onMutate({ action: "delete_fact", factId: fact.id }); }} type="button" variant="destructive">Delete fact</Button></div>
+        </div>
+      </dialog>
     </aside>
   );
 }

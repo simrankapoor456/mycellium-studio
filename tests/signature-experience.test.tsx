@@ -25,8 +25,8 @@ describe("signature Product Graph", () => {
     const user = userEvent.setup();
     render(<ScrollProductNarrative />);
 
-    const idea = screen.getByRole("button", { name: /A rough idea/ });
-    const architecture = screen.getByRole("button", { name: /Product architecture/ });
+    const idea = screen.getByRole("button", { name: /Fragmented input/ });
+    const architecture = screen.getByRole("button", { name: /Architecture emergence/ });
 
     expect(idea).toHaveAttribute("aria-pressed", "true");
     await user.click(architecture);

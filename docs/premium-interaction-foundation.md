@@ -1,6 +1,6 @@
 # Premium interaction foundation
 
-This foundation makes approved interaction runtimes available behind a narrow client-only boundary. Phase 7.2 uses it for one public hero entrance and one final word-level transition. Lenis remains unmounted, and authenticated routes retain native scrolling and CSS feedback.
+This foundation keeps approved interaction runtimes behind narrow client-only boundaries. The public experience uses them for the hero, signature growth story, final word-level transition, and public-only smooth wheel scrolling. The protected Living Foundation Map uses one scoped GSAP reveal because relationship formation carries product meaning. All other authenticated routes retain native scrolling and CSS feedback.
 
 ## Audit summary
 
@@ -16,7 +16,7 @@ This foundation makes approved interaction runtimes available behind a narrow cl
 | Candidate | Decision | Reason |
 | --- | --- | --- |
 | GSAP | Install | It adds coordinated timelines, SVG choreography, `ScrollTrigger`, responsive `matchMedia`, and deterministic context cleanup that the native utilities do not provide. |
-| Lenis | Install, keep inactive | It is an optional public-marketing enhancement. Keeping it unmounted preserves native scrolling until its behavior is tested against accessibility and navigation requirements. |
+| Lenis | Public marketing only | It improves the long public narrative while leaving authentication, forms, editors, dialogs, and protected workspaces on native scrolling. |
 | React Bits | Selective source use | React Bits is a component-source catalog, not an installed runtime. One SplitText source was adapted to the current tokens, GSAP boundary, TypeScript, static fallback, and cleanup rules. |
 | `@gsap/react` | Install | The official `useGSAP` hook keeps component-scoped lifecycle cleanup consistent for the small number of public motion boundaries. |
 
@@ -74,7 +74,7 @@ Additional rules:
 
 Lenis should power only the public marketing experience. It must not wrap `app/layout.tsx` or the authenticated, authentication, form, dialog, discovery, review, blueprint, export, or settings experiences.
 
-If Phase 7.2 activates it, mount one public-page Client Component that owns the Lenis instance and destroys it on unmount. The native-scrolling version remains the baseline. Do not initialize Lenis when `prefers-reduced-motion: reduce` matches. Do not enable touch synchronization, scroll locking, or custom multipliers without device testing.
+`MarketingMotionProvider` is the one public-page Client Component that owns the Lenis instance and destroys it on unmount. Native scrolling remains the fallback. Lenis does not initialize when `prefers-reduced-motion: reduce` matches. Touch synchronization, scroll locking, and custom multipliers remain disabled.
 
 Activation gates:
 
@@ -111,6 +111,10 @@ Rejected for the current system:
 - No installed package was reported as deprecated. `npm outdated` reports newer major releases for `@types/node`, ESLint, and TypeScript; they are not interaction-system blockers and should be reviewed in a separate upgrade task.
 - The existing audit finding is two moderate nested PostCSS advisories. Do not apply a forced breaking upgrade as part of interaction preparation.
 
-## Phase 7.2 entry criteria
+## Phase 8 implementation
 
-Before an interaction ships, verify native and enhanced versions at 375, 768, 1024, and 1440 pixels; keyboard-only navigation; reduced motion; Back/Forward navigation; anchor links; zoom; touch scrolling; and nested overflow. Measure the affected public route rather than accepting a site-wide bundle increase. Authenticated routes must not load GSAP or Lenis unless a later product requirement is independently approved.
+The signature story uses `ScrollTrigger` for meaningful chapter boundaries and a scrubbed environmental response. It is dynamically composed from the public route and remains semantically complete during server rendering. The Living Foundation Map uses a one-time scoped path reveal because the connection sequence explains evidence formation. Both owners use local refs, `useGSAP`, `gsap.matchMedia()`, and complete cleanup.
+
+Lenis starts only inside `MarketingMotionProvider`, forwards scroll events to `ScrollTrigger.update`, advances from the GSAP ticker, and removes its ticker callback before destruction. Inputs, textareas, selects, dialogs, and native-scroll regions remain outside its control. The production manifest keeps its unchanged 18,410-byte raw chunk out of protected routes.
+
+Verification covers native and enhanced versions at 375, 768, 1024, and 1440 pixels; keyboard navigation; reduced motion; anchors; zoom; mobile flow; reverse story movement; midway refresh; console output; hydration output; and nested overflow. Physical-device and representative assistive-software checks remain release work.

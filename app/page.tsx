@@ -1,3 +1,5 @@
+import dynamic from "next/dynamic";
+
 import { FaqSection } from "@/components/marketing/FaqSection";
 import { FinalCtaSection } from "@/components/marketing/FinalCtaSection";
 import { JourneySection } from "@/components/marketing/JourneySection";
@@ -7,8 +9,9 @@ import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingMotionProvider } from "@/components/marketing/MarketingMotionProvider";
 import { PhilosophySection } from "@/components/marketing/PhilosophySection";
 import { PricingSection } from "@/components/marketing/PricingSection";
-import { ScrollProductNarrative } from "@/components/marketing/ScrollProductNarrative";
 import { TrustSection } from "@/components/marketing/TrustSection";
+
+const ScrollProductNarrative = dynamic(() => import("@/components/marketing/ScrollProductNarrative").then((module) => module.ScrollProductNarrative));
 
 export default function HomePage() {
   return (
