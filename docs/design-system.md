@@ -2,185 +2,141 @@
 
 ## Direction
 
-The system is called **rooted editorial architecture**. It combines a distinctive brand register for marketing with a familiar product register for authenticated work.
+The system is **living product intelligence**: cinematic and environmental in public, spatial and calm in productive work. Organic paths express connected understanding; precise typography, rules, and state labels keep that expression technically credible.
 
-Physical scene: a founder and engineering lead review a product map at a quiet studio table in clear morning light, with precise notes above the surface and connected reasoning visible beneath it.
+The visual system must never collapse into a forest-colored template. Atmosphere belongs to page composition and environmental layers, while controls and product state remain legible, tactile, and familiar.
 
-Brand surfaces use large sans-serif display type, asymmetric layouts, architectural rules, and a single root-path motif. Product surfaces use calm hierarchy, conventional navigation, explicit status labels, and restrained motion. Neither register uses fake product screenshots, customer claims, metrics, certifications, or integrations.
+## Identity
 
-## Logo system
+The production mark is a compact radial network with a central intelligence form, six primary directions, and limited terminal nodes. It keeps a strong silhouette without glow and remains recognizable at 16 pixels. The wordmark pairs an editorial serif `Mycellium` with widely tracked sans-serif `STUDIO`.
 
-The rooted-M is hand-authored SVG geometry. The upper form is a refined capital M; its lower strokes continue into five connected root points. It must remain recognizable without color and at favicon size.
+Canonical assets live in `public/brand/`:
 
-Assets:
+- `mycellium-mark.svg`, `mycellium-mark-light.svg`, and `mycellium-mark-dark.svg`
+- `mycellium-mark-monochrome.svg`, which inherits `currentColor`
+- `mycellium-wordmark.svg`
+- `mycellium-lockup-horizontal.svg` and `mycellium-lockup-stacked.svg`
+- `icons/favicon.svg` and generated PNG icon sizes
+- `social/open-graph.svg` and generated social PNGs
 
-- `public/brand/mycellium-mark.svg`: primary forest mark on transparent background
-- `public/brand/mycellium-mark-light.svg`: light mark for dark surfaces
-- `public/brand/mycellium-wordmark.svg`: geometric stroke wordmark
-- `public/brand/mycellium-lockup.svg`: mark and wordmark lockup
-- `public/brand/favicon.svg`: simplified mark on a forest tile
-- `public/brand/apple-touch-icon.svg`: enlarged touch target asset
-- `public/brand/og-image.svg`: 1200 by 630 social card
+Use `BrandMark` and `BrandLogo` in the interface. Both use inline vector geometry so they stay crisp and can adopt semantic color. Do not use a raster identity board, add decorative nodes, distort the silhouette, or make glow necessary for recognition.
 
-Use `BrandLogo` in application UI so spacing, accessible naming, and light/dark asset selection stay consistent. Do not redraw, rotate, stretch, decorate, or place the mark on a low-contrast surface.
+Run `npm run brand:generate` after changing the social source or icon geometry. The script uses the installed image pipeline to create reproducible optimized PNG outputs; it does not fetch remote assets.
 
-## Visual tokens
+## Token architecture
 
-Tokens live in `app/globals.css` and are exposed to Tailwind CSS 4 through `@theme`.
+Phase 7.1 tokens are centralized in `app/phase-7-1.css` and imported after the established compatibility styles in `app/globals.css`. New surfaces and components should use semantic custom properties instead of route-local visual values.
 
 ### Color roles
 
-| Token | Role |
+| Token family | Purpose |
 | --- | --- |
-| `canvas` | Green-tinted application and marketing background |
-| `surface` | Primary content surface |
-| `surface-quiet` | Secondary hierarchy layer |
-| `ink` | Primary charcoal text |
-| `forest` | Brand identity and primary actions |
-| `moss` | Supporting labels and product context |
-| `sage` | Positive and low-emphasis surfaces |
-| `gold` | Root-path emphasis and focus ring only |
-| `clay` | Destructive actions and error text |
-| `line` / `line-strong` | Structural borders and field boundaries |
+| `--environment-*` | Near-black forest page atmosphere |
+| `--workspace-*` | Calm authenticated application planes |
+| `--surface-*` | Content, inspector, overlay, and intelligence-active hierarchy |
+| `--text-*` | Warm cream primary text and stone/sage secondary tiers |
+| `--intelligence-*` | Bioluminescent lime for primary action and meaningful active state |
+| `--gold-*` | Restrained uncertainty, focus, and lineage emphasis |
+| `--warning-*` | Genuine blockers only |
+| `--danger-*` | Destructive actions and errors only |
+| `--line-*` | Quiet structural separation and active boundaries |
 
-Gold is never a large background or decorative premium cue. Forest remains the only primary action color. Status information always includes text and never depends on color alone.
+Lime is not ambient decoration. Use its strongest value for primary action, selected graph nodes, active Mycel Core state, and meaningful completion. State always includes text or shape, never color alone.
 
 ### Typography
 
-- Display: Aptos Display, Avenir Next, then Segoe UI Variable Display
-- Body and interface: Aptos, Avenir Next, then Segoe UI Variable
-- Metadata: Cascadia Mono, SFMono-Regular, then Consolas
+- Editorial display: Georgia, Times New Roman, then a generic serif.
+- Product and body: Aptos, Avenir Next, Segoe UI Variable, then system sans-serif.
+- System metadata: Cascadia Mono, SFMono-Regular, then Consolas.
 
-Display type uses a strong roman sans face with tight spacing. Body copy uses a maximum measure of roughly 65 characters and line height between 1.5 and 1.7. Monospace is limited to product-category and artifact labels.
+Public headings may use the serif for selected expressive phrases. Authenticated work uses calmer sans-serif scales. Body measure remains near 65 characters; metadata is never set so small or faint that it becomes ornamental.
 
-### Shape and depth
+### Shape, depth, and lighting
 
-- Controls: 8 to 10 pixel radius
-- Cards: 12 pixel radius
-- Badges: pill shape at tag scale only
-- Marketing structure: borders and whitespace instead of decorative shadows
-- Dialog: native browser top layer with one quiet surface
+- Compact controls use a tactile rounded rectangle, not an exaggerated pill.
+- The public navigation is the one deliberate capsule.
+- Content surfaces use quiet borders and internal illumination before shadow.
+- Environmental background, workspace, content surface, inspector, overlay, and intelligence-active surface are separate tiers.
+- Blur is reserved for floating navigation and exceptional overlays.
+- Glow appears only around active intelligence or a focused primary action.
+- Nested card stacks and glass on every panel are outside the system.
 
-Nested cards and decorative shadow stacks are outside the system. Translucency is reserved for navigation, selected intelligence surfaces, and generation state; restrained glow identifies active Mycel Core paths only.
+### Spacing and containers
 
-## Reusable components
+Spacing follows a compact base rhythm with larger editorial jumps between narrative chapters. Public sections may be asymmetric and open; product pages keep stable reading widths and closer grouping between label, state, and action. Containers protect the edges at every supported viewport and respect safe-area insets.
 
-| Component | Purpose and key behavior |
+## Reusable primitives
+
+| Primitive | Contract |
 | --- | --- |
-| `BrandLogo` | Accessible logo link with primary, light, and compact states |
-| `Button` / `ButtonLink` | Primary, secondary, quiet, danger, disabled, active, and focus states |
-| `Card` | One structural content boundary without decorative elevation |
-| `Badge` | Text-backed neutral, success, warning, and accent status |
-| `SectionHeading` | Consistent marketing heading hierarchy and readable measure |
-| `Container` | Responsive page width and edge padding |
-| `EmptyState` | Branded explanation plus one useful next action |
-| `LoadingState` | Layout-mirroring project skeleton with live-region text |
-| `ConfirmDialog` | Native modal confirmation, Escape support, focus management, cancel and danger actions |
-| `FormField` | Visible label, hint or error association, and consistent spacing |
-| `ProductStageExperience` | ARIA tabs with pointer, arrow, Home, and End controls |
-| `FaqSection` | Native disclosure semantics with keyboard-operable summaries |
+| `BrandMark` | Inline radial mark, accessible label when meaningful, decorative otherwise, optional one-time formation |
+| `BrandLogo` | Home or dashboard link with canonical mark and typographic wordmark |
+| `Button` / `ButtonLink` | Intelligence-primary, neutral-secondary, quiet, destructive, compact, disabled, active, and focus states |
+| `FormField` | Visible label, hint/error association, stable input surface, and explicit validation state |
+| `Card` | One semantic content boundary using the content-surface tier |
+| `Badge` | Text-backed neutral, success, warning, danger, and accent states |
+| `ConfirmDialog` | Native dialog behavior with focused overlay treatment |
+| `EmptyState` | Branded explanation and one useful next action |
+| `LoadingState` | Layout-mirroring skeleton with live-region text and no motion requirement |
+| `WorkspaceNavigation` | Anchored global product navigation with current route, profile access, identity context, and mobile mode |
+| `ProjectWorkspaceNav` | Data-backed journey state, current project context, locked-stage explanation, and export access |
 
-## Interaction and motion
+Phase 7.1 applies these foundations across existing routes without replacing the internal workspace structures reserved for Phase 7.2.
 
-Motion confirms state; it does not decorate idle screens.
+## Motion
 
-- Fast: 120 milliseconds for small feedback
-- Normal: 200 milliseconds for controls and tabs
-- Moderate: 320 milliseconds for overlays
-- Deliberate: 560 milliseconds for a one-time section reveal
-- Standard curve: `cubic-bezier(0.2, 0, 0, 1)`
-- Entrance curve: `cubic-bezier(0, 0, 0.2, 1)`
+Motion communicates connection and state; it does not make the user wait.
 
-Only opacity and transform are animated. Root-path drawing runs once when the selected stage changes. Under `prefers-reduced-motion: reduce`, duration tokens become zero, scroll behavior becomes immediate, and root/reveal movement is removed.
-
-### Living Architecture signature system
-
-The signature experience keeps one Product Graph visible from the hero through the scroll story and the Discover, Architect, and Execute example. Its visual grammar is semantic:
-
-- Nodes are named product artifacts, never decorative particles.
-- Edges show a traceable dependency or transformation.
-- Active layers use forest and gold; future layers remain quiet but legible.
-- Seed and sprint nodes bookend the graph so the original intent remains connected to delivery.
-- Diagram labels and detail panels carry meaning independently of motion or color.
-
-The graph enters in four deliberate layers: seed, discovery, architecture, then execution. Pointer movement may offset selected hero layers by a few pixels through compositor transforms. Scroll progression changes a single active layer through `IntersectionObserver`; it does not bind rendering work to the scroll event. On narrow screens, the large SVG becomes a five-step ordered summary. The workflow diagrams remain locally scrollable without creating page-level overflow.
-
-Phase 6 extends this grammar into a near-black forest environment, warm cream type, bioluminescent active paths, and antique-gold uncertainty cues. The application stays calmer than marketing. Its journey rail, narrative review, Foundation Map, and generation workspace use persisted product state rather than decorative values. The architecture reveal lasts only long enough to explain the real blueprint structure, supports skip, and becomes immediate under reduced motion.
-
-### Elevation and motion tokens
-
-| Tier | Use |
+| Token | Typical use |
 | --- | --- |
-| `flat` | Content that belongs directly to the page plane |
-| `raised` | Interactive panels, tabs, and selected product surfaces |
-| `floating` | The signature hero graph and exceptional narrative emphasis |
+| Immediate, 90 ms | Pressed and focus feedback |
+| Fast, 140 ms | Hover and small state changes |
+| Normal, 220 ms | Menus and surface transitions |
+| Moderate, 360 ms | Diagram relationships |
+| Deliberate, 640 ms | One-time narrative entrance |
+| Formation, up to 2.4 s | Spark, Connect, Grow, Form, Settle identity sequence |
 
-| Motion | Duration | Use |
-| --- | --- | --- |
-| Immediate | 90 ms | Pressed and focus feedback |
-| Fast | 140 ms | Small hover and state changes |
-| Normal | 220 ms | Tabs and surface transitions |
-| Moderate | 360 ms | Diagram relationships |
-| Deliberate | 640 ms | One-time narrative entrance |
-| Extended | 760 ms | Connector drawing |
+The spatial easing curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product surfaces use only the first three tiers. Environmental effects use opacity and transforms and never hijack scrolling.
 
-The spatial curve is `cubic-bezier(0.22, 1, 0.36, 1)`. Product application surfaces use only the immediate, fast, and normal tiers. Marketing may use moderate and deliberate motion for explanation. No surface oscillates while idle.
-
-### Performance budgets
-
-- No runtime visualization dependency; diagrams use optimized inline SVG and CSS.
-- No continuous React state updates from pointer or scroll movement.
-- One observer coordinates the scroll story, and one animation frame batches hero pointer transforms.
-- Static content is rendered before enhancement so the story remains complete without JavaScript or motion.
-- Incremental landing-page client JavaScript should remain below 25 KB gzip.
-- Hero and diagram dimensions are stable before animation to avoid layout shift.
+The animated mark forms once through Spark, Connect, Grow, Form, and Settle. It is complete from the start in the document, does not delay content, and becomes immediately static under `prefers-reduced-motion: reduce`.
 
 ## Accessibility
 
-- Semantic landmarks and headings describe page structure.
-- Skip links exist on marketing and authenticated surfaces.
-- Touch targets are at least 44 pixels high.
-- Keyboard focus uses a three-pixel antique-gold ring with external offset.
-- Tabs implement roving `tabIndex`, arrow keys, Home, and End.
-- FAQ uses native `details` and `summary` behavior.
-- Confirmation uses native `dialog` for browser focus trapping and Escape dismissal.
-- Every form control has a visible programmatic label.
-- Field hints and errors use `aria-describedby`; form outcomes use live status roles.
-- Disabled and future states use labels in addition to color or opacity.
-- Loading regions expose screen-reader text and mirror final layout dimensions.
+- Semantic landmarks and ordered headings define each page.
+- The mark has a concise accessible name only when it carries content; decorative instances are hidden.
+- Focus is visible on every interactive element and is not replaced by hover styling.
+- Controls meet a 44-pixel target where touch use is expected.
+- Mobile navigation preserves every destination and exposes expanded state.
+- Form labels and field messages retain programmatic association.
+- Dialogs use the browser top layer and native keyboard behavior.
+- Reduced motion removes formation, reveals, smooth scrolling, and environmental drift.
+- Higher contrast preferences strengthen surface lines and text separation.
+- Product status always combines wording with visual treatment.
 
-Automated tests cover markup and interaction logic, but they do not certify complete WCAG conformance. Manual keyboard, zoom, contrast, screen-reader, and real-device review remain part of release verification.
+Automated checks protect semantics and interactions but do not establish complete accessibility conformance. Keyboard, zoom, contrast, screen-reader, and real-device checks remain release work.
 
-## Responsive behavior
+## Responsive principles
 
-Base styles target narrow screens. Multi-column layouts collapse below 768 pixels, navigation becomes horizontally scrollable rather than removing destinations, and project actions wrap without hiding functionality. Review widths are 375, 768, 1024, and 1440 pixels. Safe viewport height uses `100dvh` for application and authentication shells.
+Review widths are 375, 768, 1024, and 1440 pixels.
 
-At 375 pixels, the Product Graph uses its ordered text fallback and each detailed workflow diagram scrolls inside its own focused region. At 768 pixels and above, the full graph is restored. The narrative sticky plane is reserved for large viewports; smaller screens receive the same five chapters in normal document flow.
+- At 375 pixels, the identity remains recognizable, public navigation becomes a designed inline panel, and diagrams become linear reading sequences.
+- At 768 pixels, text and visual chapters may share more horizontal space without restoring dense desktop navigation.
+- At 1024 pixels, public storytelling gains spatial depth while keeping the compact navigation mode.
+- At 1440 pixels, full floating navigation and asymmetric editorial composition are available.
+- No route may create page-level horizontal overflow or hide a critical action.
+- Product navigation wraps or changes mode instead of shrinking labels below legibility.
 
-## Content rules
+## Performance boundaries
 
-### Product voice
+- No WebGL, large animation library, autoplay video, or continuous particle loop.
+- SVG and CSS construct the environment and identity.
+- Brand PNGs are generated once and only the needed favicon, touch icon, or social image is loaded.
+- Layout dimensions are reserved before animation.
+- Static meaning exists before JavaScript enhancement.
+- Large blur is restricted to bounded floating surfaces.
 
-Mycellium speaks like an experienced product strategist: warm, curious, precise, grounded, and concise. It acknowledges what changed, names one useful insight or uncertainty, then asks one material question. It encourages momentum without forced cheerfulness, corporate workflow language, or decorative metaphor.
+## Voice and content
 
-Reusable product copy lives in `lib/voice/mycellium.ts`. A stable input-derived selector varies deterministic acknowledgements without runtime randomness, so fallback conversations stay natural and testable. The same layer owns readiness, contradiction, fallback disclosure, empty-state, review, generation, transition, and export language.
+Mycellium speaks like an experienced product strategist: warm, curious, precise, grounded, and concise. It names facts, uncertainty, changes, and the next useful action without confidence theater or excessive nature language.
 
-Primary UI copy describes the user's product progress: “Foundation strength,” “Still needs clarity,” “Reliable mode,” and “Ready to architect.” Raw domain statuses remain available in detail surfaces where precision matters. Seed, root, and growth language is reserved for occasional momentum cues rather than every sentence.
-
-- Keep acknowledgements to one sentence unless the answer is genuinely complex.
-- Explain the change before asking the next question.
-- Name contradictions directly without sounding punitive.
-- State when Reliable mode is active without presenting it as a failure.
-- Explain exactly when locked actions become available.
-- Never use “input received,” “proceed to next step,” “critical gaps remain,” or “readiness assessment updated.”
-
-### Export states
-
-Export remains visible in project navigation at every stage. Before blueprint generation, the destination explains that exports unlock after the first Product Blueprint. After generation, Markdown, JSON, and CSV actions remain directly visible on the export page, blueprint header, blueprint export section, and completion state. Each download confirms success and is generated from the current persisted blueprint, including saved edits.
-
-- State what exists today and label future capability clearly.
-- Use sentence case and direct verbs for actions.
-- Avoid fake customers, testimonials, logos, metrics, certifications, pricing checkout, and integrations.
-- Do not call planned AI behavior available.
-- No social authentication controls until a real provider is configured.
-- No silent publishing or approval language that weakens human authority.
+Reusable state copy belongs in `lib/voice/mycellium.ts`. Provider availability never changes the product promise; Reliable mode is a first-class engine state. Do not add fake customers, metrics, social proof, integrations, or unsupported flows.

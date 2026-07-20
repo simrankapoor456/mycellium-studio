@@ -1,36 +1,40 @@
 import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
+import "./phase-7-1.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Mycellium Studio | AI Product Architect",
+    default: "Mycellium Studio | Living Product Intelligence",
     template: "%s | Mycellium Studio",
   },
   description:
-    "Develop rough product ideas into grounded understanding, architecture, requirements, and execution plans.",
+    "Turn scattered product context into grounded discovery, traceable architecture, and editable Product Blueprints.",
   alternates: { canonical: "/" },
   icons: {
-    icon: [{ url: "/brand/favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/brand/apple-touch-icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/brand/icons/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/brand/icons/app-icon-512.png", sizes: "512x512", type: "image/png" }],
   },
   openGraph: {
     type: "website",
     url: "/",
     siteName: "Mycellium Studio",
-    title: "Mycellium Studio | AI Product Architect",
+    title: "Mycellium Studio | Living Product Intelligence",
     description:
-      "Turn rough product ideas into grounded understanding, architecture, requirements, and execution plans.",
-    images: [{ url: "/brand/og-image.svg", width: 1200, height: 630, alt: "Mycellium Studio AI Product Architect" }],
+      "Ideas take root. Products take shape through grounded discovery, architecture, and editable Product Blueprints.",
+    images: [{ url: "/brand/social/open-graph.png", width: 1280, height: 640, alt: "Mycellium Studio. Ideas take root. Products take shape." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mycellium Studio | AI Product Architect",
-    description: "Give your product idea roots before delivery work begins.",
-    images: ["/brand/og-image.svg"],
+    title: "Mycellium Studio | Living Product Intelligence",
+    description: "Ideas take root. Products take shape.",
+    images: ["/brand/social/open-graph.png"],
   },
 };
 
@@ -38,7 +42,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#173f31",
+  themeColor: "#07110d",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

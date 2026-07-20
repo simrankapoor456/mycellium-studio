@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title desc">
+  <title id="title">Rooted Architecture</title><desc id="desc">An architectural frame organizes a central stem into three grounded root channels.</desc>
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M25 28H75V70H65M35 70H25V28" stroke-width="6"/>
+    <path d="M50 24V56M50 56L35 72M50 56L50 78M50 56L66 72" stroke-width="5"/>
+  </g>
+  <g fill="currentColor"><rect x="43" y="18" width="14" height="12" rx="5"/><circle cx="35" cy="72" r="5"/><circle cx="50" cy="78" r="5"/><circle cx="66" cy="72" r="5"/></g>
+</svg>

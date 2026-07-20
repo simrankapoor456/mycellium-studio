@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { BrandMark } from "@/components/brand/BrandMark";
 import { cn } from "@/lib/class-names";
 
 type BrandLogoProps = {
@@ -16,18 +16,17 @@ export function BrandLogo({
   compact = false,
   className,
 }: BrandLogoProps) {
-  const source = light ? "/brand/mycellium-mark-light.svg" : "/brand/mycellium-mark.svg";
-
   return (
     <Link
       aria-label="Mycellium Studio home"
-      className={cn("inline-flex min-h-11 items-center gap-2.5 font-semibold", className)}
+      className={cn("brand-logo inline-flex min-h-11 items-center", light && "brand-logo--light", className)}
       href={href}
     >
-      <Image alt="" height={40} priority src={source} width={40} />
+      <BrandMark className="brand-logo__mark" />
       {compact ? null : (
-        <span className="leading-none tracking-[-0.025em]">
-          Mycellium <span className={light ? "text-sage" : "text-moss"}>Studio</span>
+        <span aria-hidden="true" className="brand-logo__wordmark">
+          <span>Mycellium</span>
+          <small>Studio</small>
         </span>
       )}
     </Link>

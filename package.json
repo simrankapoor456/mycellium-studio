@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "brand:generate": "node scripts/generate-brand-assets.mjs",
+    "screenshots:optimize": "node scripts/optimize-product-assets.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
