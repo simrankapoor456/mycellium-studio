@@ -37,19 +37,19 @@ test("moves the signature story forward and backward without trapping the page",
   await page.goto("/", { waitUntil: "networkidle" });
 
   const first = page.getByRole("button", { name: /Fragmented input/ });
-  const architecture = page.getByRole("button", { name: /Architecture emergence/ });
-  const finalBeat = page.getByRole("button", { name: /New seed/ });
-  await architecture.scrollIntoViewIfNeeded();
-  await expect(architecture).toHaveAttribute("aria-pressed", "true");
-  await finalBeat.scrollIntoViewIfNeeded();
+  const connections = page.getByRole("button", { name: /Mycelium connections/ });
+  const finalBeat = page.getByRole("button", { name: /Foundation stabilized/ });
+  await connections.evaluate((element) => element.scrollIntoView({ block: "center" }));
+  await expect(connections).toHaveAttribute("aria-pressed", "true");
+  await finalBeat.evaluate((element) => element.scrollIntoView({ block: "center" }));
   await expect(finalBeat).toHaveAttribute("aria-pressed", "true");
-  await first.scrollIntoViewIfNeeded();
+  await first.evaluate((element) => element.scrollIntoView({ block: "center" }));
   await expect(first).toHaveAttribute("aria-pressed", "true");
 
-  await architecture.scrollIntoViewIfNeeded();
+  await connections.evaluate((element) => element.scrollIntoView({ block: "center" }));
   await page.reload({ waitUntil: "networkidle" });
   await expect(page.locator("#how-it-works")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "From first signal to useful product value." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "From scattered signals to a Foundation." })).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
@@ -60,9 +60,11 @@ test("presents the complete signature composition without spatial motion", async
   await page.goto("/", { waitUntil: "networkidle" });
   await page.locator("#how-it-works").scrollIntoViewIfNeeded();
 
-  await expect(page.getByRole("button", { name: /New seed/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: /Foundation stabilized/ })).toHaveAttribute("aria-pressed", "true");
   const levels = page.locator(".signature-growth [data-level]");
-  await expect(levels).toHaveCount(12);
+  expect(await levels.evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-level")))].sort())).toEqual(
+    ["0", "1", "2", "3", "4", "5", "6", "7", "8"],
+  );
   expect(await levels.evaluateAll((nodes) => nodes.every((node) => node.getAttribute("data-visible") === "true"))).toBe(true);
   await expect(page.locator(".scroll-story__visual")).toHaveCSS("position", "relative");
 });

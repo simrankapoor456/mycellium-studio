@@ -542,39 +542,89 @@
 .export-readiness__clear { border-left: 2px solid var(--intelligence); padding-left: 0.8rem; }
 .export-readiness__actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
 
+.scroll-story__visual-column { min-width: 0; }
+.scroll-story__progress { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 0.3rem; padding-inline: clamp(1.1rem, 3vw, 1.7rem); }
+.scroll-story__progress span { height: 2px; background: var(--line-default); transition: background var(--motion-ui) var(--ease-feedback), transform var(--motion-ui) var(--ease-feedback); transform-origin: left; }
+.scroll-story__progress span[data-complete="true"] { background: rgb(185 237 102 / 58%); }
+.scroll-story__progress span[data-current="true"] { background: var(--intelligence); transform: scaleY(2); }
+
 .signature-growth {
   position: relative;
-  min-height: clamp(23rem, 46vw, 35rem);
+  min-height: clamp(25rem, 48vw, 37rem);
+  padding: 0.3rem clamp(0.2rem, 1.5vw, 0.9rem) 0;
 }
-.signature-growth svg { display: block; width: 100%; height: auto; max-height: min(56dvh, 35rem); overflow: visible; }
-.signature-growth svg [data-level] { opacity: 0.05; transition: opacity var(--motion-panel) var(--ease-feedback); }
+.signature-growth svg { display: block; width: 100%; height: auto; max-height: min(62dvh, 39rem); overflow: visible; }
+.signature-growth svg [data-level] { opacity: 0.035; transition: opacity var(--motion-panel) var(--ease-feedback); }
 .signature-growth svg [data-visible="true"] { opacity: 1; }
-.signature-growth svg path { fill: none; stroke: var(--line-strong); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.signature-growth svg path { fill: none; stroke: var(--line-strong); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .signature-growth svg circle,
-.signature-growth svg rect { fill: #0a1811; stroke: var(--line-strong); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-.signature-growth svg text { fill: var(--text-secondary); font: 650 11px var(--font-system); letter-spacing: 0.04em; }
-.signature-growth__fragments rect { stroke-dasharray: 5 4; }
-.signature-growth__seed circle:first-child { fill: rgb(185 237 102 / 12%); stroke: var(--intelligence); filter: drop-shadow(0 0 14px rgb(185 237 102 / 18%)); }
-.signature-growth__seed circle:last-child { fill: var(--intelligence); stroke: var(--intelligence); }
-.signature-growth__root { stroke: var(--intelligence) !important; stroke-width: 3 !important; }
-.signature-growth__evidence path { stroke: rgb(185 237 102 / 55%); }
-.signature-growth__evidence circle { fill: var(--intelligence); stroke: var(--intelligence); }
-.signature-growth__open path,
-.signature-growth__open rect { stroke: var(--antique-gold); stroke-dasharray: 5 4; }
-.signature-growth__connections path { stroke: rgb(185 237 102 / 42%); stroke-dasharray: 3 4; }
-.signature-growth__foundation path { fill: rgb(185 237 102 / 3%); stroke: var(--intelligence); stroke-width: 2.5; }
-.signature-growth__foundation text { fill: var(--intelligence); font-size: 9px; letter-spacing: 0.12em; }
-.signature-growth__architecture rect { fill: #10241a; stroke: var(--intelligence); }
-.signature-growth__architecture path { stroke: var(--intelligence); }
-.signature-growth__blueprint rect { fill: #12271c; stroke: var(--antique-gold); }
-.signature-growth__blueprint path { stroke: var(--text-secondary); stroke-width: 1; }
-.signature-growth__blueprint text { fill: var(--antique-gold); font-size: 9px; }
-.signature-growth__execution path { stroke: var(--intelligence); }
-.signature-growth__execution circle { fill: #10241a; stroke: var(--intelligence); }
-.signature-growth__value path { stroke: var(--intelligence); }
-.signature-growth__value circle { fill: rgb(185 237 102 / 18%); stroke: var(--intelligence); filter: drop-shadow(0 0 12px rgb(185 237 102 / 15%)); }
-.signature-growth__renewal path { stroke: var(--antique-gold); stroke-dasharray: 5 4; }
-.signature-growth__renewal circle { fill: var(--antique-gold); stroke: var(--antique-gold); }
+.signature-growth svg ellipse,
+.signature-growth svg rect { fill: #0a1811; stroke: var(--line-strong); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+.signature-growth svg text { fill: var(--text-secondary); font: 650 11px var(--font-system); letter-spacing: 0.035em; }
+
+.signature-growth__soil { fill: url("#signature-soil") !important; stroke: none !important; }
+.signature-growth__soil-line { stroke: rgb(238 248 238 / 16%) !important; stroke-width: 1.1 !important; }
+.signature-growth__soil-strata { stroke: rgb(238 248 238 / 5%) !important; }
+.signature-growth__soil-grain circle { fill: rgb(238 248 238 / 14%); stroke: none; }
+
+.signature-growth__fragments g { transform-box: fill-box; transform-origin: center; }
+.signature-growth__fragments rect { fill: rgb(7 17 13 / 84%); stroke: rgb(238 248 238 / 28%); stroke-dasharray: 3 4; }
+.signature-growth__fragments circle { fill: var(--antique-gold); stroke: none; }
+.signature-growth__fragments text { fill: var(--text-muted); font-size: 10px; }
+.signature-growth__fragments [data-useful="false"] rect { stroke-opacity: 0.5; }
+
+.signature-growth__attraction circle { fill: url("#signature-intent-glow"); stroke: none; }
+.signature-growth__attraction path { stroke: rgb(185 237 102 / 24%); stroke-dasharray: 2 7; }
+.signature-growth__seed > ellipse { fill: rgb(2 8 5 / 82%); stroke: rgb(238 248 238 / 8%); }
+.signature-growth__seed-shell { fill: #625036 !important; stroke: #cfbb8c !important; stroke-width: 1.4 !important; }
+.signature-growth__seed-shell--left,
+.signature-growth__seed-shell--right { transform-box: fill-box; }
+.signature-growth__embryo { fill: rgb(185 237 102 / 64%) !important; stroke: var(--intelligence) !important; filter: drop-shadow(0 0 12px rgb(185 237 102 / 28%)); }
+.signature-growth__germination circle { fill: url("#signature-intent-glow"); stroke: none; }
+.signature-growth__germination path { stroke: #f1e4bd; stroke-width: 2 !important; }
+.signature-growth__germination .signature-growth__radicle { stroke: var(--intelligence); stroke-width: 2.6 !important; }
+
+.signature-growth__root { stroke: rgb(205 229 165 / 68%) !important; }
+.signature-growth__root--primary { stroke: var(--intelligence) !important; stroke-width: 3.2 !important; }
+.signature-growth__root--branch { stroke-width: 2.2 !important; }
+.signature-growth__root--connection { stroke: rgb(185 237 102 / 44%) !important; stroke-dasharray: 3 5; stroke-width: 1.2 !important; }
+
+.signature-growth__foundation-node circle { fill: #091710; stroke: var(--text-secondary); stroke-width: 1.5; }
+.signature-growth__foundation-node[data-state="confirmed"] circle { fill: rgb(185 237 102 / 20%); stroke: var(--intelligence); stroke-width: 2.4; }
+.signature-growth__foundation-node[data-state="emerging"] circle { stroke: var(--intelligence); stroke-dasharray: 8 4; stroke-width: 2; }
+.signature-growth__foundation-node[data-state="unknown"] circle { stroke: var(--text-secondary); stroke-dasharray: 2 4; }
+.signature-growth__foundation-node[data-state="blocked"] circle { stroke: var(--warning); stroke-dasharray: 1 3; stroke-width: 2.2; }
+.signature-growth__state-symbol { fill: none !important; stroke: var(--intelligence) !important; stroke-width: 1.7 !important; }
+.signature-growth__state-symbol--fill { fill: rgb(185 237 102 / 38%) !important; stroke: none !important; }
+.signature-growth__foundation-node[data-state="blocked"] .signature-growth__state-symbol path { stroke: var(--warning) !important; }
+.signature-growth__state-question { fill: var(--text-secondary) !important; font-size: 10px !important; font-weight: 800 !important; }
+.signature-growth__foundation-label { fill: var(--text-primary) !important; font-size: 12px !important; font-weight: 750 !important; }
+.signature-growth__foundation-state { fill: var(--text-muted) !important; font-size: 8.5px !important; letter-spacing: 0.08em !important; text-transform: uppercase; }
+
+.signature-growth__shoot { stroke: var(--intelligence) !important; stroke-width: 2.8 !important; }
+.signature-growth__leaf { fill: rgb(185 237 102 / 22%) !important; stroke: var(--intelligence) !important; stroke-width: 1.6 !important; }
+.signature-growth__foundation-bracket { stroke: rgb(185 237 102 / 44%) !important; stroke-dasharray: 1 5; }
+.signature-growth__foundation-title { fill: var(--intelligence) !important; font-size: 9px !important; font-weight: 750 !important; letter-spacing: 0.16em !important; }
+
+.signature-growth__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem 1rem;
+  margin: -0.1rem 0 0;
+  padding: 0.45rem 0.9rem 0.8rem;
+  color: var(--text-muted);
+  font: 650 0.62rem var(--font-system);
+  letter-spacing: 0.045em;
+  list-style: none;
+  text-transform: uppercase;
+}
+.signature-growth__legend li { display: inline-flex; align-items: center; gap: 0.38rem; }
+.signature-growth__legend li span { width: 0.6rem; aspect-ratio: 1; border: 1.5px solid var(--text-secondary); border-radius: 50%; }
+.signature-growth__legend li[data-state="confirmed"] span { border: 2px solid var(--intelligence); background: rgb(185 237 102 / 28%); }
+.signature-growth__legend li[data-state="emerging"] span { border-color: var(--intelligence); border-style: dashed; background: linear-gradient(90deg, rgb(185 237 102 / 34%) 50%, transparent 50%); }
+.signature-growth__legend li[data-state="unknown"] span { border-style: dotted; }
+.signature-growth__legend li[data-state="blocked"] span { border-color: var(--warning); background: linear-gradient(45deg, transparent 43%, var(--warning) 44% 55%, transparent 56%); }
 
 @media (min-width: 880px) {
   .foundation-decision-groups > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -583,8 +633,8 @@
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-  .living-story .scroll-story__chapter { min-height: 27dvh; }
-  .signature-growth { min-height: 25rem; }
+  .living-story .scroll-story__chapter { min-height: 24dvh; }
+  .signature-growth { min-height: 24rem; }
 }
 
 .discovery-change-summary {
@@ -670,11 +720,40 @@
   .signature-growth svg { max-height: none; }
 }
 
+@media (max-width: 767px) {
+  .living-story__layout { display: block; }
+  .scroll-story__visual-column { min-height: 0; }
+  .living-story .scroll-story__visual { position: relative; top: auto; max-height: none; }
+  .living-story .scroll-story__chapters {
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+  .living-story .scroll-story__chapter,
+  .living-story .scroll-story__chapter:last-child { min-height: 0; border: 1px solid var(--line-default); scroll-snap-align: none; }
+  .living-story .scroll-story__chapter-control { min-height: 10.5rem; height: auto; align-content: center; padding: 1.35rem; }
+  .living-story .scroll-story__chapter:not([data-active="true"]) .scroll-story__chapter-control { opacity: 0.82; }
+  .signature-growth { min-height: 20rem; padding-inline: 0; }
+  .signature-growth svg { max-height: none; }
+  .signature-growth__foundation-label { font-size: 9px !important; }
+  .signature-growth__foundation-state { font-size: 6.5px !important; }
+  .signature-growth__legend { gap: 0.45rem 0.75rem; font-size: 0.56rem; }
+}
+
 @keyframes action-spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
   .ui-button__spinner { animation-duration: 1.4s; }
   .generation-workspace__truth > span { animation: none; border-right-color: var(--intelligence); }
   .living-story .scroll-story__visual { position: relative; top: auto; max-height: none; }
+  .living-story .scroll-story__chapter { min-height: 0; }
+  .living-story .scroll-story__chapter-control { min-height: 0; padding-block: 1.1rem; }
   .signature-growth svg [data-level] { opacity: 1; transition: none; }
+  .signature-growth svg [data-growth-path] { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .signature-growth__fragments g { opacity: 0.14; }
 }

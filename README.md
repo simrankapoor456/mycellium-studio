@@ -84,7 +84,7 @@ The proposal layer cannot write application data. The Decision Layer owns authen
 - **Mycel Core:** AI proposals, product decisions, and deterministic execution have separate authority.
 - **Reliable mode:** missing or invalid provider output falls back safely without changing the product contract.
 - **Product Blueprint:** architecture, requirements, work structure, and exports remain editable and versioned.
-- **Living interface:** a 12-beat product story, intelligent Foundation Map, architecture reveal, calm workspace shell, reduced motion, and responsive composition form one coherent system.
+- **Living interface:** a nine-stage Seed-to-Foundation story, intelligent Foundation Map, architecture reveal, calm workspace shell, reduced motion, and responsive composition form one coherent system.
 
 ## Technology
 
@@ -170,6 +170,9 @@ legacy-static/               Preserved pre-Next.js prototype
 - [Phase 7.1 review](docs/phase-7-1-review.md)
 - [Phase 7.2 review](docs/phase-7-2-review.md)
 - [Phase 8 Mycelium Experience](docs/phase-8-mycelium-experience.md)
+- [Phase 9A Signature Growth](docs/phase-9a-signature-growth.md)
+- [Phase 9A Storyboard](docs/phase-9a-storyboard.md)
+- [Phase 9A Motion System](docs/phase-9a-motion-system.md)
 - [Discovery control model](docs/discovery-control-model.md)
 - [Living Foundation Map](docs/living-foundation-map.md)
 - [Signature Growth Story](docs/signature-growth-story.md)
@@ -196,7 +199,7 @@ legacy-static/               Preserved pre-Next.js prototype
 
 ## Project status
 
-Implemented: the complete personal-user journey from authentication through controlled discovery, grouped foundation review, approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; resilient form validation and draft recovery; and the Mycelium Experience across public storytelling, the Living Foundation Map, architecture, Blueprint, and dashboard surfaces.
+Implemented: the complete personal-user journey from authentication through controlled discovery, grouped foundation review, approval, blueprint generation, editing, and export; Mycel Core boundaries; Reliable mode; the living identity and application shell; resilient form validation and draft recovery; the Phase 9A Seed-to-Foundation public story; and the Mycelium Experience across the Living Foundation Map, architecture, Blueprint, and dashboard surfaces.
 
 Active development: advanced reasoning visualization, Blueprint Studio, and Living Workspace remain later milestones.
 

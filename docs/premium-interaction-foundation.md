@@ -109,12 +109,16 @@ Rejected for the current system:
 - GSAP has no React peer dependency. Lenis declares optional React support for React 17 and newer, which includes the current React 19 application.
 - The installed Next.js, React, and React DOM versions remain aligned.
 - No installed package was reported as deprecated. `npm outdated` reports newer major releases for `@types/node`, ESLint, and TypeScript; they are not interaction-system blockers and should be reviewed in a separate upgrade task.
-- The existing audit finding is two moderate nested PostCSS advisories. Do not apply a forced breaking upgrade as part of interaction preparation.
+- The latest required `npm install` reported three high-severity advisories in the existing dependency tree. Phase 9A does not force-upgrade unrelated packages; review them in a dedicated dependency and security task.
 
-## Phase 8 implementation
+## Phase 9A signature implementation
 
-The signature story uses `ScrollTrigger` for meaningful chapter boundaries and a scrubbed environmental response. It is dynamically composed from the public route and remains semantically complete during server rendering. The Living Foundation Map uses a one-time scoped path reveal because the connection sequence explains evidence formation. Both owners use local refs, `useGSAP`, `gsap.matchMedia()`, and complete cleanup.
+The public signature story uses one paused GSAP master timeline for fragment convergence, structural seed opening, path-length root drawing, evidence branching, mycelium connection, and Foundation stabilization. One ScrollTrigger scrubs the timeline, chapter triggers update semantic state at forward and reverse boundaries, and a separate desktop trigger pins the visual from 1024 pixels. Mobile does not create the GSAP story timeline or pin. Reduced motion renders the full Foundation immediately.
 
-Lenis starts only inside `MarketingMotionProvider`, forwards scroll events to `ScrollTrigger.update`, advances from the GSAP ticker, and removes its ticker callback before destruction. Inputs, textareas, selects, dialogs, and native-scroll regions remain outside its control. The production manifest keeps its unchanged 18,410-byte raw chunk out of protected routes.
+The story is dynamically composed from the public route and remains semantically complete before enhancement. The Living Foundation Map retains its one-time scoped path reveal because connection sequence carries authenticated product meaning. Both owners use local refs, `useGSAP`, `gsap.matchMedia()`, and complete cleanup.
 
-Verification covers native and enhanced versions at 375, 768, 1024, and 1440 pixels; keyboard navigation; reduced motion; anchors; zoom; mobile flow; reverse story movement; midway refresh; console output; hydration output; and nested overflow. Physical-device and representative assistive-software checks remain release work.
+Lenis starts only inside `MarketingMotionProvider`, forwards scroll events to `ScrollTrigger.update`, advances from the GSAP ticker, and removes its ticker callback before destruction. Inputs, textareas, selects, dialogs, and native-scroll regions remain outside its control. It remains a separate public-only runtime and is not imported by protected layouts.
+
+Focused coverage protects deterministic root geometry, the nine-stage Foundation stop, forward and reverse semantics, reduced motion, desktop pinning, mobile flow, cleanup, protected-route isolation, anchors, calls to action, keyboard access, console and hydration errors, and page overflow. Physical-device and representative assistive-software checks remain release work.
+
+Phase 9A adds no runtime dependency, raster sequence, video, canvas, or WebGL. The inline SVG is larger than the former reveal graphic, but it produces no separate asset request and runs no idle loop. The current Turbopack output does not expose stable feature-level gzip attribution, so no exact transfer delta is claimed.

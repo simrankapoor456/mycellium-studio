@@ -1,57 +1,62 @@
 # Signature Growth Story
 
-## Narrative
+The public signature story is the Phase 9A Seed-to-Foundation experience. It replaces the former 12-beat reveal that continued through architecture, Blueprint, execution, value, and renewal.
 
-The public experience follows one product cycle through 12 configured beats:
+## Canonical narrative
+
+The nine configured stages are:
 
 1. Fragmented input
-2. Seed of intent
-3. First root
-4. Evidence branching
-5. Questions and constraints
-6. Mycelium connections
-7. Foundation stabilization
-8. Architecture emergence
-9. Blueprint formation
-10. Execution branches
-11. Visible product value
-12. New seed
+2. Signal attraction
+3. Seed of intent
+4. Germination
+5. First root
+6. Evidence branching
+7. Mycelium connections
+8. Foundation areas
+9. Foundation stabilized
 
-Each beat has a stable id, label, title, description, artifact, and visual level in `lib/marketing/signature-experience.ts`.
+Stable ids, labels, copy, artifacts, and levels live in `lib/marketing/signature-experience.ts`. Deterministic fragments, root paths, parent relationships, nodes, and states live in `lib/marketing/signature-growth.ts`.
 
-## Rendering architecture
+## Rendering
 
-`ScrollProductNarrative` is dynamically composed from the public route. It renders the complete ordered narrative, a skip link, a visual caption, and the deterministic `SignatureGrowthVisual`. The SVG begins with separated context blocks, grows a central seed and evidence roots, preserves open questions, stabilizes a reviewed boundary, forms architecture and a Blueprint, branches into work, shows visible value, and returns learning as a new seed.
+`ScrollProductNarrative` renders the semantic story and owns GSAP. `SignatureGrowthVisual` renders one original inline SVG organism, a DOM Foundation-state legend, and an accessible text summary.
 
-The visual uses only DOM and SVG. It adds no generated frame sequence, raster asset, video, canvas, WebGL, or continuous idle renderer.
+The SVG contains:
 
-## Desktop and tablet
+- restrained soil strata and fixed grain
+- seven labeled source fragments
+- a bounded attraction field
+- independent left and right seed shells
+- crack and radicle paths
+- one primary root
+- seven child evidence branches
+- five later mycelium connections
+- seven Foundation nodes with confirmed, emerging, unknown, and blocked states
+- a small final shoot and Foundation review handoff
 
-At 768 pixels and wider, the visual remains sticky while native document chapters control its state. `IntersectionObserver` provides semantic chapter selection and `ScrollTrigger` keeps forward and reverse boundaries consistent. A scrubbed environmental timeline adjusts only transform, opacity, and border color.
+No uploaded reference image, raster sequence, video, canvas, or WebGL asset is part of production.
 
-Tablet reduces chapter height so the narrative requires less travel. The visual remains primary without creating a scroll lock.
+## Motion and scroll
 
-## Mobile
+At 768 pixels and wider, a single GSAP timeline is scrubbed by ScrollTrigger. Root geometry draws through normalized dash offsets, and reverse scrolling rewinds the same path sequence. Chapter triggers update state at meaningful forward and reverse boundaries.
 
-Below 640 pixels, the visual returns to normal document flow and the chapters become a vertical, snap-free sequence. There is no long pinned range, horizontal carousel, or blank scroll region. Each chapter remains a normal button for direct keyboard or touch selection.
+At 1024 pixels and wider, the visual receives one scoped ScrollTrigger pin. Tablet keeps a shorter progress range without that desktop pin. Mobile uses normal vertical document flow and no GSAP story timeline. Reduced motion renders the complete final Foundation immediately without pinning or spatial scrub.
 
-## Reduced motion
+Every trigger and timeline is scoped through `useGSAP`, killed or reverted on cleanup, and created only inside `gsap.matchMedia()` conditions.
 
-Reduced motion selects the final level after the first frame, displays all SVG layers, removes sticky positioning, and disables GSAP spatial movement. The ordered copy and accessible visual summary remain complete.
+## Product alignment
 
-## GSAP and cleanup
+The final labels match the authenticated Foundation Map: Users, Problem, Outcome, Evidence, Scope, Feasibility, and Risks. Public state styling includes wording and shape, so color is never the only signal.
 
-- Imports come only from `lib/motion/gsap-client.ts`.
-- Every selector is scoped to the section or visual ref.
-- `useGSAP` owns all timelines.
-- `gsap.matchMedia()` contains desktop and motion-preference branches.
-- Chapter triggers, the story trigger, match media, and local timelines are killed or reverted on cleanup.
-- React state changes only at meaningful beat boundaries, never on every animation frame.
+The story stops at a reviewable Foundation. Phase 9B can continue from these nodes into architecture, but Phase 9A contains no architecture or Blueprint transformation.
 
-## Lenis boundary
+## Runtime boundaries
 
-`MarketingMotionProvider` is the single public owner. Lenis is dynamically imported, synchronized with ScrollTrigger through the GSAP ticker, and destroyed with that ticker on unmount. Reduced motion prevents startup. Touch synchronization stays disabled. Inputs, textareas, selects, dialogs, and native overflow regions opt out. No protected route imports or mounts the provider.
+Lenis remains owned only by the public `MarketingMotionProvider`, synchronized with ScrollTrigger, disabled for reduced motion, and absent from protected routes. The adapted React Bits SplitText utility remains limited to the final public call to action and is not used by this scene.
 
-## Validation
+See:
 
-Automated browser checks cover forward movement, reverse movement, midway refresh, reduced motion, required widths, zoom-equivalent layout, keyboard focus, anchor navigation, console output, hydration output, and page-level overflow. Physical-device touch and representative assistive-software checks remain release work.
+- [Phase 9A implementation](./phase-9a-signature-growth.md)
+- [Storyboard interpretation](./phase-9a-storyboard.md)
+- [Motion system](./phase-9a-motion-system.md)

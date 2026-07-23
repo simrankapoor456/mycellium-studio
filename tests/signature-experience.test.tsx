@@ -26,11 +26,11 @@ describe("signature Product Graph", () => {
     render(<ScrollProductNarrative />);
 
     const idea = screen.getByRole("button", { name: /Fragmented input/ });
-    const architecture = screen.getByRole("button", { name: /Architecture emergence/ });
+    const foundation = screen.getByRole("button", { name: /Foundation stabilized/ });
 
     expect(idea).toHaveAttribute("aria-pressed", "true");
-    await user.click(architecture);
-    expect(architecture).toHaveAttribute("aria-pressed", "true");
+    await user.click(foundation);
+    expect(foundation).toHaveAttribute("aria-pressed", "true");
   });
 });
 

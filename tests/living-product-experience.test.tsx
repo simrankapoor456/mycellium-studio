@@ -9,16 +9,16 @@ import { signatureStoryStages } from "@/lib/marketing/signature-experience";
 import { calculateReadiness, createInitialDiscoveryContext } from "@/lib/discovery/engine";
 
 describe("Living Product Experience", () => {
-  it("tells the complete product cycle with static accessible copy", () => {
+  it("tells the complete seed-to-Foundation story with static accessible copy", () => {
     render(<ScrollProductNarrative />);
 
-    expect(signatureStoryStages).toHaveLength(12);
+    expect(signatureStoryStages).toHaveLength(9);
     expect(signatureStoryStages.map((stage) => stage.label)).toEqual([
-      "Fragmented input", "Seed of intent", "First root", "Evidence branching", "Questions and constraints", "Mycelium connections",
-      "Foundation stabilization", "Architecture emergence", "Blueprint formation", "Execution branches", "Visible product value", "New seed",
+      "Fragmented input", "Signal attraction", "Seed of intent", "Germination", "First root", "Evidence branching",
+      "Mycelium connections", "Foundation areas", "Foundation stabilized",
     ]);
-    expect(screen.getByRole("list", { name: "Living product story" })).toBeVisible();
-    expect(screen.getByRole("button", { name: /New seed/ })).toBeVisible();
+    expect(screen.getByRole("list", { name: "Seed to Foundation story" })).toBeVisible();
+    expect(screen.getByRole("button", { name: /Foundation stabilized/ })).toBeVisible();
   });
 
   it("keeps the story progressive, scoped, and reduced-motion aware", () => {
