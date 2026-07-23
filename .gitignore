@@ -10,6 +10,7 @@ coverage/
 playwright-report/
 test-results/
 blob-report/
+output/playwright/
 
 # Local environment files
 .env
@@ -25,6 +26,8 @@ npm-debug.log*
 
 # Deployment
 .vercel/
+.supabase/
+supabase/.temp/
 
 # Operating systems and editors
 .DS_Store
