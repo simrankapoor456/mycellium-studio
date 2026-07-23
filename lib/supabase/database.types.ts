@@ -136,7 +136,7 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Omit<ProjectRow, "id" | "created_at">>;
+        Update: Partial<Omit<ProjectRow, "id" | "user_id" | "created_at" | "updated_at">>;
         Relationships: [];
       };
       discovery_messages: {
@@ -163,12 +163,8 @@ export type Database = {
           request_id: string;
           project_id: string;
           user_id: string;
-          status?: string;
-          response_payload?: Json | null;
-          created_at?: string;
-          updated_at?: string;
         };
-        Update: Partial<Pick<DiscoveryRequestRow, "status" | "response_payload" | "updated_at">>;
+        Update: Partial<Pick<DiscoveryRequestRow, "status" | "response_payload">>;
         Relationships: [];
       };
       workflow_requests: {
@@ -179,12 +175,8 @@ export type Database = {
           operation: string;
           project_id: string;
           user_id: string;
-          status?: string;
-          response_payload?: Json | null;
-          created_at?: string;
-          updated_at?: string;
         };
-        Update: Partial<Pick<WorkflowRequestRow, "status" | "response_payload" | "updated_at">>;
+        Update: Partial<Pick<WorkflowRequestRow, "status" | "response_payload">>;
         Relationships: [];
       };
     };

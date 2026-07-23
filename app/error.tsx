@@ -7,7 +7,7 @@ import { Button, ButtonLink } from "@/components/ui/Button";
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    console.error("A route failed to render.", error);
+    console.error("A route failed to render.", { digest: error.digest ?? "unavailable" });
   }, [error]);
 
   return (

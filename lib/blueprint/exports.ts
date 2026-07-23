@@ -1,6 +1,7 @@
 import { ProductBlueprintSchema, type ProductBlueprint } from "@/lib/domain/blueprint/schemas";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
 import { getProductTypeLabel } from "@/lib/domain/project/labels";
+import { toCsvCell } from "@/lib/security/csv";
 
 export type BlueprintExportFormat = "markdown" | "json" | "csv";
 
@@ -44,15 +45,11 @@ export function blueprintToCsv(input: ProductBlueprint): string {
   blueprint.tasks.forEach((item) => add("task", item, item.storyId));
   blueprint.sprintPlan.forEach((item) => add("sprint", item));
   blueprint.risks.forEach((item) => add("risk", item));
-  return rows.map((row) => row.map(csvCell).join(",")).join("\n");
+  return rows.map((row) => row.map(toCsvCell).join(",")).join("\n");
 }
 
 function lineageLine(item: { lineage: { factIds: string[]; sourceMessageIds: string[]; source: string } }) {
   return `Lineage: ${item.lineage.source}; facts ${item.lineage.factIds.join(", ") || "none"}; messages ${item.lineage.sourceMessageIds.join(", ") || "none"}.`;
-}
-
-function csvCell(value: string | number) {
-  return `"${String(value).replaceAll('"', '""')}"`;
 }
 
 function listOrNone(items: readonly string[]): string[] {

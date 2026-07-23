@@ -16,6 +16,7 @@ import {
   type DiscoveryTurnResponse,
   type ReadinessAssessment,
 } from "@/lib/domain/discovery/schemas";
+import { readJsonResponseSafely, readTypedApiError } from "@/lib/errors/response";
 import { MYCELLIUM_COPY } from "@/lib/voice/mycellium";
 
 type Message = Readonly<{ id: string; role: string; content: string }>;
@@ -66,7 +67,12 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(action === "answer" ? { requestId, action, message } : { requestId, action }),
       });
-      const responseBody: unknown = await response.json();
+      const parsedResponse = await readJsonResponseSafely(response);
+      if (!parsedResponse.ok) {
+        requestFailure = "Discovery could not continue. Your answer is still here. Retry.";
+        throw new Error("Handled discovery response failure");
+      }
+      const responseBody = parsedResponse.body;
 
       if (!response.ok) {
         requestFailure = response.status === 401
@@ -121,7 +127,12 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
 
     try {
       const response = await fetch(`/api/projects/${projectId}/review`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
-      const body: unknown = await response.json();
+      const parsedResponse = await readJsonResponseSafely(response);
+      if (!parsedResponse.ok) {
+        requestFailure = "That graph change could not be saved. Your edit is still here. Retry.";
+        throw new Error("Handled graph response failure");
+      }
+      const body = parsedResponse.body;
       if (!response.ok) {
         requestFailure = response.status === 401
           ? "Your session expired. Sign in again, then retry. Your graph edit is still here."
@@ -190,6 +201,8 @@ export function DiscoveryWorkspace({ blueprintAvailable, foundationApproved = fa
 }
 
 function readErrorMessage(input: unknown, fallback: string): string {
-  if (typeof input === "object" && input !== null && "error" in input && typeof input.error === "string") return input.error;
-  return fallback;
+  if (typeof input === "object" && input !== null && "error" in input && typeof input.error === "string") {
+    return input.error;
+  }
+  return readTypedApiError(input, fallback).message;
 }

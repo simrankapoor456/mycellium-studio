@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { BLUEPRINT_INTERRUPTED_MESSAGE } from "@/lib/errors/response";
+import { parseProjectId, readSecureJsonBody } from "@/lib/http/secure-api";
 import { orchestrateBlueprintEdit, orchestrateBlueprintGeneration } from "@/lib/mycel-core/orchestration";
 import { logBlueprintGeneration, safeGenerationErrorCode } from "@/lib/mycel-core/generation-logging";
 import type { CoreOutcome } from "@/lib/mycel-core/types";
@@ -23,11 +24,14 @@ async function handleBlueprintRequest(
   let requestId: string | null = null;
   try {
     const { id } = await params;
-    const body = await readJson(request);
-    requestId = readRequestId(body);
+    const projectId = parseProjectId(id);
+    if (!projectId.ok) return projectId.response;
+    const parsedBody = await readSecureJsonBody(request);
+    if (!parsedBody.ok) return parsedBody.response;
+    requestId = readRequestId(parsedBody.value);
     const outcome = operation === "generation"
-      ? await orchestrateBlueprintGeneration(id, body)
-      : await orchestrateBlueprintEdit(id, body);
+      ? await orchestrateBlueprintGeneration(projectId.value, parsedBody.value)
+      : await orchestrateBlueprintEdit(projectId.value, parsedBody.value);
 
     if (outcome.ok) {
       logBlueprintGeneration("response_completion", { operation, requestId, status: 200 });
@@ -56,14 +60,6 @@ async function handleBlueprintRequest(
         retryable: true,
       },
     }, { status: 500 });
-  }
-}
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json();
-  } catch {
-    return null;
   }
 }
 

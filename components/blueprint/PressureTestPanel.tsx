@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { PressureTestSchema, type PressureTest } from "@/lib/domain/pressure-test/schemas";
+import { readJsonResponseSafely, readTypedApiError } from "@/lib/errors/response";
 
 type PressureTestPanelProps = Readonly<{
   initialPressureTest: PressureTest | null;
@@ -22,7 +23,9 @@ export function PressureTestPanel({ initialPressureTest, projectId, onUpdated }:
 
     try {
       const response = await fetch(`/api/projects/${projectId}/pressure-test`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId: crypto.randomUUID() }) });
-      const responseBody: unknown = await response.json();
+      const parsedResponse = await readJsonResponseSafely(response);
+      if (!parsedResponse.ok) throw new Error("Pressure Test could not be completed.");
+      const responseBody = parsedResponse.body;
       if (!response.ok) throw new Error(readError(responseBody));
       const result = PressureTestSchema.parse(responseBody);
       setPressureTest(result);
@@ -50,5 +53,5 @@ function PressureList({ items, title }: { items: readonly string[]; title: strin
 
 function readError(input: unknown): string {
   if (typeof input === "object" && input !== null && "error" in input && typeof input.error === "string") return input.error;
-  return "Pressure Test could not be completed.";
+  return readTypedApiError(input, "Pressure Test could not be completed.").message;
 }

@@ -1,5 +1,6 @@
 import { getStories } from "@/lib/domain/plan/selectors";
 import type { PlanOutput } from "@/lib/domain/plan/schemas";
+import { toCsvCell } from "@/lib/security/csv";
 
 type CsvValue = string | number;
 
@@ -33,8 +34,4 @@ export function planToCsv(plan: PlanOutput): string {
   }
 
   return rows.map((row) => row.map(toCsvCell).join(",")).join("\n");
-}
-
-function toCsvCell(value: CsvValue): string {
-  return `"${String(value).replaceAll('"', '""')}"`;
 }

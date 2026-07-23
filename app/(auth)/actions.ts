@@ -6,7 +6,7 @@ import { validationActionState, type ActionState } from "@/lib/actions/action-st
 import { getSafeReturnPath } from "@/lib/auth/return-path";
 import { LoginSchema, SignupSchema } from "@/lib/auth/schemas";
 import { getServerEnvironment } from "@/lib/env/server";
-import { classifySafeError, toAuthErrorMessage } from "@/lib/errors/safe-error";
+import { classifySafeError, isAccountExistenceError, toAuthErrorMessage } from "@/lib/errors/safe-error";
 import { createClient } from "@/lib/supabase/server";
 
 export async function loginAction(
@@ -61,6 +61,9 @@ export async function signupAction(
   });
 
   if (error) {
+    if (isAccountExistenceError(error)) {
+      return confirmationPendingState();
+    }
     return authActionFailure(error);
   }
 
@@ -68,6 +71,10 @@ export async function signupAction(
     redirect(returnPath);
   }
 
+  return confirmationPendingState();
+}
+
+function confirmationPendingState(): ActionState {
   return {
     status: "success",
     message: "Check your email to confirm your account, then sign in.",

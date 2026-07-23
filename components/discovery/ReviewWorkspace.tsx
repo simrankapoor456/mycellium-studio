@@ -64,7 +64,12 @@ export function ReviewWorkspace({ blueprintAvailable, initialContext, initialRea
     let requestFailure = "";
     try {
       const response = await fetch(`/api/projects/${projectId}/review`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const body: unknown = await response.json();
+      const parsedResponse = await readJsonResponseSafely(response);
+      if (!parsedResponse.ok) {
+        requestFailure = "That review change could not be saved. Your edit is still here. Retry.";
+        throw new Error("Handled review response failure");
+      }
+      const body = parsedResponse.body;
       if (!response.ok) {
         if (response.status === 401) { const message = "Your session expired. Sign in again, then retry. Your review edit is still here."; setError(message); setMutationFeedback(targetId ? { targetId, status: "error", message } : null); return; }
         if (response.status === 403) { const message = "You do not have permission to change this foundation."; setError(message); setMutationFeedback(targetId ? { targetId, status: "error", message } : null); return; }
@@ -178,5 +183,8 @@ function readReviewFailure(input: unknown): Readonly<{ error: string; details: F
 }
 
 function readErrorMessage(input: unknown, fallback: string): string {
-  return typeof input === "object" && input !== null && "error" in input && typeof input.error === "string" ? input.error : fallback;
+  if (typeof input === "object" && input !== null && "error" in input && typeof input.error === "string") {
+    return input.error;
+  }
+  return readTypedApiError(input, fallback).message;
 }

@@ -17,7 +17,7 @@ describe("safe error mapping", () => {
   it("maps account, provider, and rate boundaries without returning provider text", () => {
     expect(toAuthErrorMessage({ code: "email_address_invalid", message: "internal" })).toBe("Enter a valid email address.");
     expect(toAuthErrorMessage({ code: "email_not_confirmed" })).toBe("Confirm your email before signing in.");
-    expect(toAuthErrorMessage({ code: "email_exists" })).toBe("An account with this email already exists.");
+    expect(toAuthErrorMessage({ code: "email_exists" })).toBe("We could not complete that request. Please try again.");
     expect(toAuthErrorMessage({ code: "weak_password" })).toBe("Choose a stronger password and try again.");
     expect(toAuthErrorMessage({ code: "signup_disabled" })).toBe("New account creation is currently unavailable.");
     expect(toAuthErrorMessage({ code: "provider_disabled" })).toBe("Email sign-in is currently unavailable.");

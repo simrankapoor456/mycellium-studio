@@ -84,10 +84,6 @@ export function toAuthErrorMessage(error: unknown): string {
     return "Confirm your email before signing in.";
   }
 
-  if (code === "user_already_exists" || code === "email_exists") {
-    return "An account with this email already exists.";
-  }
-
   if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit") {
     return "Too many attempts. Wait a moment and try again.";
   }
@@ -109,6 +105,12 @@ export function toAuthErrorMessage(error: unknown): string {
   }
 
   return "We could not complete that request. Please try again.";
+}
+
+export function isAccountExistenceError(error: unknown): boolean {
+  const candidate = asErrorLike(error);
+  const code = typeof candidate.code === "string" ? candidate.code : "";
+  return code === "user_already_exists" || code === "email_exists";
 }
 
 export function toProjectErrorMessage(error: unknown): string {
